@@ -1,0 +1,30 @@
+service: cvs-tsk-update-store
+
+provider:
+  name: aws
+  runtime: nodejs10.12
+  tracing: true # enable tracing
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "xray:PutTraceSegments"
+        - "xray:PutTelemetryRecords"
+      Resource:
+        - "*"
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+  - serverless-plugin-tracing
+
+functions:
+  main:
+    handler: src/handler.handler
+    events:
+    - sqs:
+        arn: arn:aws:sqs:region:XXXXXX:update-store-q
+        batchSize: 10
+
+custom:
+  serverless-offline:
+    port: 3012
