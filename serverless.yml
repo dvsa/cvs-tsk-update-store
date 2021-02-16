@@ -2,15 +2,19 @@ service: cvs-tsk-update-store
 
 provider:
   name: aws
-  runtime: nodejs10.12
-  tracing: true # enable tracing
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action:
-        - "xray:PutTraceSegments"
-        - "xray:PutTelemetryRecords"
-      Resource:
-        - "*"
+  runtime: nodejs10.x
+  tracing:
+    lambda: "true"
+  lambdaHashingVersion: 20201221
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "xray:PutTraceSegments"
+            - "xray:PutTelemetryRecords"
+          Resource:
+            - "*"
 
 plugins:
   - serverless-plugin-typescript
