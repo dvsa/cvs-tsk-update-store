@@ -7,7 +7,7 @@
       "messageAttributes": {},
       "md5OfBody": "9586727cbc9f3312542387099b60982c",
       "eventSource": "aws:sqs",
-      "eventSourceARN": "arn:aws:sqs:eu-west-2:006106226016:cert-gen-q",
+      "eventSourceARN": "arn:aws:sqs:eu-west-2:000000000000:update-store-q",
       "awsRegion": "eu-west-2"
     },
     {
@@ -17,7 +17,7 @@
       "messageAttributes": {},
       "md5OfBody": "d6e05307ba89b78b88d4c627024c93d4",
       "eventSource": "aws:sqs",
-      "eventSourceARN": "arn:aws:sqs:eu-west-2:006106226016:cert-gen-q",
+      "eventSourceARN": "arn:aws:sqs:eu-west-2:000000000000:update-store-q",
       "awsRegion": "eu-west-2"
     },
     {
@@ -27,7 +27,7 @@
       "messageAttributes": {},
       "md5OfBody": "9586727cbc9f3312542387099b60982c",
       "eventSource": "aws:sqs",
-      "eventSourceARN": "arn:aws:sqs:eu-west-2:006106226016:cert-gen-q",
+      "eventSourceARN": "arn:aws:sqs:eu-west-2:000000000000:update-store-q",
       "awsRegion": "eu-west-2"
     },
     {
@@ -37,7 +37,7 @@
       "messageAttributes": {},
       "md5OfBody": "b6e05307ba89b78b88d4c627024c93d7",
       "eventSource": "aws:sqs",
-      "eventSourceARN": "arn:aws:sqs:eu-west-2:006106226016:cert-gen-q",
+      "eventSourceARN": "arn:aws:sqs:eu-west-2:000000000000:update-store-q",
       "awsRegion": "eu-west-2"
     }
   ]
