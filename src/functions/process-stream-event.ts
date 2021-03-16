@@ -42,7 +42,7 @@ const selectImage = (operationType: KnownOperationType, streamRecord: StreamReco
         case "DELETE":
             return DynamoDbImage.parse(streamRecord.OldImage!);
     }
-}
+};
 
 const selectSql = (operationType: KnownOperationType, entity: DatabaseEntity): SqlStatement => {
     switch (operationType) {
@@ -53,37 +53,37 @@ const selectSql = (operationType: KnownOperationType, entity: DatabaseEntity): S
         case "DELETE":
             return entity.deleteStatement();
     }
-}
+};
 
 const validateEvent = (event: DynamoDBStreamEvent): void => {
     if (!event) {
-        throw new Error('event is null or undefined');
+        throw new Error("event is null or undefined");
     }
 
     if (!event.Records) {
-        throw new Error('missing required field event.Records');
+        throw new Error("missing required field event.Records");
     }
 
     if (!Array.isArray(event.Records)) {
-        throw new Error('event.Records is not an array');
+        throw new Error("event.Records is not an array");
     }
-}
+};
 
 const validateRecord = (record: DynamoDBRecord): void => {
     if (!record.eventName) {
-        throw new Error('record is missing required field \'eventName\'');
+        throw new Error("record is missing required field \'eventName\'");
     }
 
     if (!record.dynamodb) {
-        throw new Error('record is missing required field \'dynamodb\'');
+        throw new Error("record is missing required field \'dynamodb\'");
     }
 
     if (!record.eventSourceARN) {
-        throw new Error('record is missing required field \'eventSourceARN\'');
+        throw new Error("record is missing required field \'eventSourceARN\'");
     }
-}
+};
 
 const dumpArguments = (event: DynamoDBStreamEvent, context: Context): void => {
-    console.error('Event dump  : ', JSON.stringify(event));
-    console.error('Context dump: ', JSON.stringify(context));
-}
+    console.error("Event dump  : ", JSON.stringify(event));
+    console.error("Context dump: ", JSON.stringify(context));
+};

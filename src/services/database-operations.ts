@@ -10,17 +10,20 @@ import util from "util";
 import {DB_OPERATIONS} from "../handler";
 
 export interface DatabaseEntity {
-    tableName: string,
-    databaseName: () => DbName
-    insertStatement: () => SqlStatement
-    updateStatement: () => SqlStatement
-    deleteStatement: () => SqlStatement
-    sqlParameters: () => SqlParametersList
+    tableName: string;
+    databaseName: () => DbName;
+    insertStatement: () => SqlStatement;
+    updateStatement: () => SqlStatement;
+    deleteStatement: () => SqlStatement;
+    sqlParameters: () => SqlParametersList;
 }
 
+/**
+ * placeholder
+ */
 export class DatabaseOperations extends RDSDataService {
 
-    executeStatementPromise: (request: ExecuteStatementRequest) => Promise<ExecuteStatementResponse>;
+    public executeStatementPromise: (request: ExecuteStatementRequest) => Promise<ExecuteStatementResponse>;
 
     constructor() {
         super();
@@ -36,4 +39,4 @@ export const executeStatement = async (sql: SqlStatement, entity: DatabaseEntity
         database: entity.databaseName(),
         parameters: entity.sqlParameters(),
     });
-}
+};

@@ -6,8 +6,8 @@ export const stringValue = (name: ParameterName, value: string): SqlParameter =>
         value: {
             stringValue: value
         }
-    }
-}
+    };
+};
 
 export const longValue = (name: ParameterName, value: number): SqlParameter => {
     return {
@@ -15,5 +15,5 @@ export const longValue = (name: ParameterName, value: number): SqlParameter => {
         value: {
             longValue: value
         }
-    }
-}
+    };
+};

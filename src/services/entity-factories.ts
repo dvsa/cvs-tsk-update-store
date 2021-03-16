@@ -10,8 +10,8 @@ export const getEntityFactory = (tableName: string): EntityFactory => {
     const entityFactory: ((image: DynamoDbImage) => DatabaseEntity) | undefined = entityFactories.get(tableName);
 
     if (!entityFactory) {
-        throw new Error(`no entity factory for table '${tableName}'`);
+        throw new Error(`no entity factory for table "${tableName}"`);
     }
 
     return entityFactory;
-}
+};
