@@ -1,0 +1,11 @@
+{
+  "StringsField": {
+    "SS": ["Giraffe", "Hippo" ,"Zebra"]
+  },
+  "NumbersField": {
+    "NS": ["42.2", "-19", "7.5", "3.14"]
+  },
+  "BinariesField": {
+    "BS": ["U3Vubnk=", "UmFpbnk=", "U25vd3k="]
+  }
+}

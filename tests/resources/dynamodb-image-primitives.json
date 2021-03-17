@@ -1,0 +1,17 @@
+{
+  "NullField": {
+    "NULL": null
+  },
+  "BooleanField": {
+    "BOOL": true
+  },
+  "NumberField": {
+    "N": "123.45"
+  },
+  "StringField": {
+    "S": "Hello"
+  },
+  "BinaryField": {
+    "B": "dGhpcyB0ZXh0IGlzIGJhc2U2NC1lbmNvZGVk"
+  }
+}

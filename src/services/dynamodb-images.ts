@@ -17,7 +17,7 @@ export class DynamoDbImage {
     private constructor(list: DynamoDbField[]) {
         this.fields = list.reduce(
             (map: Map<string, DynamoDbField>, field: DynamoDbField): Map<string, DynamoDbField> => {
-                map.set(field.key, field);
+                map.set(field.key!, field);
                 return map;
             },
             new Map()
@@ -33,20 +33,12 @@ export class DynamoDbImage {
         const fieldKeys = Object.keys(image);
 
         for (const fieldKey of fieldKeys) {
-            const value: AttributeValue = image[fieldKey];
-
-            const typeKeys = Object.keys(value);
-
-            if (typeKeys.length !== 1) {
-                throw new Error(`expected exactly 1 type key, found ${typeKeys.length} (${typeKeys})`);
-            }
-
-            const typeKey: DynamoDbType = typeKeys[0] as DynamoDbType;
+            const [typeKey, value] = typeValuePair(image[fieldKey]);
 
             fields.push({
                 key: fieldKey,
                 type: typeKey,
-                value: value[typeKey]
+                value
             });
         }
 
@@ -55,22 +47,11 @@ export class DynamoDbImage {
 
     /**
      * placeholder
-     * @param expectedType
-     * @param field
-     */
-    private static verifyType(expectedType: DynamoDbType, field: DynamoDbField) {
-        if (expectedType !== field.type) {
-            throw new Error(`field ${field.key} is not of type "${expectedType}" (actual: "${field.type}"`);
-        }
-    }
-
-    /**
-     * placeholder
      * @param key
      */
     public getNull(key: string): null {
         const field: DynamoDbField = this.getRequired(key);
-        DynamoDbImage.verifyType("NULL", field);
+        verifyType("NULL", field);
         return field.value as null;
     }
 
@@ -80,7 +61,7 @@ export class DynamoDbImage {
      */
     public getBoolean(key: string): boolean {
         const field: DynamoDbField = this.getRequired(key);
-        DynamoDbImage.verifyType("BOOL", field);
+        verifyType("BOOL", field);
         return field.value as boolean;
     }
 
@@ -90,7 +71,7 @@ export class DynamoDbImage {
      */
     public getString(key: string): string {
         const field: DynamoDbField = this.getRequired(key);
-        DynamoDbImage.verifyType("S", field);
+        verifyType("S", field);
         return field.value as string;
     }
 
@@ -100,7 +81,7 @@ export class DynamoDbImage {
      */
     public getStrings(key: string): string[] {
         const field: DynamoDbField = this.getRequired(key);
-        DynamoDbImage.verifyType("SS", field);
+        verifyType("SS", field);
         return field.value as string[];
     }
 
@@ -110,8 +91,8 @@ export class DynamoDbImage {
      */
     public getNumber(key: string): number {
         const field: DynamoDbField = this.getRequired(key);
-        DynamoDbImage.verifyType("N", field);
-        return field.value as number;
+        verifyType("N", field);
+        return parseFloat(field.value) as number;
     }
 
     /**
@@ -120,8 +101,8 @@ export class DynamoDbImage {
      */
     public getNumbers(key: string): number[] {
         const field: DynamoDbField = this.getRequired(key);
-        DynamoDbImage.verifyType("NS", field);
-        return field.value as number[];
+        verifyType("NS", field);
+        return field.value.map((f: any) => parseFloat(f)) as number[];
     }
 
     /**
@@ -130,8 +111,8 @@ export class DynamoDbImage {
      */
     public getBinary(key: string): Buffer {
         const field: DynamoDbField = this.getRequired(key);
-        DynamoDbImage.verifyType("B", field);
-        return Buffer.from(field.value, "base64");
+        verifyType("B", field);
+        return Buffer.from(field.value, "base64") as Buffer;
     }
 
     /**
@@ -140,35 +121,40 @@ export class DynamoDbImage {
      */
     public getBinaries(key: string): Buffer[] {
         const field: DynamoDbField = this.getRequired(key);
-        DynamoDbImage.verifyType("BS", field);
-        return field.value.map((e: string) => Buffer.from(e, "base64"));
+        verifyType("BS", field);
+        return field.value.map((e: string) => Buffer.from(e, "base64")) as Buffer[];
     }
 
     /**
      * placeholder
      * @param key
      */
-    public getMap(key: string): Map<string, any> {
+    public getMap(key: string): DynamoDbImage {
         const field: DynamoDbField = this.getRequired(key);
-        DynamoDbImage.verifyType("M", field);
-
-        const map: Map<string, any> = new Map();
-
-        for (const mapKey of Object.keys(field.value)) {
-            map.set(mapKey, field.value[mapKey]);
-        }
-
-        return map;
+        verifyType("M", field);
+        return DynamoDbImage.parse(field.value) as DynamoDbImage;
     }
 
     /**
      * placeholder
      * @param key
      */
-    public getList(key: string): any[] {
+    public getList(key: string): DynamoDbImage {
         const field: DynamoDbField = this.getRequired(key);
-        DynamoDbImage.verifyType("L", field);
-        return field.value as any[];
+        verifyType("L", field);
+        let index = 0;
+        return new DynamoDbImage(
+            field.value
+                .map((e: AttributeValue) => typeValuePair(e))
+                .map(([type, value]: [DynamoDbType, any]) => {
+                    return {
+                        key: "" + (index++),
+                        type,
+                        value
+                    } as DynamoDbField;
+                })
+        );
+        // return field.value as DynamoDbImage;
     }
 
     /**
@@ -185,3 +171,21 @@ export class DynamoDbImage {
         return field;
     }
 }
+
+const verifyType = (expectedType: DynamoDbType, field: DynamoDbField) => {
+    if (expectedType !== field.type) {
+        throw new Error(`field ${field.key} is not of type "${expectedType}" (actual: "${field.type}")`);
+    }
+};
+
+const typeValuePair = (value: AttributeValue): [DynamoDbType, any] => {
+    const typeKeys = Object.keys(value);
+
+    if (typeKeys.length !== 1) {
+        throw new Error(`expected exactly 1 type key, found ${typeKeys.length} (${typeKeys})`);
+    }
+
+    const typeKey: DynamoDbType = typeKeys[0] as DynamoDbType;
+
+    return [typeKey, value[typeKey]];
+};
