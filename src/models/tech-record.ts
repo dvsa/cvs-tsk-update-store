@@ -18,7 +18,7 @@ import {booleanParam, dateParam, integerParam, stringParam, timestampParam} from
 
 export type TechRecords = TechRecord[];
 
-export type TechRecord = {
+export interface TechRecord {
     recordCompleteness: string;
     createdAt: string;
     lastUpdatedAt: string;
@@ -184,7 +184,7 @@ export const parseTechRecords = (image: DynamoDbImage): TechRecords => {
     }
 
     return techRecords;
-}
+};
 
 const parseTechRecord = (image: DynamoDbImage): TechRecord => {
     return {
@@ -194,16 +194,16 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
         make: image.getString("make"),
         model: image.getString("model"),
         functionCode: image.getString("functionCode"),
-        fuelPropulsionSystem: <FuelPropulsionSystem>image.getString("fuelPropulsionSystem"),
+        fuelPropulsionSystem: image.getString("fuelPropulsionSystem") as FuelPropulsionSystem,
         offRoad: image.getBoolean("offRoad"),
         numberOfWheelsDriven: image.getNumber("numberOfWheelsDriven"),
-        euVehicleCategory: <EuVehicleCategory>image.getString("euVehicleCategory"),
+        euVehicleCategory: image.getString("euVehicleCategory") as EuVehicleCategory,
         emissionsLimit: image.getNumber("emissionsLimit"),
         departmentalVehicleMarker: image.getBoolean("departmentalVehicleMarker"),
         authIntoService: parseAuthIntoService(image.getMap("authIntoService")),
         lettersOfAuth: parseLettersOfAuth(image.getMap("lettersOfAuth")),
         alterationMarker: image.getBoolean("alterationMarker"),
-        approvalType: <ApprovalType>image.getString("approvalType"),
+        approvalType: image.getString("approvalType") as ApprovalType,
         approvalTypeNumber: image.getString("approvalTypeNumber"),
         variantNumber: image.getString("variantNumber"),
         variantVersionNumber: image.getString("variantVersionNumber"),
@@ -238,7 +238,7 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
         dispensations: image.getString("dispensations"),
         remarks: image.getString("remarks"),
         reasonForCreation: image.getString("reasonForCreation"),
-        statusCode: <StatusCode>image.getString("statusCode"),
+        statusCode: image.getString("statusCode") as StatusCode,
         unladenWeight: image.getNumber("unladenWeight"),
         grossKerbWeight: image.getNumber("grossKerbWeight"),
         grossLadenWeight: image.getNumber("grossLadenWeight"),
@@ -249,7 +249,7 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
         maxTrainGbWeight: image.getNumber("maxTrainGbWeight"),
         maxTrainDesignWeight: image.getNumber("maxTrainDesignWeight"),
         maxLoadOnCoupling: image.getNumber("maxLoadOnCoupling"),
-        frameDescription: <FrameDescription>image.getString("frameDescription"),
+        frameDescription: image.getString("frameDescription") as FrameDescription,
         tyreUseCode: image.getString("tyreUseCode"),
         roadFriendly: image.getBoolean("roadFriendly"),
         drawbarCouplingFitted: image.getBoolean("drawbarCouplingFitted"),
@@ -276,19 +276,19 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
         createdById: image.getString("createdById"),
         lastUpdatedByName: image.getString("lastUpdatedByName"),
         lastUpdatedById: image.getString("lastUpdatedById"),
-        updateType: <UpdateType>image.getString("updateType"),
+        updateType: image.getString("updateType") as UpdateType,
         vehicleClass: parseVehicleClass(image.getMap("vehicleClass")),
         vehicleSubclass: parseStringArray(image.getList("vehicleSubclass")),
-        vehicleType: <VehicleType>image.getString("vehicleType"),
-        vehicleSize: <VehicleSize>image.getString("vehicleSize"),
+        vehicleType: image.getString("vehicleType") as VehicleType,
+        vehicleSize: image.getString("vehicleSize") as VehicleSize,
         numberOfSeatbelts: image.getString("numberOfSeatbelts"),
         seatbeltInstallationApprovalDate: image.getString("seatbeltInstallationApprovalDate"),
-        vehicleConfiguration: <VehicleConfiguration>image.getString("vehicleConfiguration"),
+        vehicleConfiguration: image.getString("vehicleConfiguration") as VehicleConfiguration,
         brakes: parseBrakes(image.getMap("brakes")),
         axles: parseAxles(image.getList("axles")),
         dda: parseDda(image.getMap("dda"))
-    }
-}
+    };
+};
 
 export const toSqlParameters = (techRecord: TechRecord): SqlParametersList => {
     const sqlParameters: SqlParametersList = [];

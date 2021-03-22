@@ -1,7 +1,6 @@
-import {DynamoDbImage} from "../services/dynamodb-images";
-import {parseStringArray} from "./parameter-generation-stuff";
+import {DynamoDbImage, parseStringArray} from "../services/dynamodb-images";
 
-export type AdrDetails = {
+export interface AdrDetails {
     vehicleDetails: VehicleDetails;
     listStatementApplicable: boolean;
     batteryListNumber: string;
@@ -22,12 +21,12 @@ export type AdrDetails = {
     tank: Tank;
 }
 
-export type VehicleDetails = {
+export interface VehicleDetails {
     type: string;
     approvalDate: string;
 }
 
-export type ApplicantDetails = {
+export interface ApplicantDetails {
     name: string;
     street: string;
     town: string;
@@ -35,17 +34,17 @@ export type ApplicantDetails = {
     postcode: string;
 }
 
-export type AdditionalNotes = {
+export interface AdditionalNotes {
     number: string[];
-    guidanceNotes: string[]
+    guidanceNotes: string[];
 }
 
-export type Tank = {
+export interface Tank {
     tankDetails: TankDetails;
     tankStatement: TankStatement;
 }
 
-export type TankDetails = {
+export interface TankDetails {
     tankManufacturer: string;
     yearOfManufacture: number;
     tankCode: string;
@@ -56,7 +55,7 @@ export type TankDetails = {
     tc3Details: Tc3Details;
 }
 
-export type TankStatement = {
+export interface TankStatement {
     substancesPermitted: string;
     statement: string;
     productListRefNo: string;
@@ -64,20 +63,20 @@ export type TankStatement = {
     productList: string;
 }
 
-export type Tc2Details = {
-    tc2Type: Tc2Type,
-    tc2IntermediateApprovalNo: string,
-    tc2IntermediateExpiryDate: string
+export interface Tc2Details {
+    tc2Type: Tc2Type;
+    tc2IntermediateApprovalNo: string;
+    tc2IntermediateExpiryDate: string;
 }
 
 export type Tc2Type = "initial";
 
 export type Tc3Details = Tc3DetailsItem[];
 
-export type Tc3DetailsItem = {
-    tc3Type: Tc3Type,
-    tc3PeriodicNumber: string
-    tc3PeriodicExpiryDate: string
+export interface Tc3DetailsItem {
+    tc3Type: Tc3Type;
+    tc3PeriodicNumber: string;
+    tc3PeriodicExpiryDate: string;
 }
 
 export type Tc3Type = "intermediate" | "periodic" | "exceptional";
@@ -96,13 +95,13 @@ export const parseAdrDetails = (adrDetails: DynamoDbImage): AdrDetails => {
         town: applicantDetailsImage.getString("town"),
         city: applicantDetailsImage.getString("city"),
         postcode: applicantDetailsImage.getString("postcode"),
-    }
+    };
 
     const vehicleDetailsImage: DynamoDbImage = adrDetails.getMap("vehicleDetails");
     const vehicleDetails: VehicleDetails = {
         type: vehicleDetailsImage.getString("type"),
         approvalDate: vehicleDetailsImage.getString("approvalDate")
-    }
+    };
 
     const tankImage: DynamoDbImage = adrDetails.getMap("tank");
 
@@ -110,10 +109,10 @@ export const parseAdrDetails = (adrDetails: DynamoDbImage): AdrDetails => {
 
     const tc2DetailsImage: DynamoDbImage = tankDetailsImage.getMap("tc2Details");
     const tc2Details: Tc2Details = {
-        tc2Type: <Tc2Type>tc2DetailsImage.getString("tc2Type"),
+        tc2Type: tc2DetailsImage.getString("tc2Type") as Tc2Type,
         tc2IntermediateApprovalNo: tc2DetailsImage.getString("tc2IntermediateApprovalNo"),
         tc2IntermediateExpiryDate: tc2DetailsImage.getString("tc2IntermediateExpiryDate")
-    }
+    };
 
     const tc3DetailsImage: DynamoDbImage = tankDetailsImage.getList("tc3Details");
     const tc3Details: Tc3Details = [];
@@ -121,7 +120,7 @@ export const parseAdrDetails = (adrDetails: DynamoDbImage): AdrDetails => {
     for (const key of Object.keys(tc3DetailsImage)) {
         const tc3DetailsItemImage = tc3DetailsImage.getMap(key);
         tc3Details.push({
-            tc3Type: <Tc3Type>tc3DetailsItemImage.getString("tc3Type"),
+            tc3Type: tc3DetailsItemImage.getString("tc3Type") as Tc3Type,
             tc3PeriodicNumber: tc3DetailsItemImage.getString("tc3PeriodicNumber"),
             tc3PeriodicExpiryDate: tc3DetailsItemImage.getString("tc3PeriodicExpiryDate")
         });
@@ -130,13 +129,13 @@ export const parseAdrDetails = (adrDetails: DynamoDbImage): AdrDetails => {
     const tankDetails: TankDetails = {
         tankManufacturer: tankDetailsImage.getString("tankManufacturer"),
         yearOfManufacture: 0,
-        tankCode: tankDetailsImage.getString("tankCodd"),
+        tankCode: tankDetailsImage.getString("tankCode"),
         specialProvisions: tankDetailsImage.getString("specialProvisions"),
         tankManufacturerSerialNo: tankDetailsImage.getString("tankManufacturerSerialNo"),
         tankTypeAppNo: tankDetailsImage.getString("tankTypeAppNo"),
         tc2Details,
         tc3Details
-    }
+    };
 
     const tankStatementImage: DynamoDbImage = tankImage.getMap("tankStatement");
     const tankStatement: TankStatement = {
@@ -145,12 +144,12 @@ export const parseAdrDetails = (adrDetails: DynamoDbImage): AdrDetails => {
         productListRefNo: tankStatementImage.getString("productListRefNo"),
         productListUnNo: parseStringArray(tankStatementImage.getList("productListUnNo")),
         productList: tankStatementImage.getString("productList")
-    }
+    };
 
     const tank: Tank = {
         tankDetails,
         tankStatement
-    }
+    };
 
     return {
         vehicleDetails,
@@ -171,5 +170,5 @@ export const parseAdrDetails = (adrDetails: DynamoDbImage): AdrDetails => {
         adrTypeApprovalNo: adrDetails.getString("adrTypeApprovalNo"),
         adrCertificateNotes: adrDetails.getString("adrCertificateNotes"),
         tank
-    }
-}
+    };
+};

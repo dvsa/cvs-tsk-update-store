@@ -2,12 +2,12 @@ import {DynamoDbImage} from "../services/dynamodb-images";
 
 export type Plates = Plate[];
 
-export type Plate = {
-    plateSerialNumber: string
-    plateIssueDate: string
-    plateReasonForIssue: PlateReasonForIssue
-    plateIssuer: string
-    toEmailAddress: string
+export interface Plate {
+    plateSerialNumber: string;
+    plateIssueDate: string;
+    plateReasonForIssue: PlateReasonForIssue;
+    plateIssuer: string;
+    toEmailAddress: string;
 }
 
 export type PlateReasonForIssue =
@@ -27,11 +27,11 @@ export const parsePlates = (platesImage: DynamoDbImage): Plates => {
         plates.push({
             plateSerialNumber: plateImage.getString("plateSerialNumber"),
             plateIssueDate: plateImage.getString("plateIssueDate"),
-            plateReasonForIssue: <PlateReasonForIssue>plateImage.getString("plateReasonForIssue"),
+            plateReasonForIssue: plateImage.getString("plateReasonForIssue") as PlateReasonForIssue,
             plateIssuer: plateImage.getString("plateIssuer"),
             toEmailAddress: plateImage.getString("toEmailAddress")
         });
     }
 
     return plates;
-}
+};

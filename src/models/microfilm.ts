@@ -1,9 +1,9 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 
-export type Microfilm = {
-    microfilmDocumentType: MicrofilmDocumentType
-    microfilmRollNumber: string
-    microfilmSerialNumber: string
+export interface Microfilm {
+    microfilmDocumentType: MicrofilmDocumentType;
+    microfilmRollNumber: string;
+    microfilmSerialNumber: string;
 }
 
 export type MicrofilmDocumentType =
@@ -65,8 +65,8 @@ export type MicrofilmDocumentType =
 
 export const parseMicrofilm = (microfilm: DynamoDbImage): Microfilm => {
     return {
-        microfilmDocumentType: <MicrofilmDocumentType>microfilm.getString("microfilmDocumentType"),
+        microfilmDocumentType: microfilm.getString("microfilmDocumentType") as MicrofilmDocumentType,
         microfilmRollNumber: microfilm.getString("microfilmRollNumber"),
         microfilmSerialNumber: microfilm.getString("microfilmSerialNumber")
-    }
-}
+    };
+};

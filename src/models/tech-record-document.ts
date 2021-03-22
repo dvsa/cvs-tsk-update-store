@@ -3,14 +3,14 @@ import {parseTechRecords, TechRecords} from "./tech-record";
 
 // https://wiki.dvsacloud.uk/pages/viewpage.action?spaceKey=HVT&title=Technical+API+Changelog
 // API_Vehicle_Tech_Records_v32.yaml
-export type TechRecordDocument = {
+export interface TechRecordDocument {
     systemNumber: string;
     partialVin: string;
     primaryVrm: string;
     secondaryVms: string[];
     vin: string;
     trailerId: string;
-    techRecord: TechRecords
+    techRecord: TechRecords;
 }
 
 export const parseTechRecordDocument = (image: DynamoDbImage): TechRecordDocument => {
@@ -22,5 +22,5 @@ export const parseTechRecordDocument = (image: DynamoDbImage): TechRecordDocumen
         vin: image.getString("vin"),
         trailerId: image.getString("trailerId"),
         techRecord: parseTechRecords(image.getList("techRecord"))
-    }
-}
+    };
+};

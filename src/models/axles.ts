@@ -2,7 +2,7 @@ import {DynamoDbImage} from "../services/dynamodb-images";
 
 export type Axles = Axle[];
 
-export type Axle = {
+export interface Axle {
     axleNumber: number;
     parkingBrakeMrk: boolean;
     weights: AxleWeightProperties;
@@ -10,7 +10,7 @@ export type Axle = {
     brakes: AxleBrakeProperties;
 }
 
-export type AxleWeightProperties = {
+export interface AxleWeightProperties {
     kerbWeight: number;
     ladenWeight: number;
     gbWeight: number;
@@ -18,7 +18,7 @@ export type AxleWeightProperties = {
     designWeight: number;
 }
 
-export type AxleTyreProperties = {
+export interface AxleTyreProperties {
     tyreSize: string;
     plyRating: string;
     fitmentCode: FitmentCode;
@@ -46,7 +46,7 @@ export type SpeedCategorySymbol =
     | "p"
     | "q";
 
-export type AxleBrakeProperties = {
+export interface AxleBrakeProperties {
     brakeActuator: number;
     leverLength: number;
     springBrakeParking: boolean;
@@ -65,22 +65,22 @@ export const parseAxles = (axlesImage: DynamoDbImage): Axles => {
             gbWeight: weightsImage.getNumber("gbWeight"),
             eecWeight: weightsImage.getNumber("eecWeight"),
             designWeight: weightsImage.getNumber("designWeight")
-        }
+        };
         const tyresImage = axleImage.getMap("tyres");
         const tyres: AxleTyreProperties = {
             tyreSize: tyresImage.getString("tyreSize"),
             plyRating: tyresImage.getString("plyRating"),
-            fitmentCode: <FitmentCode>tyresImage.getString("fitmentCode"),
+            fitmentCode: tyresImage.getString("fitmentCode") as FitmentCode,
             dataTrAxles: tyresImage.getNumber("dataTrAxles"),
-            speedCategorySymbol: <SpeedCategorySymbol>tyresImage.getString("speedCategorySymbol"),
+            speedCategorySymbol: tyresImage.getString("speedCategorySymbol") as SpeedCategorySymbol,
             tyreCode: tyresImage.getNumber("tyreCode")
-        }
+        };
         const brakesImage = axleImage.getMap("brakes");
         const brakes: AxleBrakeProperties = {
             brakeActuator: brakesImage.getNumber("brakeActuator"),
             leverLength: brakesImage.getNumber("leverLength"),
             springBrakeParking: brakesImage.getBoolean("springBrakeParking")
-        }
+        };
 
         axles.push({
             axleNumber: axleImage.getNumber("axleNumber"),
@@ -88,8 +88,8 @@ export const parseAxles = (axlesImage: DynamoDbImage): Axles => {
             weights,
             brakes,
             tyres
-        })
+        });
     }
 
     return axles;
-}
+};

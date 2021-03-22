@@ -1,7 +1,7 @@
 // (disability discrimination act)
 import {DynamoDbImage} from "../services/dynamodb-images";
 
-export type Dda = {
+export interface Dda {
     certificateIssued: boolean;
     wheelchairCapacity: number;
     wheelchairFittings: string;
@@ -30,5 +30,5 @@ export const parseDda = (dda: DynamoDbImage): Dda => {
         ddaSchedules: dda.getString("ddaSchedules"),
         seatbeltsFitted: dda.getNumber("seatbeltsFitted"),
         ddaNotes: dda.getString("ddaNotes")
-    }
-}
+    };
+};

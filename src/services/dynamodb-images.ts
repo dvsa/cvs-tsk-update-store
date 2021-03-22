@@ -18,7 +18,7 @@ export const parseStringArray = (listOfStrings: DynamoDbImage): string[] => {
     }
 
     return strings;
-}
+};
 
 /**
  * placeholder

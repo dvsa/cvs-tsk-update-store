@@ -1,14 +1,14 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 
-export type ApplicantDetailsProperties = {
-    name: string,
-    address1: string,
-    address2: string,
-    postTown: string,
-    address3: string,
-    postCode: string,
-    emailAddress: string,
-    telephoneNumber: string,
+export interface ApplicantDetailsProperties {
+    name: string;
+    address1: string;
+    address2: string;
+    postTown: string;
+    address3: string;
+    postCode: string;
+    emailAddress: string;
+    telephoneNumber: string;
 }
 
 export const parseApplicantDetailsProperties = (applicantDetailsProperties: DynamoDbImage): ApplicantDetailsProperties => {
@@ -21,5 +21,5 @@ export const parseApplicantDetailsProperties = (applicantDetailsProperties: Dyna
         postCode: applicantDetailsProperties.getString("postCode"),
         emailAddress: applicantDetailsProperties.getString("emailAddress"),
         telephoneNumber: applicantDetailsProperties.getString("telephoneNumber")
-    }
-}
+    };
+};

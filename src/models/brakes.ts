@@ -1,9 +1,8 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 import {SqlParametersList} from "aws-sdk/clients/rdsdataservice";
-import {TechRecord} from "./tech-record";
-import {booleanParam, integerParam, stringParam, timestampParam} from "../services/sql-parameter";
+import {booleanParam, integerParam, stringParam} from "../services/sql-parameter";
 
-export type Brakes = {
+export interface Brakes {
     brakeCodeOriginal: string;
     brakeCode: string;
     dataTrBrakeOne: string;
@@ -20,13 +19,13 @@ export type Brakes = {
 
 export type RetarderBrakeType = "electric" | "exhaust" | "friction" | "hydraulic" | "other" | "none";
 
-export type BrakeForceWheelsNotLocked = {
+export interface BrakeForceWheelsNotLocked {
     serviceBrakeForceA: number;
     secondaryBrakeForceA: number;
     parkingBrakeForceA: number;
 }
 
-export type BrakeForceWheelsUpToHalfLocked = {
+export interface BrakeForceWheelsUpToHalfLocked {
     serviceBrakeForceB: number;
     secondaryBrakeForceB: number;
     parkingBrakeForceB: number;
@@ -38,14 +37,14 @@ export const parseBrakes = (brakes: DynamoDbImage): Brakes => {
         serviceBrakeForceA: brakeForceWheelsNotLockedImage.getNumber("serviceBrakeForceA"),
         secondaryBrakeForceA: brakeForceWheelsNotLockedImage.getNumber("secondaryBrakeForceA"),
         parkingBrakeForceA: brakeForceWheelsNotLockedImage.getNumber("parkingBrakeForceA")
-    }
+    };
 
     const brakeForceWheelsUpToHalfLockedImage: DynamoDbImage = brakes.getMap("brakeForceWheelsUpToHalfLocked");
     const brakeForceWheelsUpToHalfLocked: BrakeForceWheelsUpToHalfLocked = {
         serviceBrakeForceB: brakeForceWheelsUpToHalfLockedImage.getNumber("serviceBrakeForceB"),
         secondaryBrakeForceB: brakeForceWheelsUpToHalfLockedImage.getNumber("secondaryBrakeForceB"),
         parkingBrakeForceB: brakeForceWheelsUpToHalfLockedImage.getNumber("parkingBrakeForceB")
-    }
+    };
 
     return {
         brakeCodeOriginal: brakes.getString("brakeCodeOriginal"),
@@ -53,15 +52,15 @@ export const parseBrakes = (brakes: DynamoDbImage): Brakes => {
         dataTrBrakeOne: brakes.getString("dataTrBrakeOne"),
         dataTrBrakeTwo: brakes.getString("dataTrBrakeTwo"),
         dataTrBrakeThree: brakes.getString("dataTrBrakeThree"),
-        retarderBrakeOne: <RetarderBrakeType>brakes.getString("retarderBrakeOne"),
-        retarderBrakeTwo: <RetarderBrakeType>brakes.getString("retarderBrakeTwo"),
+        retarderBrakeOne: brakes.getString("retarderBrakeOne") as RetarderBrakeType,
+        retarderBrakeTwo: brakes.getString("retarderBrakeTwo") as RetarderBrakeType,
         dtpNumber: brakes.getString("dtpNumber"),
         brakeForceWheelsNotLocked,
         brakeForceWheelsUpToHalfLocked,
         loadSensingValve: brakes.getBoolean("loadSensingValve"),
         antilockBrakingSystem: brakes.getBoolean("antilockBrakingSystem")
-    }
-}
+    };
+};
 
 export const toSqlParameters = (brakes: Brakes): SqlParametersList => {
     const sqlParameters: SqlParametersList = [];
@@ -84,4 +83,4 @@ export const toSqlParameters = (brakes: Brakes): SqlParametersList => {
     sqlParameters.push(integerParam("parkingBrakeForceB", brakes.brakeForceWheelsUpToHalfLocked.parkingBrakeForceB));
 
     return sqlParameters;
-}
+};

@@ -1,16 +1,16 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 
-export type PurchaserDetails = {
-    name: string,
-    address1: string,
-    address2: string,
-    postTown: string,
-    address3: string,
-    postCode: string,
-    emailAddress: string,
-    telephoneNumber: string,
-    faxNumber: string,
-    purchaserNotes: string,
+export interface PurchaserDetails {
+    name: string;
+    address1: string;
+    address2: string;
+    postTown: string;
+    address3: string;
+    postCode: string;
+    emailAddress: string;
+    telephoneNumber: string;
+    faxNumber: string;
+    purchaserNotes: string;
 }
 
 export const parsePurchaserDetails = (purchaserDetails: DynamoDbImage): PurchaserDetails => {
@@ -25,5 +25,5 @@ export const parsePurchaserDetails = (purchaserDetails: DynamoDbImage): Purchase
         telephoneNumber: purchaserDetails.getString("telephoneNumber"),
         faxNumber: purchaserDetails.getString("faxNumber"),
         purchaserNotes: purchaserDetails.getString("purchaserNotes")
-    }
-}
+    };
+};

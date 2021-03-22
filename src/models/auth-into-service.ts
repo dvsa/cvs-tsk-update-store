@@ -1,11 +1,11 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 
-export type AuthIntoService = {
-    cocIssueDate: string,
-    dateReceived: string,
-    datePending: string,
-    dateAuthorised: string,
-    dateRejected: string,
+export interface AuthIntoService {
+    cocIssueDate: string;
+    dateReceived: string;
+    datePending: string;
+    dateAuthorised: string;
+    dateRejected: string;
 }
 
 export const parseAuthIntoService = (authIntoService: DynamoDbImage): AuthIntoService => {
@@ -15,5 +15,5 @@ export const parseAuthIntoService = (authIntoService: DynamoDbImage): AuthIntoSe
         datePending: authIntoService.getString("datePending"),
         dateReceived: authIntoService.getString("dateReceived"),
         dateRejected: authIntoService.getString("dateRejected")
-    }
-}
+    };
+};

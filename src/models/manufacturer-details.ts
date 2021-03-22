@@ -1,16 +1,16 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 
-export type ManufacturerDetails = {
-    name: string,
-    address1: string,
-    address2: string,
-    postTown: string,
-    address3: string,
-    postCode: string,
-    emailAddress: string,
-    telephoneNumber: string,
-    faxNumber: string,
-    manufacturerNotes: string,
+export interface ManufacturerDetails {
+    name: string;
+    address1: string;
+    address2: string;
+    postTown: string;
+    address3: string;
+    postCode: string;
+    emailAddress: string;
+    telephoneNumber: string;
+    faxNumber: string;
+    manufacturerNotes: string;
 }
 
 export const parseManufacturerDetails = (manufacturerDetails: DynamoDbImage): ManufacturerDetails => {
@@ -25,5 +25,5 @@ export const parseManufacturerDetails = (manufacturerDetails: DynamoDbImage): Ma
         telephoneNumber: manufacturerDetails.getString("telephoneNumber"),
         faxNumber: manufacturerDetails.getString("faxNumber"),
         manufacturerNotes: manufacturerDetails.getString("manufacturerNotes")
-    }
-}
+    };
+};

@@ -1,6 +1,6 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 
-export type Dimensions = {
+export interface Dimensions {
     length: number;
     height: number;
     width: number;
@@ -9,9 +9,9 @@ export type Dimensions = {
 
 export type AxleSpacing = AxleSpacingItem[];
 
-export type AxleSpacingItem = {
-    axles: string
-    value: number
+export interface AxleSpacingItem {
+    axles: string;
+    value: number;
 }
 
 export const parseDimensions = (dimensions: DynamoDbImage): Dimensions => {
@@ -23,7 +23,7 @@ export const parseDimensions = (dimensions: DynamoDbImage): Dimensions => {
         axleSpacing.push({
             axles: axleSpacingItemImage.getString("axles"),
             value: axleSpacingItemImage.getNumber("value")
-        })
+        });
     }
 
     return {
@@ -31,5 +31,5 @@ export const parseDimensions = (dimensions: DynamoDbImage): Dimensions => {
         height: dimensions.getNumber("height"),
         width: dimensions.getNumber("width"),
         axleSpacing
-    }
-}
+    };
+};
