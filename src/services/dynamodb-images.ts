@@ -8,6 +8,18 @@ export interface DynamoDbField {
     value: any;
 }
 
+// maps type "L", subtype "S" to string[]
+// note difference with DynamoDbImage::getStrings, which maps type "SS" to string[]
+export const parseStringArray = (listOfStrings: DynamoDbImage): string[] => {
+    const strings: string[] = [];
+
+    for (const key of Object.keys(listOfStrings)) {
+        strings.push(listOfStrings.getString(key));
+    }
+
+    return strings;
+}
+
 /**
  * placeholder
  */
