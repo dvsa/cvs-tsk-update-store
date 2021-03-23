@@ -1,11 +1,9 @@
 import {Context, DynamoDBStreamEvent, Handler, StreamRecord} from "aws-lambda";
-import {DatabaseEntity, executeStatement} from "../services/database-operations";
 import {DynamoDBRecord} from "aws-lambda/trigger/dynamodb-stream";
 import {EventSourceArn, stringToArn} from "../services/event-source-arn";
-import {EntityFactory, getEntityFactory} from "../services/entity-factories";
+import {EntityConverter, getEntityConverter} from "../services/entity-converters";
 import {DynamoDbImage} from "../services/dynamodb-images";
 import {KnownOperationType, parseOperationType} from "../services/operation-types";
-import {SqlStatement} from "aws-sdk/clients/rdsdataservice";
 
 /**
  * λ function to process an SQS message detailing info for update store
@@ -22,13 +20,12 @@ export const processStreamEvent: Handler = async (event: DynamoDBStreamEvent, co
         const operationType: KnownOperationType = parseOperationType(record.eventName!);
 
         const image: DynamoDbImage = selectImage(operationType, record.dynamodb!);
-        const entityFactory: EntityFactory = getEntityFactory(eventSourceArn.table);
-        const entity = entityFactory(image);
+        const entityConverter: EntityConverter = getEntityConverter(eventSourceArn.table);
 
         try {
-            await executeStatement(selectSql(operationType, entity), entity);
+            await entityConverter(operationType, image);
         } catch (e) {
-            console.error(e.message);
+            console.error("couldn't apply entity converter", e);
             dumpArguments(event, context);
         }
     }
@@ -41,17 +38,6 @@ const selectImage = (operationType: KnownOperationType, streamRecord: StreamReco
             return DynamoDbImage.parse(streamRecord.NewImage!);
         case "DELETE":
             return DynamoDbImage.parse(streamRecord.OldImage!);
-    }
-};
-
-const selectSql = (operationType: KnownOperationType, entity: DatabaseEntity): SqlStatement => {
-    switch (operationType) {
-        case "INSERT":
-            return entity.insertStatement();
-        case "UPDATE":
-            return entity.updateStatement();
-        case "DELETE":
-            return entity.deleteStatement();
     }
 };
 
