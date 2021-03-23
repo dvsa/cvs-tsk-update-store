@@ -4,7 +4,7 @@ import {default as setsJson} from "../resources/dynamodb-image-sets.json";
 import {default as listJson} from "../resources/dynamodb-image-list.json";
 import {default as mapJson} from "../resources/dynamodb-image-map.json";
 import {default as nestedJson} from "../resources/dynamodb-image-nested.json";
-import {AttributeValue} from "aws-sdk/clients/dynamodbstreams";
+import {castToImageShape} from "./utils";
 
 describe("parse()", () => {
     it("should parse a Dynamo image containing all primitive types", () => {
@@ -57,8 +57,4 @@ describe("parse()", () => {
         const image = DynamoDbImage.parse(castToImageShape(primitivesJson));
         expect(() => image.getString("NumberField")).toThrowError("not of type");
     });
-
-    const castToImageShape = (json: any): { [key: string]: AttributeValue } => {
-        return json as any;
-    };
 });
