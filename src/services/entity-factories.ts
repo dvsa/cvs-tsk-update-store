@@ -1,13 +1,15 @@
-import {toTechnicalRecord} from "../models/technical-records";
 import {DynamoDbImage} from "./dynamodb-images";
-import {DatabaseEntity} from "./database-operations";
+import {techRecordDocumentConverter} from "./tech-record-conversion";
+import {KnownOperationType} from "./operation-types";
 
-export type EntityFactory = (image: DynamoDbImage) => DatabaseEntity;
+export type EntityConverter = (operationType: KnownOperationType, image: DynamoDbImage) => Promise<void>;
 
-const entityFactories: Map<string, EntityFactory> = new Map();
+const entityHandlers: Map<string, EntityConverter> = new Map();
 
-export const getEntityFactory = (tableName: string): EntityFactory => {
-    const entityFactory: ((image: DynamoDbImage) => DatabaseEntity) | undefined = entityFactories.get(tableName);
+entityHandlers.set("Technical_Records", techRecordDocumentConverter); // TODO actual table names
+
+export const getEntityConverter = (tableName: string): EntityConverter => {
+    const entityFactory: ((operationType: KnownOperationType, image: DynamoDbImage) => Promise<void>) | undefined = entityHandlers.get(tableName);
 
     if (!entityFactory) {
         throw new Error(`no entity factory for table "${tableName}"`);
