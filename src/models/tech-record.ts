@@ -290,19 +290,8 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
     };
 };
 
-export const toSqlParameters = (techRecord: TechRecord): SqlParametersList => {
+export const toTechRecordSqlParameters = (techRecord: TechRecord): SqlParametersList => {
     const sqlParameters: SqlParametersList = [];
-
-    // exclude "id" param for now TODO use "id" for updates
-
-    // FOREIGN KEYS
-    // sqlParameters.push(integerParam("vehicle_id", techRecord.TODO));
-    // sqlParameters.push(integerParam("applicant_detail_id", techRecord.TODO));
-    // sqlParameters.push(integerParam("purchaser_detail_id", techRecord.TODO));
-    // sqlParameters.push(integerParam("manufacturer_detail_id", techRecord.TODO));
-    // sqlParameters.push(integerParam("make_model_id", techRecord.TODO));
-    // sqlParameters.push(integerParam("vehicle_class_id", techRecord.TODO));
-    // sqlParameters.push(integerParam("brakes_id", techRecord.TODO));
 
     sqlParameters.push(stringParam("recordCompleteness", techRecord.recordCompleteness));
     sqlParameters.push(timestampParam("createdAt", techRecord.createdAt));
@@ -324,6 +313,8 @@ export const toSqlParameters = (techRecord: TechRecord): SqlParametersList => {
     sqlParameters.push(stringParam("ntaNumber", techRecord.ntaNumber));
     sqlParameters.push(stringParam("coifSerialNumber", techRecord.coifSerialNumber));
     sqlParameters.push(stringParam("coifCertifierName", techRecord.coifCertifierName));
+    sqlParameters.push(stringParam("approvalType", techRecord.approvalType));
+    sqlParameters.push(stringParam("approvalTypeNumber", techRecord.approvalTypeNumber));
     sqlParameters.push(stringParam("conversionRefNo", techRecord.conversionRefNo));
     sqlParameters.push(integerParam("seatsLowerDeck", techRecord.seatsLowerDeck));
     sqlParameters.push(integerParam("seatsUpperDeck", techRecord.seatsUpperDeck));
@@ -367,6 +358,8 @@ export const toSqlParameters = (techRecord: TechRecord): SqlParametersList => {
     sqlParameters.push(integerParam("couplingCenterToRearTrlMax", techRecord.couplingCenterToRearTrlMax));
     sqlParameters.push(integerParam("centreOfRearmostAxleToRearOfTrl", techRecord.centreOfRearmostAxleToRearOfTrl));
     sqlParameters.push(stringParam("notes", techRecord.notes));
+    sqlParameters.push(stringParam("purchaserNotes", techRecord.purchaserDetails.purchaserNotes));
+    sqlParameters.push(stringParam("manufacturerNotes", techRecord.manufacturerDetails.manufacturerNotes));
     sqlParameters.push(integerParam("noOfAxles", techRecord.noOfAxles));
     sqlParameters.push(stringParam("brakeCode", techRecord.brakeCode));
     sqlParameters.push(integerParam("createdBy_Id", +techRecord.createdById));
@@ -376,4 +369,82 @@ export const toSqlParameters = (techRecord: TechRecord): SqlParametersList => {
     sqlParameters.push(dateParam("seatbeltInstallationApprovalDate", techRecord.seatbeltInstallationApprovalDate));
 
     return sqlParameters;
+};
+
+export const toMakeModelSqlParameters = (techRecord: TechRecord): SqlParametersList => {
+    const sqlParameters: SqlParametersList = [];
+
+    sqlParameters.push(stringParam("make", techRecord.make));
+    sqlParameters.push(stringParam("model", techRecord.model));
+    sqlParameters.push(stringParam("chassisMake", techRecord.chassisMake));
+    sqlParameters.push(stringParam("chassisModel", techRecord.chassisModel));
+    sqlParameters.push(stringParam("bodyMake", techRecord.bodyMake));
+    sqlParameters.push(stringParam("bodyModel", techRecord.bodyModel));
+    sqlParameters.push(stringParam("modelLiteral", techRecord.modelLiteral));
+    sqlParameters.push(stringParam("bodyTypeCode", techRecord.bodyType.code));
+    sqlParameters.push(stringParam("bodyTypeDescription", techRecord.bodyType.description));
+    sqlParameters.push(stringParam("fuelPropulsionSystem", techRecord.fuelPropulsionSystem));
+
+    return sqlParameters;
+};
+
+export const toMakeModelTemplateVariables = (techRecord: TechRecord): any[] => {
+    const templateVariables: any[] = [];
+
+    templateVariables.push(techRecord.make);
+    templateVariables.push(techRecord.model);
+    templateVariables.push(techRecord.chassisMake);
+    templateVariables.push(techRecord.chassisModel);
+    templateVariables.push(techRecord.bodyMake);
+    templateVariables.push(techRecord.bodyModel);
+    templateVariables.push(techRecord.modelLiteral);
+    templateVariables.push(techRecord.bodyType.code);
+    templateVariables.push(techRecord.bodyType.description);
+    templateVariables.push(techRecord.fuelPropulsionSystem);
+
+    return templateVariables;
+};
+
+export const toVehicleClassSqlParameters = (techRecord: TechRecord): SqlParametersList => {
+    const sqlParameters: SqlParametersList = [];
+
+    sqlParameters.push(stringParam("code", techRecord.vehicleClass.code));
+    sqlParameters.push(stringParam("description", techRecord.vehicleClass.code));
+    sqlParameters.push(stringParam("vehicleType", techRecord.vehicleType));
+    sqlParameters.push(stringParam("vehicleSize", techRecord.vehicleSize));
+    sqlParameters.push(stringParam("vehicleConfiguration", techRecord.vehicleConfiguration));
+    sqlParameters.push(stringParam("euVehicleCategory", techRecord.euVehicleCategory));
+
+    return sqlParameters;
+};
+
+export const toVehicleClassTemplateVariables = (techRecord: TechRecord): any[] => {
+    const templateVariables: any[] = [];
+
+    templateVariables.push(techRecord.vehicleClass.code);
+    templateVariables.push(techRecord.vehicleClass.description);
+    templateVariables.push(techRecord.vehicleType);
+    templateVariables.push(techRecord.vehicleSize);
+    templateVariables.push(techRecord.vehicleConfiguration);
+    templateVariables.push(techRecord.euVehicleCategory);
+
+    return templateVariables;
+};
+
+export const toVehicleSubClassSqlParameters = (techRecord: TechRecord): SqlParametersList => {
+    const sqlParameters: SqlParametersList = [];
+
+    sqlParameters.push(stringParam("subclass", techRecord.euVehicleCategory));
+
+    return sqlParameters;
+};
+
+export const getFaxNumber = (techRecord: TechRecord): string | undefined => {
+    if (techRecord.purchaserDetails) {
+        return techRecord.purchaserDetails.faxNumber;
+    }
+    if (techRecord.manufacturerDetails) {
+        return techRecord.manufacturerDetails.faxNumber;
+    }
+    return undefined;
 };

@@ -62,7 +62,7 @@ export const parseBrakes = (brakes: DynamoDbImage): Brakes => {
     };
 };
 
-export const toSqlParameters = (brakes: Brakes): SqlParametersList => {
+export const toBrakeSqlParameters = (brakes: Brakes): SqlParametersList => {
     const sqlParameters: SqlParametersList = [];
 
     sqlParameters.push(stringParam("brakeCodeOriginal", brakes.brakeCodeOriginal));
@@ -83,4 +83,27 @@ export const toSqlParameters = (brakes: Brakes): SqlParametersList => {
     sqlParameters.push(integerParam("parkingBrakeForceB", brakes.brakeForceWheelsUpToHalfLocked.parkingBrakeForceB));
 
     return sqlParameters;
+};
+
+export const toBrakesTemplateVariables = (brakes: Brakes): any[] => {
+    const templateVariables: any[] = [];
+
+    templateVariables.push(brakes.brakeCodeOriginal);
+    templateVariables.push(brakes.brakeCode);
+    templateVariables.push(brakes.dataTrBrakeOne);
+    templateVariables.push(brakes.dataTrBrakeTwo);
+    templateVariables.push(brakes.dataTrBrakeThree);
+    templateVariables.push(brakes.retarderBrakeOne);
+    templateVariables.push(brakes.retarderBrakeTwo);
+    templateVariables.push(brakes.dtpNumber);
+    templateVariables.push(brakes.loadSensingValve);
+    templateVariables.push(brakes.antilockBrakingSystem);
+    templateVariables.push(brakes.brakeForceWheelsNotLocked.serviceBrakeForceA);
+    templateVariables.push(brakes.brakeForceWheelsNotLocked.secondaryBrakeForceA);
+    templateVariables.push(brakes.brakeForceWheelsNotLocked.parkingBrakeForceA);
+    templateVariables.push(brakes.brakeForceWheelsUpToHalfLocked.serviceBrakeForceB);
+    templateVariables.push(brakes.brakeForceWheelsUpToHalfLocked.secondaryBrakeForceB);
+    templateVariables.push(brakes.brakeForceWheelsUpToHalfLocked.parkingBrakeForceB);
+
+    return templateVariables;
 };

@@ -1,4 +1,6 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
+import {SqlParametersList} from "aws-sdk/clients/rdsdataservice";
+import {stringParam} from "../services/sql-parameter";
 
 export interface Microfilm {
     microfilmDocumentType: MicrofilmDocumentType;
@@ -69,4 +71,14 @@ export const parseMicrofilm = (microfilm: DynamoDbImage): Microfilm => {
         microfilmRollNumber: microfilm.getString("microfilmRollNumber"),
         microfilmSerialNumber: microfilm.getString("microfilmSerialNumber")
     };
+};
+
+export const toMicrofilmSqlParameters = (microfilm: Microfilm): SqlParametersList => {
+    const sqlParameters: SqlParametersList = [];
+
+    sqlParameters.push(stringParam("microfilmDocumentType", microfilm.microfilmDocumentType));
+    sqlParameters.push(stringParam("microfilmRollNumber", microfilm.microfilmRollNumber));
+    sqlParameters.push(stringParam("microfilmSerialNumber", microfilm.microfilmSerialNumber));
+
+    return sqlParameters;
 };
