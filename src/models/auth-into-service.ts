@@ -1,4 +1,5 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
+import {Maybe} from "./optionals";
 
 export interface AuthIntoService {
     cocIssueDate?: string;
@@ -8,7 +9,7 @@ export interface AuthIntoService {
     dateRejected?: string;
 }
 
-export const parseAuthIntoService = (authIntoService?: DynamoDbImage): AuthIntoService | undefined => {
+export const parseAuthIntoService = (authIntoService?: DynamoDbImage): Maybe<AuthIntoService> => {
     if (!authIntoService) {
         return undefined;
     }

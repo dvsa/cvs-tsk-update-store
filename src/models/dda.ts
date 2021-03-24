@@ -1,5 +1,6 @@
 // (disability discrimination act)
 import {DynamoDbImage} from "../services/dynamodb-images";
+import {Maybe} from "./optionals";
 
 export interface Dda {
     certificateIssued?: boolean;
@@ -16,7 +17,10 @@ export interface Dda {
     ddaNotes?: string;
 }
 
-export const parseDda = (dda: DynamoDbImage): Dda => {
+export const parseDda = (dda?: DynamoDbImage): Maybe<Dda> => {
+    if (!dda) {
+        return undefined;
+    }
     return {
         certificateIssued: dda.getBoolean("certificateIssued"),
         wheelchairCapacity: dda.getNumber("wheelchairCapacity"),

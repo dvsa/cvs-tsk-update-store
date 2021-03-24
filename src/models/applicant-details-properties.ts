@@ -1,4 +1,5 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
+import {Maybe} from "./optionals";
 
 export interface ApplicantDetailsProperties {
     name?: string;
@@ -11,7 +12,7 @@ export interface ApplicantDetailsProperties {
     telephoneNumber?: string;
 }
 
-export const parseApplicantDetailsProperties = (applicantDetailsProperties?: DynamoDbImage): ApplicantDetailsProperties | undefined => {
+export const parseApplicantDetailsProperties = (applicantDetailsProperties?: DynamoDbImage): Maybe<ApplicantDetailsProperties> => {
     if (!applicantDetailsProperties) {
         return undefined;
     }

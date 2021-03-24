@@ -1,4 +1,5 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
+import {Maybe} from "./optionals";
 
 export interface ManufacturerDetails {
     name?: string;
@@ -13,7 +14,7 @@ export interface ManufacturerDetails {
     manufacturerNotes?: string;
 }
 
-export const parseManufacturerDetails = (manufacturerDetails?: DynamoDbImage): ManufacturerDetails | undefined => {
+export const parseManufacturerDetails = (manufacturerDetails?: DynamoDbImage): Maybe<ManufacturerDetails> => {
     if (!manufacturerDetails) {
         return undefined;
     }

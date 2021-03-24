@@ -1,4 +1,5 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
+import {Maybe} from "./optionals";
 
 export interface BodyType {
     code?: BodyTypeCode;
@@ -21,7 +22,7 @@ export type BodyTypeDescription =
     | "skip loader"
     | "refrigerated";
 
-export const parseBodyType = (bodyType?: DynamoDbImage): BodyType | undefined => {
+export const parseBodyType = (bodyType?: DynamoDbImage): Maybe<BodyType> => {
     if (!bodyType) {
         return undefined;
     }

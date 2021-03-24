@@ -13,6 +13,7 @@ import {parseVehicleClass, VehicleClass} from "./vehicle-class";
 import {Brakes, parseBrakes} from "./brakes";
 import {Axles, parseAxles} from "./axles";
 import {Dda} from "./dda";
+import {Maybe} from "./optionals";
 
 export type TechRecords = TechRecord[];
 
@@ -412,7 +413,7 @@ export const toVehicleSubClassTemplateVariables = (techRecord: TechRecord): any[
     return templateVariables;
 };
 
-export const getFaxNumber = (techRecord: TechRecord): string | undefined => {
+export const getFaxNumber = (techRecord: TechRecord): Maybe<string> => {
     if (techRecord.purchaserDetails) {
         return techRecord.purchaserDetails.faxNumber;
     }

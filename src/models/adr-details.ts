@@ -1,4 +1,5 @@
 import {DynamoDbImage, parseStringArray} from "../services/dynamodb-images";
+import {Maybe} from "./optionals";
 
 export interface AdrDetails {
     vehicleDetails?: VehicleDetails;
@@ -82,7 +83,7 @@ export interface Tc3DetailsItem {
 export type Tc3Type = "intermediate" | "periodic" | "exceptional";
 
 // TODO fix this function to work with nullable values if it's ever needed
-export const parseAdrDetails = (adrDetails?: DynamoDbImage): AdrDetails | undefined => {
+export const parseAdrDetails = (adrDetails?: DynamoDbImage): Maybe<AdrDetails> => {
     if (!adrDetails) {
         return undefined;
     }

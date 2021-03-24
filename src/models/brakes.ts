@@ -1,4 +1,5 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
+import {Maybe} from "./optionals";
 
 export interface Brakes {
     brakeCodeOriginal?: string;
@@ -29,7 +30,7 @@ export interface BrakeForceWheelsUpToHalfLocked {
     parkingBrakeForceB?: number;
 }
 
-export const parseBrakes = (brakes?: DynamoDbImage): Brakes | undefined => {
+export const parseBrakes = (brakes?: DynamoDbImage): Maybe<Brakes> => {
     if (!brakes) {
         return undefined;
     }
@@ -78,7 +79,7 @@ export const toBrakesTemplateVariables = (brakes: Brakes): any[] => {
     return templateVariables;
 };
 
-const parseBrakeForceWheelsNotLocked = (brakeForceWheelsNotLockedImage?: DynamoDbImage): BrakeForceWheelsNotLocked | undefined => {
+const parseBrakeForceWheelsNotLocked = (brakeForceWheelsNotLockedImage?: DynamoDbImage): Maybe<BrakeForceWheelsNotLocked> => {
     if (!brakeForceWheelsNotLockedImage) {
         return undefined;
     }
@@ -90,7 +91,7 @@ const parseBrakeForceWheelsNotLocked = (brakeForceWheelsNotLockedImage?: DynamoD
     };
 };
 
-const parseBrakeForceWheelsUpToHalfLocked = (brakeForceWheelsUpToHalfLockedImage?: DynamoDbImage): BrakeForceWheelsUpToHalfLocked | undefined => {
+const parseBrakeForceWheelsUpToHalfLocked = (brakeForceWheelsUpToHalfLockedImage?: DynamoDbImage): Maybe<BrakeForceWheelsUpToHalfLocked> => {
     if (!brakeForceWheelsUpToHalfLockedImage) {
         return undefined;
     }

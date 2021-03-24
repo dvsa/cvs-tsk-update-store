@@ -1,4 +1,5 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
+import {Maybe} from "./optionals";
 
 export interface VehicleClass {
     code?: VehicleCode;
@@ -22,7 +23,7 @@ export type VehicleDescription =
 
 export type VehicleCode = "2" | "n" | "s" | "1" | "t" | "l" | "3" | "v" | "4" | "7" | "5";
 
-export const parseVehicleClass = (vehicleClass?: DynamoDbImage): VehicleClass | undefined => {
+export const parseVehicleClass = (vehicleClass?: DynamoDbImage): Maybe<VehicleClass> => {
     if (!vehicleClass) {
         return undefined;
     }

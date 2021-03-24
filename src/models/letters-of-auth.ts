@@ -1,4 +1,5 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
+import {Maybe} from "./optionals";
 
 export type LetterType = "Trailer authorization" | "Trailer rejection";
 
@@ -8,7 +9,7 @@ export interface LettersOfAuth {
     letterContents?: string;
 }
 
-export const parseLettersOfAuth = (lettersOfAuth?: DynamoDbImage): LettersOfAuth | undefined => {
+export const parseLettersOfAuth = (lettersOfAuth?: DynamoDbImage): Maybe<LettersOfAuth> => {
     if (!lettersOfAuth) {
         return undefined;
     }

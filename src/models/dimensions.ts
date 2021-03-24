@@ -1,4 +1,5 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
+import {Maybe} from "./optionals";
 
 export interface Dimensions {
     length?: number;
@@ -14,7 +15,7 @@ export interface AxleSpacingItem {
     value?: number;
 }
 
-export const parseDimensions = (dimensions?: DynamoDbImage): Dimensions | undefined => {
+export const parseDimensions = (dimensions?: DynamoDbImage): Maybe<Dimensions> => {
     if (!dimensions) {
         return undefined;
     }

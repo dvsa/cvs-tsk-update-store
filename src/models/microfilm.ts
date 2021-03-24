@@ -1,4 +1,5 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
+import {Maybe} from "./optionals";
 
 export interface Microfilm {
     microfilmDocumentType?: MicrofilmDocumentType;
@@ -63,7 +64,7 @@ export type MicrofilmDocumentType =
     | "PRT - Tr Plating Cert paid"
     | "Tempo 100 Permit";
 
-export const parseMicrofilm = (microfilm?: DynamoDbImage): Microfilm | undefined => {
+export const parseMicrofilm = (microfilm?: DynamoDbImage): Maybe<Microfilm> => {
     if (!microfilm) {
         return undefined;
     }

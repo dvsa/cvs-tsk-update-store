@@ -1,6 +1,7 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 import {SqlParametersList} from "aws-sdk/clients/rdsdataservice";
 import {integerParam, stringParam} from "../services/sql-parameter";
+import {Maybe} from "./optionals";
 
 export type Axles = Axle[];
 
@@ -94,7 +95,7 @@ export const toTireSqlParameters = (tyre: AxleTyreProperties): SqlParametersList
     return sqlParameters;
 };
 
-const parseAxleWeightProperties = (axleWeightPropertiesImage?: DynamoDbImage): AxleWeightProperties | undefined => {
+const parseAxleWeightProperties = (axleWeightPropertiesImage?: DynamoDbImage): Maybe<AxleWeightProperties> => {
     if (!axleWeightPropertiesImage) {
         return undefined;
     }
@@ -108,7 +109,7 @@ const parseAxleWeightProperties = (axleWeightPropertiesImage?: DynamoDbImage): A
     };
 };
 
-const parseAxleTyreProperties = (axleTyrePropertiesImage?: DynamoDbImage): AxleTyreProperties | undefined => {
+const parseAxleTyreProperties = (axleTyrePropertiesImage?: DynamoDbImage): Maybe<AxleTyreProperties> => {
     if (!axleTyrePropertiesImage) {
         return undefined;
     }
@@ -123,7 +124,7 @@ const parseAxleTyreProperties = (axleTyrePropertiesImage?: DynamoDbImage): AxleT
     };
 };
 
-const parseAxleBrakeProperties = (axleBrakePropertiesImage?: DynamoDbImage): AxleBrakeProperties | undefined => {
+const parseAxleBrakeProperties = (axleBrakePropertiesImage?: DynamoDbImage): Maybe<AxleBrakeProperties> => {
     if (!axleBrakePropertiesImage) {
         return undefined;
     }
