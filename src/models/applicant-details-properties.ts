@@ -11,7 +11,11 @@ export interface ApplicantDetailsProperties {
     telephoneNumber?: string;
 }
 
-export const parseApplicantDetailsProperties = (applicantDetailsProperties: DynamoDbImage): ApplicantDetailsProperties => {
+export const parseApplicantDetailsProperties = (applicantDetailsProperties?: DynamoDbImage): ApplicantDetailsProperties | undefined => {
+    if (!applicantDetailsProperties) {
+        return undefined;
+    }
+
     return {
         name: applicantDetailsProperties.getString("name"),
         address1: applicantDetailsProperties.getString("address1"),

@@ -8,7 +8,11 @@ export interface LettersOfAuth {
     letterContents?: string;
 }
 
-export const parseLettersOfAuth = (lettersOfAuth: DynamoDbImage): LettersOfAuth => {
+export const parseLettersOfAuth = (lettersOfAuth?: DynamoDbImage): LettersOfAuth | undefined => {
+    if (!lettersOfAuth) {
+        return undefined;
+    }
+
     return {
         letterType: lettersOfAuth.getString("letterType") as LetterType,
         letterDateRequested: lettersOfAuth.getString("letterDateRequested"),

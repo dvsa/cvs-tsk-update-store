@@ -21,7 +21,11 @@ export type BodyTypeDescription =
     | "skip loader"
     | "refrigerated";
 
-export const parseBodyType = (bodyType: DynamoDbImage): BodyType => {
+export const parseBodyType = (bodyType?: DynamoDbImage): BodyType | undefined => {
+    if (!bodyType) {
+        return undefined;
+    }
+
     return {
         code: bodyType.getString("code") as BodyTypeCode,
         description: bodyType.getString("description") as BodyTypeDescription

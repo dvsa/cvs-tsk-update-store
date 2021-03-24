@@ -25,25 +25,29 @@ const deriveSqlOperation = (operationType: KnownOperationType): ((techRecordDocu
     switch (operationType) {
         case "INSERT":
         case "UPDATE":
-            return upsertTechRecord;
+            return upsertTechRecords;
         case "DELETE":
-            return deleteTechRecord;
+            return deleteTechRecords;
     }
 };
 
-const upsertTechRecord = async (techRecordDocument: TechRecordDocument): Promise<number[]> => {
+const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promise<number[]> => {
     const vehicleId = await upsertVehicle(techRecordDocument);
 
     const techRecords = techRecordDocument.techRecord;
 
     const insertedIds: number[] = [];
 
+    if (!techRecords) {
+        return [];
+    }
+
     for (const techRecord of techRecords) {
         const makeModelId = upsertMakeModel(techRecord);
         const vehicleClassId = upsertVehicleClass(techRecord);
         const contactDetailsId = upsertContactDetails(techRecord);
-        const createdById = upsertIdentity(techRecord.createdById, techRecord.createdByName);
-        const lastUpdatedById = upsertIdentity(techRecord.lastUpdatedById, techRecord.lastUpdatedByName);
+        const createdById = upsertIdentity(techRecord.createdById!, techRecord.createdByName!);
+        const lastUpdatedById = upsertIdentity(techRecord.lastUpdatedById!, techRecord.lastUpdatedByName!);
         const brakesId = upsertBrakes(techRecord);
         const vehicleSubclassId = upsertVehicleSubclass(techRecord);
 
@@ -57,7 +61,7 @@ const upsertTechRecord = async (techRecordDocument: TechRecordDocument): Promise
     return insertedIds;
 };
 
-const deleteTechRecord = async (techRecordDocument: TechRecordDocument): Promise<void> => {
+const deleteTechRecords = async (techRecordDocument: TechRecordDocument): Promise<void> => {
     // TODO
 };
 
@@ -81,13 +85,14 @@ const upsertVehicleClass = async (techRecord: TechRecord): Promise<number> => {
 
 const upsertContactDetails = async (techRecord: TechRecord): Promise<void> => {
     const insertContactDetailsQuery = "f_upsert_contact_details(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    const contactDetailsTemplateVariables = toContactDetailsTemplateVariables(techRecord.applicantDetails);
+    const contactDetailsTemplateVariables = toContactDetailsTemplateVariables(techRecord.applicantDetails!); // TODO check nullity
     contactDetailsTemplateVariables.push(getFaxNumber(techRecord));
     const insertContactDetailsResponse = await query(insertContactDetailsQuery, contactDetailsTemplateVariables);
     return insertContactDetailsResponse.results.insertId;
 };
 
 const upsertIdentity = async (id: string, name: string): Promise<number> => {
+    // TODO check nullity
     const insertIdentityQuery = "f_upsert_identity(?, ?)";
     const insertIdentityResponse = await query(insertIdentityQuery, [id, name]);
     return insertIdentityResponse.results.insertId;
@@ -95,7 +100,7 @@ const upsertIdentity = async (id: string, name: string): Promise<number> => {
 
 const upsertBrakes = async (techRecord: TechRecord): Promise<number> => {
     const insertBrakesQuery = "INSERT INTO brakes (brakeCodeOriginal, brakeCode, dataTrBrakeOne, dataTrBrakeTwo, dataTrBrakeThree, retarderBrakeOne, retarderBrakeTwo, dtpNumber, loadSensingValve, antilockBrakingSystem, serviceBrakeForceA, secondaryBrakeForceA, parkingBrakeForceA, serviceBrakeForceB, secondaryBrakeForceB, parkingBrakeForceB) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID();";
-    const insertBrakesResponse = await query(insertBrakesQuery, toBrakesTemplateVariables(techRecord.brakes));
+    const insertBrakesResponse = await query(insertBrakesQuery, toBrakesTemplateVariables(techRecord.brakes!)); // TODO check nullity
     return insertBrakesResponse.results[0].id;
 };
 

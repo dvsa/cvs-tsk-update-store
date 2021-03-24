@@ -13,7 +13,7 @@ describe("parse()", () => {
         expect(image.getBoolean("BooleanField")).toEqual(true);
         expect(image.getNumber("NumberField")).toEqual(123.45);
         expect(image.getString("StringField")).toEqual("Hello");
-        expect(image.getBinary("BinaryField").toString("utf-8")).toEqual("this text is base64-encoded");
+        expect(image.getBinary("BinaryField")!.toString("utf-8")).toEqual("this text is base64-encoded");
     });
 
     it("should parse a Dynamo image containing all set types", () => {
@@ -25,9 +25,9 @@ describe("parse()", () => {
 
     it("should parse a Dynamo image containing a list type", () => {
         const image = DynamoDbImage.parse(castToImageShape(listJson));
-        expect(image.getList("ListField").getString("0")).toEqual("Cookies");
-        expect(image.getList("ListField").getString("1")).toEqual("Coffee");
-        expect(image.getList("ListField").getNumber("2")).toEqual(3.14159);
+        expect(image.getList("ListField")!.getString("0")).toEqual("Cookies");
+        expect(image.getList("ListField")!.getString("1")).toEqual("Coffee");
+        expect(image.getList("ListField")!.getNumber("2")).toEqual(3.14159);
     });
 
     it("should parse a Dynamo image containing a map type", () => {
@@ -44,13 +44,13 @@ describe("parse()", () => {
     it("should access nested values correctly", () => {
         const image = DynamoDbImage.parse(castToImageShape(nestedJson));
 
-        const nestedListField: DynamoDbImage = image.getMap("ParentMapField").getList("ListField");
+        const nestedListField: DynamoDbImage = image.getMap("ParentMapField")!.getList("ListField")!;
         expect(nestedListField.getString("0")).toEqual("Hello");
-        expect(nestedListField.getMap("1").getString("StringField")).toEqual("Hello");
+        expect(nestedListField.getMap("1")!.getString("StringField")).toEqual("Hello");
 
-        const nestedMapField: DynamoDbImage = image.getList("ParentListField").getMap("0");
+        const nestedMapField: DynamoDbImage = image.getList("ParentListField")!.getMap("0")!;
         expect(nestedMapField.getString("StringField")).toEqual("Hello");
-        expect(nestedMapField.getList("ListField").getString("0")).toEqual("Hello");
+        expect(nestedMapField.getList("ListField")!.getString("0")).toEqual("Hello");
     });
 
     it("should fail on request for incorrect type", () => {

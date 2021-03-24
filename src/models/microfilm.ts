@@ -63,7 +63,11 @@ export type MicrofilmDocumentType =
     | "PRT - Tr Plating Cert paid"
     | "Tempo 100 Permit";
 
-export const parseMicrofilm = (microfilm: DynamoDbImage): Microfilm => {
+export const parseMicrofilm = (microfilm?: DynamoDbImage): Microfilm | undefined => {
+    if (!microfilm) {
+        return undefined;
+    }
+
     return {
         microfilmDocumentType: microfilm.getString("microfilmDocumentType") as MicrofilmDocumentType,
         microfilmRollNumber: microfilm.getString("microfilmRollNumber"),

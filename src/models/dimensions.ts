@@ -14,17 +14,12 @@ export interface AxleSpacingItem {
     value?: number;
 }
 
-export const parseDimensions = (dimensions: DynamoDbImage): Dimensions => {
-    const axleSpacing: AxleSpacing = [];
-
-    const axleSpacingImage = dimensions.getList("axleSpacing");
-    for (const key of axleSpacingImage.getKeys()) {
-        const axleSpacingItemImage = axleSpacingImage.getMap(key);
-        axleSpacing.push({
-            axles: axleSpacingItemImage.getString("axles"),
-            value: axleSpacingItemImage.getNumber("value")
-        });
+export const parseDimensions = (dimensions?: DynamoDbImage): Dimensions | undefined => {
+    if (!dimensions) {
+        return undefined;
     }
+
+    const axleSpacing = parseAxleSpacing(dimensions.getList("axleSpacing"));
 
     return {
         length: dimensions.getNumber("length"),
@@ -32,4 +27,22 @@ export const parseDimensions = (dimensions: DynamoDbImage): Dimensions => {
         width: dimensions.getNumber("width"),
         axleSpacing
     };
+};
+
+const parseAxleSpacing = (axleSpacingImage?: DynamoDbImage) => {
+    if (!axleSpacingImage) {
+        return [] as AxleSpacing;
+    }
+
+    const axleSpacing: AxleSpacing = [];
+
+    for (const key of axleSpacingImage.getKeys()) {
+        const axleSpacingItemImage = axleSpacingImage.getMap(key)!;
+        axleSpacing.push({
+            axles: axleSpacingItemImage.getString("axles"),
+            value: axleSpacingItemImage.getNumber("value")
+        });
+    }
+
+    return axleSpacing;
 };

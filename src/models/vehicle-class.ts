@@ -22,7 +22,11 @@ export type VehicleDescription =
 
 export type VehicleCode = "2" | "n" | "s" | "1" | "t" | "l" | "3" | "v" | "4" | "7" | "5";
 
-export const parseVehicleClass = (vehicleClass: DynamoDbImage): VehicleClass => {
+export const parseVehicleClass = (vehicleClass?: DynamoDbImage): VehicleClass | undefined => {
+    if (!vehicleClass) {
+        return undefined;
+    }
+
     return {
         code: vehicleClass.getString("code") as VehicleCode,
         description: vehicleClass.getString("description") as VehicleDescription

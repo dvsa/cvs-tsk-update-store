@@ -29,20 +29,13 @@ export interface BrakeForceWheelsUpToHalfLocked {
     parkingBrakeForceB?: number;
 }
 
-export const parseBrakes = (brakes: DynamoDbImage): Brakes => {
-    const brakeForceWheelsNotLockedImage: DynamoDbImage = brakes.getMap("brakeForceWheelsNotLocked");
-    const brakeForceWheelsNotLocked: BrakeForceWheelsNotLocked = {
-        serviceBrakeForceA: brakeForceWheelsNotLockedImage.getNumber("serviceBrakeForceA"),
-        secondaryBrakeForceA: brakeForceWheelsNotLockedImage.getNumber("secondaryBrakeForceA"),
-        parkingBrakeForceA: brakeForceWheelsNotLockedImage.getNumber("parkingBrakeForceA")
-    };
+export const parseBrakes = (brakes?: DynamoDbImage): Brakes | undefined => {
+    if (!brakes) {
+        return undefined;
+    }
 
-    const brakeForceWheelsUpToHalfLockedImage: DynamoDbImage = brakes.getMap("brakeForceWheelsUpToHalfLocked");
-    const brakeForceWheelsUpToHalfLocked: BrakeForceWheelsUpToHalfLocked = {
-        serviceBrakeForceB: brakeForceWheelsUpToHalfLockedImage.getNumber("serviceBrakeForceB"),
-        secondaryBrakeForceB: brakeForceWheelsUpToHalfLockedImage.getNumber("secondaryBrakeForceB"),
-        parkingBrakeForceB: brakeForceWheelsUpToHalfLockedImage.getNumber("parkingBrakeForceB")
-    };
+    const brakeForceWheelsNotLocked = parseBrakeForceWheelsNotLocked(brakes.getMap("brakeForceWheelsNotLocked"));
+    const brakeForceWheelsUpToHalfLocked = parseBrakeForceWheelsUpToHalfLocked(brakes.getMap("brakeForceWheelsUpToHalfLocked"));
 
     return {
         brakeCodeOriginal: brakes.getString("brakeCodeOriginal"),
@@ -83,4 +76,28 @@ export const toBrakesTemplateVariables = (brakes: Brakes): any[] => {
     templateVariables.push(brakes.brakeForceWheelsUpToHalfLocked!.parkingBrakeForceB);
 
     return templateVariables;
+};
+
+const parseBrakeForceWheelsNotLocked = (brakeForceWheelsNotLockedImage?: DynamoDbImage): BrakeForceWheelsNotLocked | undefined => {
+    if (!brakeForceWheelsNotLockedImage) {
+        return undefined;
+    }
+
+    return {
+        serviceBrakeForceA: brakeForceWheelsNotLockedImage.getNumber("serviceBrakeForceA"),
+        secondaryBrakeForceA: brakeForceWheelsNotLockedImage.getNumber("secondaryBrakeForceA"),
+        parkingBrakeForceA: brakeForceWheelsNotLockedImage.getNumber("parkingBrakeForceA")
+    };
+};
+
+const parseBrakeForceWheelsUpToHalfLocked = (brakeForceWheelsUpToHalfLockedImage?: DynamoDbImage): BrakeForceWheelsUpToHalfLocked | undefined => {
+    if (!brakeForceWheelsUpToHalfLockedImage) {
+        return undefined;
+    }
+
+    return {
+        serviceBrakeForceB: brakeForceWheelsUpToHalfLockedImage.getNumber("serviceBrakeForceB"),
+        secondaryBrakeForceB: brakeForceWheelsUpToHalfLockedImage.getNumber("secondaryBrakeForceB"),
+        parkingBrakeForceB: brakeForceWheelsUpToHalfLockedImage.getNumber("parkingBrakeForceB")
+    };
 };

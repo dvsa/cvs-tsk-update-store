@@ -13,7 +13,11 @@ export interface PurchaserDetails {
     purchaserNotes?: string;
 }
 
-export const parsePurchaserDetails = (purchaserDetails: DynamoDbImage): PurchaserDetails => {
+export const parsePurchaserDetails = (purchaserDetails?: DynamoDbImage): PurchaserDetails | undefined => {
+    if (!purchaserDetails) {
+        return undefined;
+    }
+
     return {
         name: purchaserDetails.getString("name"),
         address1: purchaserDetails.getString("address1"),

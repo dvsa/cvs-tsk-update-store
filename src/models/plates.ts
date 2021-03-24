@@ -20,11 +20,15 @@ export type PlateReasonForIssue =
     | "Original"
     | "Manual";
 
-export const parsePlates = (platesImage: DynamoDbImage): Plates => {
+export const parsePlates = (platesImage?: DynamoDbImage): Plates => {
+    if (!platesImage) {
+        return [] as Plates;
+    }
+
     const plates: Plates = [];
 
     for (const key of platesImage.getKeys()) {
-        const plateImage = platesImage.getMap(key);
+        const plateImage = platesImage.getMap(key)!;
 
         plates.push({
             plateSerialNumber: plateImage.getString("plateSerialNumber"),

@@ -81,14 +81,19 @@ export interface Tc3DetailsItem {
 
 export type Tc3Type = "intermediate" | "periodic" | "exceptional";
 
-export const parseAdrDetails = (adrDetails: DynamoDbImage): AdrDetails => {
-    const additionalNotesImage: DynamoDbImage = adrDetails.getMap("additionalNotes");
+// TODO fix this function to work with nullable values if it's ever needed
+export const parseAdrDetails = (adrDetails?: DynamoDbImage): AdrDetails | undefined => {
+    if (!adrDetails) {
+        return undefined;
+    }
+
+    const additionalNotesImage: DynamoDbImage = adrDetails.getMap("additionalNotes")!;
     const additionalNotes: AdditionalNotes = {
         number: parseStringArray(additionalNotesImage.getList("number")),
         guidanceNotes: parseStringArray(additionalNotesImage.getList("guidanceNotes"))
     };
 
-    const applicantDetailsImage: DynamoDbImage = adrDetails.getMap("applicantDetails");
+    const applicantDetailsImage: DynamoDbImage = adrDetails.getMap("applicantDetails")!;
     const applicantDetails: ApplicantDetails = {
         name: applicantDetailsImage.getString("name"),
         street: applicantDetailsImage.getString("street"),
@@ -97,28 +102,28 @@ export const parseAdrDetails = (adrDetails: DynamoDbImage): AdrDetails => {
         postcode: applicantDetailsImage.getString("postcode"),
     };
 
-    const vehicleDetailsImage: DynamoDbImage = adrDetails.getMap("vehicleDetails");
+    const vehicleDetailsImage: DynamoDbImage = adrDetails.getMap("vehicleDetails")!;
     const vehicleDetails: VehicleDetails = {
         type: vehicleDetailsImage.getString("type"),
         approvalDate: vehicleDetailsImage.getString("approvalDate")
     };
 
-    const tankImage: DynamoDbImage = adrDetails.getMap("tank");
+    const tankImage: DynamoDbImage = adrDetails.getMap("tank")!;
 
-    const tankDetailsImage = tankImage.getMap("tankDetails");
+    const tankDetailsImage = tankImage.getMap("tankDetails")!;
 
-    const tc2DetailsImage: DynamoDbImage = tankDetailsImage.getMap("tc2Details");
+    const tc2DetailsImage: DynamoDbImage = tankDetailsImage.getMap("tc2Details")!;
     const tc2Details: Tc2Details = {
         tc2Type: tc2DetailsImage.getString("tc2Type") as Tc2Type,
         tc2IntermediateApprovalNo: tc2DetailsImage.getString("tc2IntermediateApprovalNo"),
         tc2IntermediateExpiryDate: tc2DetailsImage.getString("tc2IntermediateExpiryDate")
     };
 
-    const tc3DetailsImage: DynamoDbImage = tankDetailsImage.getList("tc3Details");
+    const tc3DetailsImage: DynamoDbImage = tankDetailsImage.getList("tc3Details")!;
     const tc3Details: Tc3Details = [];
 
     for (const key of tc3DetailsImage.getKeys()) {
-        const tc3DetailsItemImage = tc3DetailsImage.getMap(key);
+        const tc3DetailsItemImage = tc3DetailsImage.getMap(key)!;
         tc3Details.push({
             tc3Type: tc3DetailsItemImage.getString("tc3Type") as Tc3Type,
             tc3PeriodicNumber: tc3DetailsItemImage.getString("tc3PeriodicNumber"),
@@ -137,7 +142,7 @@ export const parseAdrDetails = (adrDetails: DynamoDbImage): AdrDetails => {
         tc3Details
     };
 
-    const tankStatementImage: DynamoDbImage = tankImage.getMap("tankStatement");
+    const tankStatementImage: DynamoDbImage = tankImage.getMap("tankStatement")!;
     const tankStatement: TankStatement = {
         substancesPermitted: tankStatementImage.getString("substancesPermitted"),
         statement: tankStatementImage.getString("statement"),

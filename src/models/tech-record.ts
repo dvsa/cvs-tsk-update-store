@@ -8,11 +8,11 @@ import {Microfilm, parseMicrofilm} from "./microfilm";
 import {parsePlates, Plates} from "./plates";
 import {BodyType, parseBodyType} from "./body-type";
 import {Dimensions, parseDimensions} from "./dimensions";
-import {AdrDetails, parseAdrDetails} from "./adr-details";
+import {AdrDetails} from "./adr-details";
 import {parseVehicleClass, VehicleClass} from "./vehicle-class";
 import {Brakes, parseBrakes} from "./brakes";
 import {Axles, parseAxles} from "./axles";
-import {Dda, parseDda} from "./dda";
+import {Dda} from "./dda";
 
 export type TechRecords = TechRecord[];
 
@@ -174,11 +174,15 @@ export type VehicleConfiguration =
     | "dolly"
     | "full drawbar";
 
-export const parseTechRecords = (image: DynamoDbImage): TechRecords => {
+export const parseTechRecords = (image?: DynamoDbImage): TechRecords => {
+    if (!image) {
+        return [] as TechRecords;
+    }
+
     const techRecords: TechRecords = [];
 
     for (const key of image.getKeys()) {
-        techRecords.push(parseTechRecord(image.getMap(key)));
+        techRecords.push(parseTechRecord(image.getMap(key)!));
     }
 
     return techRecords;
@@ -269,7 +273,7 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
         notes: image.getString("notes"),
         noOfAxles: image.getNumber("noOfAxles"),
         brakeCode: image.getString("brakeCode"),
-        adrDetails: parseAdrDetails(image.getMap("adrDetails")),
+        adrDetails: undefined, // intentional - not implemented. parseAdrDetails(image.getMap("adrDetails"))
         createdByName: image.getString("createdByName"),
         createdById: image.getString("createdById"),
         lastUpdatedByName: image.getString("lastUpdatedByName"),
@@ -284,7 +288,7 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
         vehicleConfiguration: image.getString("vehicleConfiguration") as VehicleConfiguration,
         brakes: parseBrakes(image.getMap("brakes")),
         axles: parseAxles(image.getList("axles")),
-        dda: parseDda(image.getMap("dda"))
+        dda: undefined, // intentional - not implemented. parseDda(image.getMap("dda"))
     };
 };
 
