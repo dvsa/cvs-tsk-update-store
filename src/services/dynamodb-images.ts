@@ -1,4 +1,5 @@
 import {AttributeValue} from "aws-sdk/clients/dynamodbstreams";
+import {Maybe} from "../models/optionals";
 
 export type DynamoDbType = "NULL" | "BOOL" | "S" | "SS" | "N" | "NS" | "B" | "BS" | "M" | "L";
 
@@ -65,8 +66,8 @@ export class DynamoDbImage {
      * placeholder
      * @param key
      */
-    public getNull(key: string): null | undefined {
-        const field: DynamoDbField | undefined = this.fields.get(key);
+    public getNull(key: string): Maybe<null> {
+        const field: Maybe<DynamoDbField> = this.fields.get(key);
         if (field) {
             verifyType("NULL", field);
             return field.value as null;
@@ -78,8 +79,8 @@ export class DynamoDbImage {
      * placeholder
      * @param key
      */
-    public getBoolean(key: string): boolean | undefined {
-        const field: DynamoDbField | undefined = this.fields.get(key);
+    public getBoolean(key: string): Maybe<boolean> {
+        const field: Maybe<DynamoDbField> = this.fields.get(key);
         if (field) {
             verifyType("BOOL", field);
             return field.value as boolean;
@@ -91,8 +92,8 @@ export class DynamoDbImage {
      * placeholder
      * @param key
      */
-    public getString(key: string): string | undefined {
-        const field: DynamoDbField | undefined = this.fields.get(key);
+    public getString(key: string): Maybe<string> {
+        const field: Maybe<DynamoDbField> = this.fields.get(key);
         if (field) {
             verifyType("S", field);
             return field.value as string;
@@ -105,7 +106,7 @@ export class DynamoDbImage {
      * @param key
      */
     public getStrings(key: string): string[] {
-        const field: DynamoDbField | undefined = this.fields.get(key);
+        const field: Maybe<DynamoDbField> = this.fields.get(key);
         if (field) {
             verifyType("SS", field);
             return field.value as string[];
@@ -117,8 +118,8 @@ export class DynamoDbImage {
      * placeholder
      * @param key
      */
-    public getNumber(key: string): number | undefined {
-        const field: DynamoDbField | undefined = this.fields.get(key);
+    public getNumber(key: string): Maybe<number> {
+        const field: Maybe<DynamoDbField> = this.fields.get(key);
         if (field) {
             verifyType("N", field);
             return parseFloat(field.value) as number;
@@ -130,8 +131,8 @@ export class DynamoDbImage {
      * placeholder
      * @param key
      */
-    public getNumbers(key: string): number[] | undefined {
-        const field: DynamoDbField | undefined = this.fields.get(key);
+    public getNumbers(key: string): number[] {
+        const field: Maybe<DynamoDbField> = this.fields.get(key);
         if (field) {
             verifyType("NS", field);
             return field.value.map((f: any) => parseFloat(f)) as number[];
@@ -143,8 +144,8 @@ export class DynamoDbImage {
      * placeholder
      * @param key
      */
-    public getBinary(key: string): Buffer | undefined {
-        const field: DynamoDbField | undefined = this.fields.get(key);
+    public getBinary(key: string): Maybe<Buffer> {
+        const field: Maybe<DynamoDbField> = this.fields.get(key);
         if (field) {
             verifyType("B", field);
             return Buffer.from(field.value, "base64") as Buffer;
@@ -157,7 +158,7 @@ export class DynamoDbImage {
      * @param key
      */
     public getBinaries(key: string): Buffer[] {
-        const field: DynamoDbField | undefined = this.fields.get(key);
+        const field: Maybe<DynamoDbField> = this.fields.get(key);
         if (field) {
             verifyType("BS", field);
             return field.value.map((e: string) => Buffer.from(e, "base64")) as Buffer[];
@@ -169,8 +170,8 @@ export class DynamoDbImage {
      * placeholder
      * @param key
      */
-    public getMap(key: string): DynamoDbImage | undefined {
-        const field: DynamoDbField | undefined = this.fields.get(key);
+    public getMap(key: string): Maybe<DynamoDbImage> {
+        const field: Maybe<DynamoDbField> = this.fields.get(key);
         if (field) {
             verifyType("M", field);
             return DynamoDbImage.parse(field.value) as DynamoDbImage;
@@ -182,8 +183,8 @@ export class DynamoDbImage {
      * placeholder
      * @param key
      */
-    public getList(key: string): DynamoDbImage | undefined {
-        const field: DynamoDbField | undefined = this.fields.get(key);
+    public getList(key: string): Maybe<DynamoDbImage> {
+        const field: Maybe<DynamoDbField> = this.fields.get(key);
         if (field) {
             verifyType("L", field);
             let index = 0;

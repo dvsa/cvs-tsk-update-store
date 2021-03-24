@@ -1,8 +1,9 @@
 import * as mysql from "mysql";
 import {FieldInfo, Pool} from "mysql";
 import {getConnectionPoolConfiguration} from "./database-configuration";
+import {Maybe} from "../models/optionals";
 
-let pool: Pool | undefined;
+let pool: Maybe<Pool>;
 
 export const getConnectionPool = (): Pool => {
     if (!pool) {
