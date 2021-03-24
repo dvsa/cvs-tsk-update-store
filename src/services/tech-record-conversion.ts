@@ -5,7 +5,9 @@ import {
     getFaxNumber,
     TechRecord,
     toMakeModelTemplateVariables,
-    toVehicleClassTemplateVariables
+    toTechRecordTemplateVariables,
+    toVehicleClassTemplateVariables,
+    toVehicleSubClassTemplateVariables
 } from "../models/tech-record";
 import {toContactDetailsTemplateVariables} from "../models/applicant-details-properties";
 import {toBrakesTemplateVariables} from "../models/brakes";
@@ -19,7 +21,7 @@ export const techRecordDocumentConverter = async (operationType: KnownOperationT
     await sqlOperation(techRecordDocument);
 };
 
-const deriveSqlOperation = (operationType: KnownOperationType): ((techRecordDocument: TechRecordDocument) => Promise<void>) => {
+const deriveSqlOperation = (operationType: KnownOperationType): ((techRecordDocument: TechRecordDocument) => Promise<any>) => {
     switch (operationType) {
         case "INSERT":
         case "UPDATE":
@@ -29,10 +31,12 @@ const deriveSqlOperation = (operationType: KnownOperationType): ((techRecordDocu
     }
 };
 
-const upsertTechRecord = async (techRecordDocument: TechRecordDocument): Promise<void> => {
+const upsertTechRecord = async (techRecordDocument: TechRecordDocument): Promise<number[]> => {
     const vehicleId = await upsertVehicle(techRecordDocument);
 
     const techRecords = techRecordDocument.techRecord;
+
+    const insertedIds: number[] = [];
 
     for (const techRecord of techRecords) {
         const makeModelId = upsertMakeModel(techRecord);
@@ -41,13 +45,16 @@ const upsertTechRecord = async (techRecordDocument: TechRecordDocument): Promise
         const createdById = upsertIdentity(techRecord.createdById, techRecord.createdByName);
         const lastUpdatedById = upsertIdentity(techRecord.lastUpdatedById, techRecord.lastUpdatedByName);
         const brakesId = upsertBrakes(techRecord);
+        const vehicleSubclassId = upsertVehicleSubclass(techRecord);
 
-        // TODO vehicle_subclass
-        // TODO technical_record
+        const insertTechRecordQuery = "INSERT INTO technical_record (recordCompleteness, createdAt, lastUpdatedAt, functionCode, offRoad, numberOfWheelsDriven, emissionsLimit, departmentalVehicleMarker, alterationMarker, variantVersionNumber, grossEecWeight, trainEecWeight, maxTrainEecWeight, manufactureYear, regnDate, firstUseDate, coifDate, ntaNumber, coifSerialNumber, coifCertifierName, approvalType, approvalTypeNumber, variantNumber, conversionRefNo, seatsLowerDeck, seatsUpperDeck, standingCapacity, speedRestriction, speedLimiterMrk, tachoExemptMrk, dispensations, remarks, reasonForCreation, statusCode, unladenWeight, grossKerbWeight, grossLadenWeight, grossGbWeight, grossDesignWeight, trainGbWeight, trainDesignWeight, maxTrainGbWeight, maxTrainDesignWeight, maxLoadOnCoupling, frameDescription, tyreUseCode, roadFriendly, drawbarCouplingFitted, euroStandard, suspensionType, couplingType, length, height, width, frontAxleTo5thWheelMin, frontAxleTo5thWheelMax, frontAxleTo5thWheelCouplingMin, frontAxleTo5thWheelCouplingMax, frontAxleToRearAxle, rearAxleToRearTrl, couplingCenterToRearAxleMin, couplingCenterToRearAxleMax, couplingCenterToRearTrlMin, couplingCenterToRearTrlMax, centreOfRearmostAxleToRearOfTrl, notes, purchaserNotes, manufacturerNotes, noOfAxles, brakeCode, updateType, numberOfSeatbelts, seatbeltInstallationApprovalDate, vehicle_id, make_model_id, vehicle_class_id, applicant_detail_id, purchaser_detail_id, manufacturer_detail_id, createdBy_Id, lastUpdatedBy_Id, brakes_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        const techRecordTemplateVariables = toTechRecordTemplateVariables(techRecord);
+        techRecordTemplateVariables.push(vehicleId, makeModelId, vehicleClassId, contactDetailsId, createdById, lastUpdatedById, brakesId);
+        const insertTechRecordResponse = await query(insertTechRecordQuery, techRecordTemplateVariables);
+        insertedIds.push(insertTechRecordResponse.results.insertId);
     }
 
-    // #2 vehicle_subclass
-    // #3 technical_record
+    return insertedIds;
 };
 
 const deleteTechRecord = async (techRecordDocument: TechRecordDocument): Promise<void> => {
@@ -90,4 +97,10 @@ const upsertBrakes = async (techRecord: TechRecord): Promise<number> => {
     const insertBrakesQuery = "INSERT INTO brakes (brakeCodeOriginal, brakeCode, dataTrBrakeOne, dataTrBrakeTwo, dataTrBrakeThree, retarderBrakeOne, retarderBrakeTwo, dtpNumber, loadSensingValve, antilockBrakingSystem, serviceBrakeForceA, secondaryBrakeForceA, parkingBrakeForceA, serviceBrakeForceB, secondaryBrakeForceB, parkingBrakeForceB) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID();";
     const insertBrakesResponse = await query(insertBrakesQuery, toBrakesTemplateVariables(techRecord.brakes));
     return insertBrakesResponse.results[0].id;
+};
+
+const upsertVehicleSubclass = async (techRecord: TechRecord): Promise<number> => {
+    const insertVehicleSubclassQuery = "f_upsert_vehicle_subclass(?)"; // TODO why is this only one field? shouldn't it contain vehicle_class_id?
+    const insertVehicleSubclassResponse = await query(insertVehicleSubclassQuery, toVehicleSubClassTemplateVariables(techRecord));
+    return insertVehicleSubclassResponse.results.insertId;
 };
