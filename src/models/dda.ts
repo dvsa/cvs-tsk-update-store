@@ -2,18 +2,18 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 
 export interface Dda {
-    certificateIssued: boolean;
-    wheelchairCapacity: number;
-    wheelchairFittings: string;
-    wheelchairLiftPresent: boolean;
-    wheelchairLiftInformation: string;
-    wheelchairRampPresent: boolean;
-    wheelchairRampInformation: string;
-    minEmergencyExits: number;
-    outswing: string;
-    ddaSchedules: string;
-    seatbeltsFitted: number;
-    ddaNotes: string;
+    certificateIssued?: boolean;
+    wheelchairCapacity?: number;
+    wheelchairFittings?: string;
+    wheelchairLiftPresent?: boolean;
+    wheelchairLiftInformation?: string;
+    wheelchairRampPresent?: boolean;
+    wheelchairRampInformation?: string;
+    minEmergencyExits?: number;
+    outswing?: string;
+    ddaSchedules?: string;
+    seatbeltsFitted?: number;
+    ddaNotes?: string;
 }
 
 export const parseDda = (dda: DynamoDbImage): Dda => {
@@ -32,3 +32,5 @@ export const parseDda = (dda: DynamoDbImage): Dda => {
         ddaNotes: dda.getString("ddaNotes")
     };
 };
+
+// TODO add toDdaTemplateVariables, whenever it's needed

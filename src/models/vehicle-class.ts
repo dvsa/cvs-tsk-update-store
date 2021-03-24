@@ -1,8 +1,8 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 
 export interface VehicleClass {
-    code: VehicleCode;
-    description: VehicleDescription;
+    code?: VehicleCode;
+    description?: VehicleDescription;
 }
 
 export type VehicleDescription =

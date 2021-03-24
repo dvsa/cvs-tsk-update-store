@@ -5,11 +5,11 @@ import {stringParam} from "../services/sql-parameter";
 export type Plates = Plate[];
 
 export interface Plate {
-    plateSerialNumber: string;
-    plateIssueDate: string;
-    plateReasonForIssue: PlateReasonForIssue;
-    plateIssuer: string;
-    toEmailAddress: string;
+    plateSerialNumber?: string;
+    plateIssueDate?: string;
+    plateReasonForIssue?: PlateReasonForIssue;
+    plateIssuer?: string;
+    toEmailAddress?: string;
 }
 
 export type PlateReasonForIssue =
@@ -41,10 +41,12 @@ export const parsePlates = (platesImage: DynamoDbImage): Plates => {
 export const toPlateSqlParameters = (plate: Plate): SqlParametersList => {
     const sqlParameters: SqlParametersList = [];
 
-    sqlParameters.push(stringParam("plateSerialNumber", plate.plateSerialNumber));
-    sqlParameters.push(stringParam("plateIssueDate", plate.plateIssueDate));
-    sqlParameters.push(stringParam("plateReasonForIssue", plate.plateReasonForIssue));
-    sqlParameters.push(stringParam("plateIssuer", plate.plateIssuer));
+    sqlParameters.push(stringParam("plateSerialNumber", plate.plateSerialNumber!));
+    sqlParameters.push(stringParam("plateIssueDate", plate.plateIssueDate!));
+    sqlParameters.push(stringParam("plateReasonForIssue", plate.plateReasonForIssue!));
+    sqlParameters.push(stringParam("plateIssuer", plate.plateIssuer!));
 
     return sqlParameters;
 };
+
+// TODO add toPlateTemplateVariables

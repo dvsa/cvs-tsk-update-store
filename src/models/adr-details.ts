@@ -1,74 +1,72 @@
 import {DynamoDbImage, parseStringArray} from "../services/dynamodb-images";
-import {SqlParametersList} from "aws-sdk/clients/rdsdataservice";
-import {booleanParam, dateParam, stringParam} from "../services/sql-parameter";
 
 export interface AdrDetails {
-    vehicleDetails: VehicleDetails;
-    listStatementApplicable: boolean;
-    batteryListNumber: string;
-    declarationsSeen: boolean;
-    brakeDeclarationsSeen: boolean;
-    brakeDeclarationIssuer: string;
-    brakeEndurance: boolean;
-    weight: string;
-    compatibilityGroupJ: boolean;
-    documents: string[];
-    permittedDangerousGoods: string[];
-    additionalExaminerNotes: string;
-    applicantDetails: ApplicantDetails;
-    memosApply: string[];
-    additionalNotes: AdditionalNotes;
-    adrTypeApprovalNo: string;
-    adrCertificateNotes: string;
-    tank: Tank;
+    vehicleDetails?: VehicleDetails;
+    listStatementApplicable?: boolean;
+    batteryListNumber?: string;
+    declarationsSeen?: boolean;
+    brakeDeclarationsSeen?: boolean;
+    brakeDeclarationIssuer?: string;
+    brakeEndurance?: boolean;
+    weight?: string;
+    compatibilityGroupJ?: boolean;
+    documents?: string[];
+    permittedDangerousGoods?: string[];
+    additionalExaminerNotes?: string;
+    applicantDetails?: ApplicantDetails;
+    memosApply?: string[];
+    additionalNotes?: AdditionalNotes;
+    adrTypeApprovalNo?: string;
+    adrCertificateNotes?: string;
+    tank?: Tank;
 }
 
 export interface VehicleDetails {
-    type: string;
-    approvalDate: string;
+    type?: string;
+    approvalDate?: string;
 }
 
 export interface ApplicantDetails {
-    name: string;
-    street: string;
-    town: string;
-    city: string;
-    postcode: string;
+    name?: string;
+    street?: string;
+    town?: string;
+    city?: string;
+    postcode?: string;
 }
 
 export interface AdditionalNotes {
-    number: string[];
-    guidanceNotes: string[];
+    number?: string[];
+    guidanceNotes?: string[];
 }
 
 export interface Tank {
-    tankDetails: TankDetails;
-    tankStatement: TankStatement;
+    tankDetails?: TankDetails;
+    tankStatement?: TankStatement;
 }
 
 export interface TankDetails {
-    tankManufacturer: string;
-    yearOfManufacture: number;
-    tankCode: string;
-    specialProvisions: string;
-    tankManufacturerSerialNo: string;
-    tankTypeAppNo: string;
-    tc2Details: Tc2Details;
-    tc3Details: Tc3Details;
+    tankManufacturer?: string;
+    yearOfManufacture?: number;
+    tankCode?: string;
+    specialProvisions?: string;
+    tankManufacturerSerialNo?: string;
+    tankTypeAppNo?: string;
+    tc2Details?: Tc2Details;
+    tc3Details?: Tc3Details;
 }
 
 export interface TankStatement {
-    substancesPermitted: string;
-    statement: string;
-    productListRefNo: string;
-    productListUnNo: string[];
-    productList: string;
+    substancesPermitted?: string;
+    statement?: string;
+    productListRefNo?: string;
+    productListUnNo?: string[];
+    productList?: string;
 }
 
 export interface Tc2Details {
-    tc2Type: Tc2Type;
-    tc2IntermediateApprovalNo: string;
-    tc2IntermediateExpiryDate: string;
+    tc2Type?: Tc2Type;
+    tc2IntermediateApprovalNo?: string;
+    tc2IntermediateExpiryDate?: string;
 }
 
 export type Tc2Type = "initial";
@@ -76,9 +74,9 @@ export type Tc2Type = "initial";
 export type Tc3Details = Tc3DetailsItem[];
 
 export interface Tc3DetailsItem {
-    tc3Type: Tc3Type;
-    tc3PeriodicNumber: string;
-    tc3PeriodicExpiryDate: string;
+    tc3Type?: Tc3Type;
+    tc3PeriodicNumber?: string;
+    tc3PeriodicExpiryDate?: string;
 }
 
 export type Tc3Type = "intermediate" | "periodic" | "exceptional";
@@ -175,45 +173,6 @@ export const parseAdrDetails = (adrDetails: DynamoDbImage): AdrDetails => {
     };
 };
 
-export const toAdrSqlParameters = (adrDetails: AdrDetails): SqlParametersList => {
-    const sqlParameters: SqlParametersList = [];
+// TODO add toAdrDetailsTemplateVariables, whenever it's needed
 
-    // TODO resolve issues at a later date - ADR out of scope for now
-
-    sqlParameters.push(stringParam("type", adrDetails.vehicleDetails.type));
-    sqlParameters.push(dateParam("approvalDate", adrDetails.vehicleDetails.approvalDate));
-    sqlParameters.push(booleanParam("listStatementApplicable", adrDetails.listStatementApplicable));
-    sqlParameters.push(stringParam("batteryListNumber", adrDetails.batteryListNumber));
-    sqlParameters.push(booleanParam("declarationsSeen", adrDetails.declarationsSeen));
-    sqlParameters.push(booleanParam("brakeDeclarationsSeen", adrDetails.brakeDeclarationsSeen));
-    // sqlParameters.push(booleanParam("brakeDeclarationIssuer", adrDetails.brakeDeclarationIssuer));
-    sqlParameters.push(booleanParam("brakeEndurance", adrDetails.brakeEndurance));
-    sqlParameters.push(stringParam("weight", adrDetails.weight));
-    sqlParameters.push(booleanParam("compatibilityGroupJ", adrDetails.compatibilityGroupJ));
-    sqlParameters.push(stringParam("additionalExaminerNotes", adrDetails.additionalExaminerNotes));
-    sqlParameters.push(stringParam("applicantDetailsName", adrDetails.applicantDetails.name));
-    sqlParameters.push(stringParam("street", adrDetails.applicantDetails.street));
-    sqlParameters.push(stringParam("town", adrDetails.applicantDetails.town));
-    sqlParameters.push(stringParam("city", adrDetails.applicantDetails.city));
-    sqlParameters.push(stringParam("postcode", adrDetails.applicantDetails.postcode));
-    // sqlParameters.push(stringParam("memosApply", adrDetails.memosApply));
-    sqlParameters.push(stringParam("adrTypeApprovalNo", adrDetails.adrTypeApprovalNo));
-    sqlParameters.push(stringParam("adrCertificateNotes", adrDetails.adrCertificateNotes));
-    sqlParameters.push(stringParam("tankManufacturer", adrDetails.tank.tankDetails.tankManufacturer));
-    // sqlParameters.push(dateParam("yearOfManufacture", adrDetails.tank.tankDetails.yearOfManufacture));
-    sqlParameters.push(stringParam("tankCode", adrDetails.tank.tankDetails.tankCode));
-    sqlParameters.push(stringParam("specialProvisions", adrDetails.tank.tankDetails.specialProvisions));
-    sqlParameters.push(stringParam("tankManufacturerSerialNo", adrDetails.tank.tankDetails.tankManufacturerSerialNo));
-    sqlParameters.push(stringParam("tankTypeAppNo", adrDetails.tank.tankDetails.tankTypeAppNo));
-    sqlParameters.push(stringParam("tc2Type", adrDetails.tank.tankDetails.tc2Details.tc2Type));
-    sqlParameters.push(stringParam("tc2IntermediateApprovalNo", adrDetails.tank.tankDetails.tc2Details.tc2IntermediateApprovalNo));
-    sqlParameters.push(dateParam("tc2IntermediateExpiryDate", adrDetails.tank.tankDetails.tc2Details.tc2IntermediateExpiryDate));
-    sqlParameters.push(stringParam("substancesPermitted", adrDetails.tank.tankDetails.tc2Details.tc2Type));
-    sqlParameters.push(stringParam("statement", adrDetails.tank.tankStatement.statement));
-    sqlParameters.push(stringParam("productListRefNo", adrDetails.tank.tankStatement.productListRefNo));
-    sqlParameters.push(stringParam("productList", adrDetails.tank.tankStatement.productList));
-
-    return sqlParameters;
-};
-
-// TODO add toPermittedDangerousGoods, toDangerousGoods, toAdditionalNotes, toAdditionalGuidance, etc
+// TODO add variants toPermittedDangerousGoods, toDangerousGoods, toAdditionalNotes, toAdditionalGuidance, etc

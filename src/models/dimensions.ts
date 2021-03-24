@@ -1,17 +1,17 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 
 export interface Dimensions {
-    length: number;
-    height: number;
-    width: number;
-    axleSpacing: AxleSpacing;
+    length?: number;
+    height?: number;
+    width?: number;
+    axleSpacing?: AxleSpacing;
 }
 
 export type AxleSpacing = AxleSpacingItem[];
 
 export interface AxleSpacingItem {
-    axles: string;
-    value: number;
+    axles?: string;
+    value?: number;
 }
 
 export const parseDimensions = (dimensions: DynamoDbImage): Dimensions => {

@@ -1,8 +1,8 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 
 export interface BodyType {
-    code: BodyTypeCode;
-    description: BodyTypeDescription;
+    code?: BodyTypeCode;
+    description?: BodyTypeDescription;
 }
 
 export type BodyTypeCode = "a" | "s" | "d" | "o" | "m" | "x" | "p" | "k" | "t" | "b" | "f" | "r" | "c";

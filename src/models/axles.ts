@@ -5,28 +5,28 @@ import {integerParam, stringParam} from "../services/sql-parameter";
 export type Axles = Axle[];
 
 export interface Axle {
-    axleNumber: number;
-    parkingBrakeMrk: boolean;
-    weights: AxleWeightProperties;
-    tyres: AxleTyreProperties;
-    brakes: AxleBrakeProperties;
+    axleNumber?: number;
+    parkingBrakeMrk?: boolean;
+    weights?: AxleWeightProperties;
+    tyres?: AxleTyreProperties;
+    brakes?: AxleBrakeProperties;
 }
 
 export interface AxleWeightProperties {
-    kerbWeight: number;
-    ladenWeight: number;
-    gbWeight: number;
-    eecWeight: number;
-    designWeight: number;
+    kerbWeight?: number;
+    ladenWeight?: number;
+    gbWeight?: number;
+    eecWeight?: number;
+    designWeight?: number;
 }
 
 export interface AxleTyreProperties {
-    tyreSize: string;
-    plyRating: string;
-    fitmentCode: FitmentCode;
-    dataTrAxles: number;
-    speedCategorySymbol: SpeedCategorySymbol;
-    tyreCode: number;
+    tyreSize?: string;
+    plyRating?: string;
+    fitmentCode?: FitmentCode;
+    dataTrAxles?: number;
+    speedCategorySymbol?: SpeedCategorySymbol;
+    tyreCode?: number;
 }
 
 export type FitmentCode = "double" | "single";
@@ -49,9 +49,9 @@ export type SpeedCategorySymbol =
     | "q";
 
 export interface AxleBrakeProperties {
-    brakeActuator: number;
-    leverLength: number;
-    springBrakeParking: boolean;
+    brakeActuator?: number;
+    leverLength?: number;
+    springBrakeParking?: boolean;
 }
 
 export const parseAxles = (axlesImage: DynamoDbImage): Axles => {
@@ -96,15 +96,16 @@ export const parseAxles = (axlesImage: DynamoDbImage): Axles => {
     return axles;
 };
 
+// TODO remove, add toTireTemplateVariables instead
 export const toTireSqlParameters = (tyre: AxleTyreProperties): SqlParametersList => {
     const sqlParameters: SqlParametersList = [];
 
-    sqlParameters.push(stringParam("tyreSize", tyre.tyreSize));
-    sqlParameters.push(stringParam("plyRating", tyre.plyRating));
-    sqlParameters.push(stringParam("fitmentCode", tyre.fitmentCode));
-    sqlParameters.push(stringParam("dataTrAxles", "" + tyre.dataTrAxles));
-    sqlParameters.push(stringParam("speedCategorySymbol", tyre.speedCategorySymbol));
-    sqlParameters.push(integerParam("tyreCode", tyre.tyreCode));
+    sqlParameters.push(stringParam("tyreSize", tyre.tyreSize!));
+    sqlParameters.push(stringParam("plyRating", tyre.plyRating!));
+    sqlParameters.push(stringParam("fitmentCode", tyre.fitmentCode!));
+    sqlParameters.push(stringParam("dataTrAxles", "" + tyre.dataTrAxles!));
+    sqlParameters.push(stringParam("speedCategorySymbol", tyre.speedCategorySymbol!));
+    sqlParameters.push(integerParam("tyreCode", tyre.tyreCode!));
 
     return sqlParameters;
 };

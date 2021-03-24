@@ -1,16 +1,16 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 
 export interface ManufacturerDetails {
-    name: string;
-    address1: string;
-    address2: string;
-    postTown: string;
-    address3: string;
-    postCode: string;
-    emailAddress: string;
-    telephoneNumber: string;
-    faxNumber: string;
-    manufacturerNotes: string;
+    name?: string;
+    address1?: string;
+    address2?: string;
+    postTown?: string;
+    address3?: string;
+    postCode?: string;
+    emailAddress?: string;
+    telephoneNumber?: string;
+    faxNumber?: string;
+    manufacturerNotes?: string;
 }
 
 export const parseManufacturerDetails = (manufacturerDetails: DynamoDbImage): ManufacturerDetails => {
