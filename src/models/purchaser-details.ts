@@ -17,9 +17,9 @@ export const parsePurchaserDetails = (purchaserDetails: DynamoDbImage): Purchase
     return {
         name: purchaserDetails.getString("name"),
         address1: purchaserDetails.getString("address1"),
-        address2: purchaserDetails.getString("address1"),
+        address2: purchaserDetails.getString("address2"),
         postTown: purchaserDetails.getString("postTown"),
-        address3: purchaserDetails.getString("address1"),
+        address3: purchaserDetails.getString("address3"),
         postCode: purchaserDetails.getString("postCode"),
         emailAddress: purchaserDetails.getString("emailAddress"),
         telephoneNumber: purchaserDetails.getString("telephoneNumber"),

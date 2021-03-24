@@ -34,7 +34,6 @@ export const toVehicleSqlParameters = (techRecordDocument: TechRecordDocument): 
     sqlParameters.push(stringParam("vin", techRecordDocument.vin));
     sqlParameters.push(stringParam("vrm_trm", techRecordDocument.primaryVrm));
     sqlParameters.push(stringParam("trailer_id", techRecordDocument.trailerId));
-    // sqlParameters.push(timestampParam("createdAt", ""/*TODO*/));
 
     return sqlParameters;
 };

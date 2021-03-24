@@ -119,7 +119,7 @@ export const parseAdrDetails = (adrDetails: DynamoDbImage): AdrDetails => {
     const tc3DetailsImage: DynamoDbImage = tankDetailsImage.getList("tc3Details");
     const tc3Details: Tc3Details = [];
 
-    for (const key of Object.keys(tc3DetailsImage)) {
+    for (const key of tc3DetailsImage.getKeys()) {
         const tc3DetailsItemImage = tc3DetailsImage.getMap(key);
         tc3Details.push({
             tc3Type: tc3DetailsItemImage.getString("tc3Type") as Tc3Type,

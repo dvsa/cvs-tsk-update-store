@@ -17,8 +17,8 @@ export interface AxleSpacingItem {
 export const parseDimensions = (dimensions: DynamoDbImage): Dimensions => {
     const axleSpacing: AxleSpacing = [];
 
-    const axleSpacingImage = dimensions.getMap("axleSpacing");
-    for (const key of Object.keys(axleSpacingImage)) {
+    const axleSpacingImage = dimensions.getList("axleSpacing");
+    for (const key of axleSpacingImage.getKeys()) {
         const axleSpacingItemImage = axleSpacingImage.getMap(key);
         axleSpacing.push({
             axles: axleSpacingItemImage.getString("axles"),

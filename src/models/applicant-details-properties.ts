@@ -17,9 +17,9 @@ export const parseApplicantDetailsProperties = (applicantDetailsProperties: Dyna
     return {
         name: applicantDetailsProperties.getString("name"),
         address1: applicantDetailsProperties.getString("address1"),
-        address2: applicantDetailsProperties.getString("address1"),
+        address2: applicantDetailsProperties.getString("address2"),
         postTown: applicantDetailsProperties.getString("postTown"),
-        address3: applicantDetailsProperties.getString("address1"),
+        address3: applicantDetailsProperties.getString("address3"),
         postCode: applicantDetailsProperties.getString("postCode"),
         emailAddress: applicantDetailsProperties.getString("emailAddress"),
         telephoneNumber: applicantDetailsProperties.getString("telephoneNumber")

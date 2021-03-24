@@ -179,7 +179,7 @@ export type VehicleConfiguration =
 export const parseTechRecords = (image: DynamoDbImage): TechRecords => {
     const techRecords: TechRecords = [];
 
-    for (const key of Object.keys(image)) {
+    for (const key of image.getKeys()) {
         techRecords.push(parseTechRecord(image.getMap(key)));
     }
 
@@ -228,7 +228,7 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
         ntaNumber: image.getString("ntaNumber"),
         coifSerialNumber: image.getString("coifSerialNumber"),
         coifCertifierName: image.getString("coifCertifierName"),
-        conversionRefNo: image.getString("coifCertifierName"),
+        conversionRefNo: image.getString("conversionRefNo"),
         seatsLowerDeck: image.getNumber("seatsLowerDeck"),
         seatsUpperDeck: image.getNumber("seatsUpperDeck"),
         standingCapacity: image.getNumber("standingCapacity"),

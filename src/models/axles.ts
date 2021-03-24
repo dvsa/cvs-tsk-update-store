@@ -57,7 +57,7 @@ export interface AxleBrakeProperties {
 export const parseAxles = (axlesImage: DynamoDbImage): Axles => {
     const axles: Axles = [];
 
-    for (const key of Object.keys(axlesImage)) {
+    for (const key of axlesImage.getKeys()) {
         const axleImage = axlesImage.getMap(key);
 
         const weightsImage = axleImage.getMap("weights");

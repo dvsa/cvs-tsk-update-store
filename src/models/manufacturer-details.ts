@@ -17,9 +17,9 @@ export const parseManufacturerDetails = (manufacturerDetails: DynamoDbImage): Ma
     return {
         name: manufacturerDetails.getString("name"),
         address1: manufacturerDetails.getString("address1"),
-        address2: manufacturerDetails.getString("address1"),
+        address2: manufacturerDetails.getString("address2"),
         postTown: manufacturerDetails.getString("postTown"),
-        address3: manufacturerDetails.getString("address1"),
+        address3: manufacturerDetails.getString("address3"),
         postCode: manufacturerDetails.getString("postCode"),
         emailAddress: manufacturerDetails.getString("emailAddress"),
         telephoneNumber: manufacturerDetails.getString("telephoneNumber"),

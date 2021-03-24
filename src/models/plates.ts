@@ -23,7 +23,7 @@ export type PlateReasonForIssue =
 export const parsePlates = (platesImage: DynamoDbImage): Plates => {
     const plates: Plates = [];
 
-    for (const key of Object.keys(platesImage)) {
+    for (const key of platesImage.getKeys()) {
         const plateImage = platesImage.getMap(key);
 
         plates.push({
