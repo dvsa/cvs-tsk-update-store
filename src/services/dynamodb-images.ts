@@ -13,7 +13,7 @@ export interface DynamoDbField {
 export const parseStringArray = (listOfStrings: DynamoDbImage): string[] => {
     const strings: string[] = [];
 
-    for (const key of Object.keys(listOfStrings)) {
+    for (const key of listOfStrings.getKeys()) {
         strings.push(listOfStrings.getString(key));
     }
 
@@ -166,7 +166,13 @@ export class DynamoDbImage {
                     } as DynamoDbField;
                 })
         );
-        // return field.value as DynamoDbImage;
+    }
+
+    /**
+     * placeholder
+     */
+    public getKeys(): string[] {
+        return Array.from(this.fields.keys());
     }
 
     /**
