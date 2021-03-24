@@ -13,7 +13,7 @@ import {toContactDetailsTemplateVariables} from "../models/applicant-details-pro
 import {toBrakesTemplateVariables} from "../models/brakes";
 import {KnownOperationType} from "./operation-types";
 
-export const techRecordDocumentConverter = async (operationType: KnownOperationType, image: DynamoDbImage): Promise<void> => {
+export const convertTechRecordDocument = async (operationType: KnownOperationType, image: DynamoDbImage): Promise<void> => {
     const techRecordDocument: TechRecordDocument = parseTechRecordDocument(image);
 
     const sqlOperation: (techRecordDocument: TechRecordDocument) => Promise<void> = deriveSqlOperation(operationType);

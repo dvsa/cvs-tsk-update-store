@@ -1,12 +1,12 @@
 import {DynamoDbImage} from "./dynamodb-images";
-import {techRecordDocumentConverter} from "./tech-record-conversion";
+import {convertTechRecordDocument} from "./tech-record-conversion";
 import {KnownOperationType} from "./operation-types";
 
 export type EntityConverter = (operationType: KnownOperationType, image: DynamoDbImage) => Promise<void>;
 
 const entityHandlers: Map<string, EntityConverter> = new Map();
 
-entityHandlers.set("Technical_Records", techRecordDocumentConverter); // TODO actual table names
+entityHandlers.set("Technical_Records", convertTechRecordDocument); // TODO actual table names
 
 export const getEntityConverter = (tableName: string): EntityConverter => {
     const entityFactory: ((operationType: KnownOperationType, image: DynamoDbImage) => Promise<void>) | undefined = entityHandlers.get(tableName);
