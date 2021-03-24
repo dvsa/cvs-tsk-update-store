@@ -1,25 +1,17 @@
 import * as mysql from "mysql";
-import {FieldInfo, Pool, PoolConfig} from "mysql";
-
-const poolConfig: PoolConfig = {
-    connectionLimit: 10,
-    host: "localhost",
-    port: 49156,
-    user: "root",
-    password: "12345",
-    database: "vott_db"
-};
+import {FieldInfo, Pool} from "mysql";
+import {getConnectionPoolConfiguration} from "./database-configuration";
 
 let pool: Pool | undefined;
 
-export const getOrCreatePool = (): Pool => {
+export const getConnectionPool = (): Pool => {
     if (!pool) {
-        pool = mysql.createPool(poolConfig);
+        pool = mysql.createPool(getConnectionPoolConfiguration());
     }
     return pool;
 };
 
-export const destroyPool = async (): Promise<void> => {
+export const destroyConnectionPool = async (): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
         if (pool) {
             pool.end((err) => {
@@ -37,7 +29,7 @@ export interface QueryResponse {
 
 export const query = (sql: string, templateVariables?: any[]): Promise<QueryResponse> => {
     return new Promise<QueryResponse>((resolve, reject) => {
-        getOrCreatePool().query(sql, templateVariables, (error, results, fields) => {
+        getConnectionPool().query(sql, templateVariables, (error, results, fields) => {
             if (error) {
                 reject(error);
                 return;
