@@ -1,6 +1,6 @@
-import {PoolConfig} from "mysql";
+import {PoolOptions} from "mysql2";
 
-const poolConfig: PoolConfig = {
+const poolConfig: PoolOptions = {
     connectionLimit: 10,
     host: "localhost",
     port: 49156,
@@ -9,6 +9,6 @@ const poolConfig: PoolConfig = {
     database: "vott_db"
 };
 
-export const getConnectionPoolConfiguration = (): PoolConfig => {
+export const getConnectionPoolConfiguration = (): PoolOptions => {
     return poolConfig;
 };

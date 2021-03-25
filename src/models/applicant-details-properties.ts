@@ -1,5 +1,6 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 import {Maybe} from "./optionals";
+import {undefinedToNull} from "../services/connection-pool";
 
 export interface ApplicantDetailsProperties {
     name?: string;
@@ -41,5 +42,5 @@ export const toContactDetailsTemplateVariables = (applicantDetailsProperties: Ap
     templateVariables.push(applicantDetailsProperties.emailAddress);
     templateVariables.push(applicantDetailsProperties.telephoneNumber);
 
-    return templateVariables;
+    return undefinedToNull(templateVariables);
 };

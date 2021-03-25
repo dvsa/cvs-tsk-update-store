@@ -1,44 +1,41 @@
-import * as mysql from "mysql";
-import {FieldInfo, Pool} from "mysql";
+import * as mysql2 from "mysql2/promise";
+import {FieldPacket, Pool} from "mysql2/promise";
 import {getConnectionPoolConfiguration} from "./database-configuration";
 import {Maybe} from "../models/optionals";
+
+export interface QueryResponse {
+    rows?: any;
+    fields?: FieldPacket[];
+}
 
 let pool: Maybe<Pool>;
 
 export const getConnectionPool = (): Pool => {
     if (!pool) {
-        pool = mysql.createPool(getConnectionPoolConfiguration());
+        pool = mysql2.createPool(getConnectionPoolConfiguration());
     }
     return pool;
 };
 
 export const destroyConnectionPool = async (): Promise<void> => {
-    return new Promise<void>((resolve, reject) => {
-        if (pool) {
-            pool.end((err) => {
-                reject(err);
-            });
-        }
-        resolve();
-    });
+    if (pool) {
+        await pool.end();
+    }
 };
 
-export interface QueryResponse {
-    results?: any;
-    fields?: FieldInfo[];
-}
+export const execute = async (sql: string, templateVariables?: any[]): Promise<QueryResponse> => {
+    const [rows, fields] = await getConnectionPool().execute(sql, templateVariables);
+    return {
+        rows,
+        fields
+    };
+};
 
-export const query = (sql: string, templateVariables?: any[]): Promise<QueryResponse> => {
-    return new Promise<QueryResponse>((resolve, reject) => {
-        getConnectionPool().query(sql, templateVariables, (error, results, fields) => {
-            if (error) {
-                reject(error);
-                return;
-            }
-            resolve({
-                results,
-                fields
-            });
-        });
+export const undefinedToNull = (array: any[]): any[] => {
+    array.forEach((v, i) => {
+        if (v === undefined) {
+            array[i] = null;
+        }
     });
+    return array;
 };

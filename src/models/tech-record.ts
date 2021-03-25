@@ -14,6 +14,7 @@ import {Brakes, parseBrakes} from "./brakes";
 import {Axles, parseAxles} from "./axles";
 import {Dda} from "./dda";
 import {Maybe} from "./optionals";
+import {undefinedToNull} from "../services/connection-pool";
 
 export type TechRecords = TechRecord[];
 
@@ -372,7 +373,7 @@ export const toTechRecordTemplateVariables = (techRecord: TechRecord): any[] => 
     templateVariables.push(techRecord.numberOfSeatbelts);
     templateVariables.push(techRecord.seatbeltInstallationApprovalDate);
 
-    return templateVariables;
+    return undefinedToNull(templateVariables);
 };
 
 export const toMakeModelTemplateVariables = (techRecord: TechRecord): any[] => {
@@ -389,7 +390,7 @@ export const toMakeModelTemplateVariables = (techRecord: TechRecord): any[] => {
     templateVariables.push(techRecord.bodyType!.description);
     templateVariables.push(techRecord.fuelPropulsionSystem);
 
-    return templateVariables;
+    return undefinedToNull(templateVariables);
 };
 
 export const toVehicleClassTemplateVariables = (techRecord: TechRecord): any[] => {
@@ -402,7 +403,7 @@ export const toVehicleClassTemplateVariables = (techRecord: TechRecord): any[] =
     templateVariables.push(techRecord.vehicleConfiguration);
     templateVariables.push(techRecord.euVehicleCategory);
 
-    return templateVariables;
+    return undefinedToNull(templateVariables);
 };
 
 export const toVehicleSubClassTemplateVariables = (techRecord: TechRecord): any[] => {
@@ -410,7 +411,7 @@ export const toVehicleSubClassTemplateVariables = (techRecord: TechRecord): any[
 
     templateVariables.push(techRecord.euVehicleCategory);
 
-    return templateVariables;
+    return undefinedToNull(templateVariables);
 };
 
 export const getFaxNumber = (techRecord: TechRecord): Maybe<string> => {

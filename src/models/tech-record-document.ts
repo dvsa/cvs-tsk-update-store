@@ -1,5 +1,6 @@
 import {DynamoDbImage, parseStringArray} from "../services/dynamodb-images";
 import {parseTechRecords, TechRecords} from "./tech-record";
+import {undefinedToNull} from "../services/connection-pool";
 
 // https://wiki.dvsacloud.uk/pages/viewpage.action?spaceKey=HVT&title=Technical+API+Changelog
 // API_Vehicle_Tech_Records_v32.yaml
@@ -33,5 +34,5 @@ export const toVehicleTemplateVariables = (techRecordDocument: TechRecordDocumen
     templateVariables.push(techRecordDocument.primaryVrm);
     templateVariables.push(techRecordDocument.trailerId);
 
-    return templateVariables;
+    return undefinedToNull(templateVariables);
 };

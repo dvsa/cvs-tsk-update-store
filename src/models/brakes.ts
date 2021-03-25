@@ -1,5 +1,6 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 import {Maybe} from "./optionals";
+import {undefinedToNull} from "../services/connection-pool";
 
 export interface Brakes {
     brakeCodeOriginal?: string;
@@ -76,7 +77,7 @@ export const toBrakesTemplateVariables = (brakes: Brakes): any[] => {
     templateVariables.push(brakes.brakeForceWheelsUpToHalfLocked!.secondaryBrakeForceB);
     templateVariables.push(brakes.brakeForceWheelsUpToHalfLocked!.parkingBrakeForceB);
 
-    return templateVariables;
+    return undefinedToNull(templateVariables);
 };
 
 const parseBrakeForceWheelsNotLocked = (brakeForceWheelsNotLockedImage?: DynamoDbImage): Maybe<BrakeForceWheelsNotLocked> => {
