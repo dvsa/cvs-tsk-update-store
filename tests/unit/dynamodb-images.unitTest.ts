@@ -4,7 +4,7 @@ import {default as setsJson} from "../resources/dynamodb-image-sets.json";
 import {default as listJson} from "../resources/dynamodb-image-list.json";
 import {default as mapJson} from "../resources/dynamodb-image-map.json";
 import {default as nestedJson} from "../resources/dynamodb-image-nested.json";
-import {castToImageShape} from "./utils";
+import {castToImageShape} from "../utils";
 
 describe("parse()", () => {
     it("should parse a Dynamo image containing all primitive types", () => {

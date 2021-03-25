@@ -1,7 +1,7 @@
 import {parseTechRecordDocument, TechRecordDocument} from "../../../src/models/tech-record-document";
 import {DynamoDbImage} from "../../../src/services/dynamodb-images";
-import {castToImageShape} from "../utils";
 import {default as techRecordDocumentJson} from "../../resources/dynamodb-image-technical-record.json";
+import {castToImageShape} from "../../utils";
 
 describe("parseTechRecordDocument()", () => {
     it("should successfully parse a DynamoDB image into a TechRecordDocument", () => {
