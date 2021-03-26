@@ -65,9 +65,6 @@ export const toBrakesTemplateVariables = (brakes: Brakes): any[] => {
     templateVariables.push(brakes.dataTrBrakeThree);
     templateVariables.push(brakes.retarderBrakeOne);
     templateVariables.push(brakes.retarderBrakeTwo);
-    templateVariables.push(brakes.dtpNumber);
-    templateVariables.push(brakes.loadSensingValve);
-    templateVariables.push(brakes.antilockBrakingSystem);
 
     // TODO nullity checks here
     templateVariables.push(brakes.brakeForceWheelsNotLocked!.serviceBrakeForceA);

@@ -320,6 +320,7 @@ export const toTechRecordTemplateVariables = (techRecord: TechRecord): any[] => 
     templateVariables.push(techRecord.coifCertifierName);
     templateVariables.push(techRecord.approvalType);
     templateVariables.push(techRecord.approvalTypeNumber);
+    templateVariables.push(techRecord.variantNumber);
     templateVariables.push(techRecord.conversionRefNo);
     templateVariables.push(techRecord.seatsLowerDeck);
     templateVariables.push(techRecord.seatsUpperDeck);
@@ -367,8 +368,9 @@ export const toTechRecordTemplateVariables = (techRecord: TechRecord): any[] => 
     templateVariables.push(techRecord.manufacturerDetails!.manufacturerNotes);
     templateVariables.push(techRecord.noOfAxles);
     templateVariables.push(techRecord.brakeCode);
-    templateVariables.push(+techRecord.createdById!);
-    templateVariables.push(+techRecord.lastUpdatedById!);
+    templateVariables.push(techRecord.brakes?.dtpNumber);
+    templateVariables.push(techRecord.brakes?.loadSensingValve);
+    templateVariables.push(techRecord.brakes?.antilockBrakingSystem);
     templateVariables.push(techRecord.updateType);
     templateVariables.push(techRecord.numberOfSeatbelts);
     templateVariables.push(techRecord.seatbeltInstallationApprovalDate);
@@ -409,7 +411,8 @@ export const toVehicleClassTemplateVariables = (techRecord: TechRecord): any[] =
 export const toVehicleSubClassTemplateVariables = (techRecord: TechRecord): any[] => {
     const templateVariables: any[] = [];
 
-    templateVariables.push(techRecord.euVehicleCategory);
+    // TODO first element only?
+    templateVariables.push(techRecord.vehicleSubclass![0]);
 
     return undefinedToNull(templateVariables);
 };
