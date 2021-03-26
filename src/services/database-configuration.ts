@@ -3,10 +3,10 @@ import {PoolOptions} from "mysql2";
 const poolConfig: PoolOptions = {
     connectionLimit: 10,
     host: "localhost",
-    port: 49156,
+    port: 3306,
     user: "root",
     password: "12345",
-    database: "vott_db"
+    database: "CVSBNOP"
 };
 
 export const getConnectionPoolConfiguration = (): PoolOptions => {
