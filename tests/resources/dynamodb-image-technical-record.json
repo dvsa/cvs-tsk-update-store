@@ -6,7 +6,7 @@
     "S": "PARTIAL-VIN"
   },
   "primaryVrm": {
-    "S": "PRIMARY-VRM"
+    "S": "999999999"
   },
   "secondaryVrms": {
     "L": [
@@ -19,20 +19,20 @@
     "S": "VIN"
   },
   "trailerId": {
-    "S": "TRAILER-ID"
+    "S": "88888888"
   },
   "techRecord": {
     "L": [
       {
         "M": {
           "recordCompleteness": {
-            "S": "RECORD-COMPLETENESS"
+            "S": "88888888"
           },
           "createdAt": {
-            "S": "2020-01-01T00:00:00.000Z"
+            "S": "2020-01-01T00:00:00.000"
           },
           "lastUpdatedAt": {
-            "S": "2020-01-01T00:00:00.000Z"
+            "S": "2020-01-01T00:00:00.000"
           },
           "make": {
             "S": "MAKE"
@@ -41,7 +41,7 @@
             "S": "MODEL"
           },
           "functionCode": {
-            "S": "FUNCTION-CODE"
+            "S": "1"
           },
           "fuelPropulsionSystem": {
             "S": "DieselPetrol"
@@ -290,13 +290,13 @@
             "S": "NTA-NUMBER"
           },
           "coifSerialNumber": {
-            "S": "COIF-SERIAL-NUMBER"
+            "S": "88888888"
           },
           "coifCertifierName": {
             "S": "COIF-CERTIFIER-NAME"
           },
           "conversionRefNo": {
-            "S": "CONVERSION-REF-NO"
+            "S": "1010101010"
           },
           "seatsLowerDeck": {
             "N": "1"
@@ -362,7 +362,7 @@
             "S": "Channel section"
           },
           "tyreUseCode": {
-            "S": "TYRE-USE-CODE"
+            "S": "22"
           },
           "roadFriendly": {
             "BOOL": true
@@ -371,13 +371,13 @@
             "BOOL": true
           },
           "euroStandard": {
-            "S": "EURO-STANDARD"
+            "S": "999999999"
           },
           "suspensionType": {
-            "S": "SUSPENSION-TYPE"
+            "S": "1"
           },
           "couplingType": {
-            "S": "COUPLING-TYPE"
+            "S": "1"
           },
           "dimensions": {
             "M": {
@@ -476,7 +476,7 @@
           "vehicleSubclass": {
             "L": [
               {
-                "S": "VEHICLE-SUBCLASS"
+                "S": "1"
               }
             ]
           },
@@ -498,10 +498,10 @@
           "brakes": {
             "M": {
               "brakeCodeOriginal": {
-                "S": "BRAKE-CODE-ORIGINAL"
+                "S": "333"
               },
               "brakeCode": {
-                "S": "BRAKE-CODE"
+                "S": "666666"
               },
               "dataTrBrakeOne": {
                 "S": "DATA-TR-BRAKE-ONE"
@@ -519,7 +519,7 @@
                 "S": "electric"
               },
               "dtpNumber": {
-                "S": "DTP-NUMBER"
+                "S": "666666"
               },
               "brakeForceWheelsNotLocked": {
                 "M": {
