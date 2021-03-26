@@ -11,10 +11,10 @@ describe("parseTechRecordDocument()", () => {
 
         expect(techRecordDocument.systemNumber).toEqual("SYSTEM-NUMBER");
         expect(techRecordDocument.partialVin).toEqual("PARTIAL-VIN");
-        expect(techRecordDocument.primaryVrm).toEqual("PRIMARY-VRM");
+        expect(techRecordDocument.primaryVrm).toEqual("999999999");
         expect(techRecordDocument.secondaryVms).toEqual(["SECONDARY-VRM"]);
         expect(techRecordDocument.vin).toEqual("VIN");
-        expect(techRecordDocument.trailerId).toEqual("TRAILER-ID");
+        expect(techRecordDocument.trailerId).toEqual("88888888");
         expect(techRecordDocument.techRecord!.length).toEqual(1);
     });
 });
