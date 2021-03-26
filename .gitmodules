@@ -1,0 +1,3 @@
+[submodule "cvs-nop"]
+	path = cvs-nop
+	url = https://github.com/dvsa/cvs-nop
