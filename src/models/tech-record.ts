@@ -15,6 +15,7 @@ import {Axles, parseAxles} from "./axles";
 import {Dda} from "./dda";
 import {Maybe} from "./optionals";
 import {undefinedToNull} from "../services/connection-pool";
+import {EuVehicleCategory, VehicleConfiguration, VehicleSize, VehicleType} from "./shared-enums";
 
 export type TechRecords = TechRecord[];
 
@@ -122,26 +123,6 @@ export interface TechRecord {
 
 export type FuelPropulsionSystem = "DieselPetrol" | "Hybrid" | "Electric" | "CNG" | "Fuel cell" | "LNG" | "Other";
 
-export type EuVehicleCategory =
-    "m1"
-    | "m2"
-    | "m3"
-    | "n1"
-    | "n2"
-    | "n3"
-    | "o1"
-    | "o2"
-    | "o3"
-    | "o4"
-    | "l1e-a"
-    | "l1e"
-    | "l2e"
-    | "l3e"
-    | "l4e"
-    | "l5e"
-    | "l6e"
-    | "l7e";
-
 export type ApprovalType = "NTA" | "ECTA" | "IVA" | "NSSTA" | "ECSSTA";
 
 export type StatusCode = "archived" | "current" | "provisional";
@@ -158,23 +139,6 @@ export type FrameDescription =
     | "U section";
 
 export type UpdateType = "adrUpdate" | "techRecordUpdate";
-
-export type VehicleType = "psv" | "hgv" | "trl" | "car" | "lgv" | "motorcycle";
-
-export type VehicleSize = "small" | "large";
-
-export type VehicleConfiguration =
-    "rigid"
-    | "articulated"
-    | "centre axle drawbar"
-    | "semi-car transporter"
-    | "semi-trailer"
-    | "low loader"
-    | "other"
-    | "drawbar"
-    | "four-in-line"
-    | "dolly"
-    | "full drawbar";
 
 export const parseTechRecords = (image?: DynamoDbImage): TechRecords => {
     if (!image) {
