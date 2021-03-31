@@ -83,9 +83,12 @@ const upsertTestResults = async (testResults: TestResults): Promise<number[]> =>
 
             await execute(insertTestResultQuery, testResultTemplateVariables);
 
-            const techRecordId = (await execute("SELECT LAST_INSERT_ID() AS techRecordId")).rows[0].techRecordId;
+            const testResultId = (await execute("SELECT LAST_INSERT_ID() AS testResultId")).rows[0].testResultId;
 
-            insertedIds.push(techRecordId);
+            await upsertDefects(testResultId, testType);
+            await upsertCustomDefects(testResultId, testType);
+
+            insertedIds.push(testResultId);
         }
     }
 
@@ -106,7 +109,7 @@ const upsertVehicle = async (testResult: TestResult): Promise<number> => {
 
 const upsertTestStation = async (testResult: TestResult): Promise<number> => {
     const response = await execute(
-        "INSERT INTO test_station (`pNumber`, `name`, `type`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)",
+        "INSERT INTO `test_station` (`pNumber`, `name`, `type`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)",
         [
             testResult.testStationPNumber,
             testResult.testStationName,
@@ -118,7 +121,7 @@ const upsertTestStation = async (testResult: TestResult): Promise<number> => {
 
 const upsertTester = async (testResult: TestResult): Promise<number> => {
     const response = await execute(
-        "INSERT INTO tester (`staffId`, `name`, `email_address`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)",
+        "INSERT INTO `tester` (`staffId`, `name`, `email_address`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)",
         [
             testResult.testerStaffId,
             testResult.testerName,
@@ -149,7 +152,7 @@ const upsertFuelEmission = async (testType: TestType): Promise<number> => {
 
 const upsertTestType = async (testType: TestType): Promise<number> => {
     const response = await execute(
-        "INSERT INTO test_type (`testTypeClassification`, `testTypeName`) VALUES (?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)",
+        "INSERT INTO `test_type` (`testTypeClassification`, `testTypeName`) VALUES (?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)",
         [
             testType.testTypeClassification,
             testType.testTypeName,
@@ -174,6 +177,75 @@ const upsertIdentity = async (id: string, name: string): Promise<number> => {
     const insertIdentityQuery = "SELECT f_upsert_identity(?, ?) AS identityId";
     const insertIdentityResponse = await execute(insertIdentityQuery, [id, name]);
     return insertIdentityResponse.rows[0].identityId;
+};
+
+const upsertDefects = async (testResultId: number, testType: TestType): Promise<void> => {
+    if (!testType.defects) {
+        return;
+    }
+
+    for (const defect of testType.defects) {
+        const insertDefectResponse = await execute(
+            "INSERT INTO `defects` (`imNumber`, `imDescription`, `itemNumber`, `itemDescription`, `deficiencyRef`, `deficiencyId`, `deficiencySubId`, `deficiencyCategory`, `deficiencyText`, `stdForProhibition` ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+            [
+                defect.imNumber,
+                defect.imDescription,
+                defect.itemNumber,
+                defect.itemDescription,
+                defect.deficiencyRef,
+                defect.deficiencyId,
+                defect.deficiencySubId,
+                defect.deficiencyCategory,
+                defect.deficiencyText,
+                defect.stdForProhibition,
+            ]
+        );
+
+        const defectId = insertDefectResponse.rows[0].id;
+
+        const locationId = await execute(
+            "INSERT INTO `location` (`vertical`, `horizontal`, `lateral`, `longitudinal`, `rowNumber`, `seatNumber`, `axleNumber`) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+            [
+                defect.additionalInformation?.location?.vertical,
+                defect.additionalInformation?.location?.horizontal,
+                defect.additionalInformation?.location?.lateral,
+                defect.additionalInformation?.location?.longitudinal,
+                defect.additionalInformation?.location?.rowNumber,
+                defect.additionalInformation?.location?.seatNumber,
+                defect.additionalInformation?.location?.axleNumber,
+            ]
+        );
+
+        await execute(
+            "INSERT INTO `test_defect` (`test_record_id`, `defect_id`, `location_id`, `notes`, `prs`, `prohibitionIssued`) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+            [
+                testResultId,
+                defectId,
+                locationId,
+                defect.additionalInformation?.notes,
+                defect.prs,
+                defect.prohibitionIssued,
+            ]
+        );
+    }
+};
+
+const upsertCustomDefects = async (testResultId: number, testType: TestType): Promise<void> => {
+    if (!testType.customDefects) {
+        return;
+    }
+
+    for (const customDefect of testType.customDefects) {
+        await execute(
+            "INSERT INTO `custom_defect` (`test_record_id`, `referenceNumber`, `defectName`, `defectNotes`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+            [
+                testResultId,
+                customDefect.referenceNumber,
+                customDefect.defectName,
+                customDefect.defectNotes,
+            ]
+        );
+    }
 };
 
 const validateTestResult = (testResult: TestResult): void => {
