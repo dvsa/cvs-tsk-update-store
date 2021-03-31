@@ -24,6 +24,9 @@ export const destroyConnectionPool = async (): Promise<void> => {
 };
 
 export const execute = async (sql: string, templateVariables?: any[]): Promise<QueryResponse> => {
+    if (templateVariables) {
+        templateVariables = undefinedToNull(templateVariables);
+    }
     const [rows, fields] = await getConnectionPool().execute(sql, templateVariables);
     return {
         rows,
