@@ -15,6 +15,7 @@ export interface TestType {
     lastUpdatedAt?: string;
     deletionFlag?: boolean;
     testCode?: string;
+    testTypeClassification?: string; // field does not exist in API schema, but is definitely present on some documents
     testTypeName?: string;
     name?: string;
     testTypeId?: string;
