@@ -1,6 +1,7 @@
 export interface TableDetails {
     tableName: string;
     columnNames: string[];
+    primaryKeyColumnName?: string;
 }
 
 export const MAKE_MODEL_TABLE: TableDetails = {

@@ -1,11 +1,17 @@
 import {TableDetails} from "./table-details";
 
-export const generatePartialUpsertSql = (tableDetails: TableDetails, primaryKeyColumn?: string): string => {
-    return generateUpsertSql(tableDetails, generateUpdatePlaceholders(primaryKeyColumn));
+export const generatePartialUpsertSql = (tableDetails: TableDetails): string => {
+    return generateUpsertSql(
+        tableDetails,
+        generateUpdatePlaceholders(tableDetails.primaryKeyColumnName)
+    );
 };
 
-export const generateFullUpsertSql = (tableDetails: TableDetails, primaryKeyColumn?: string): string => {
-    return generateUpsertSql(tableDetails, generateUpdatePlaceholders(primaryKeyColumn, tableDetails.columnNames));
+export const generateFullUpsertSql = (tableDetails: TableDetails): string => {
+    return generateUpsertSql(
+        tableDetails,
+        generateUpdatePlaceholders(tableDetails.primaryKeyColumnName, tableDetails.columnNames)
+    );
 };
 
 const generateUpsertSql = (tableDetails: TableDetails, updatePlaceholders: string[]): string => {

@@ -11,7 +11,7 @@ describe("generatePartialUpsertSql", () => {
     });
 
     it("should generate correct SQL when PK is provided", async () => {
-        expect(generatePartialUpsertSql({ tableName, columnNames }, "myId")).toEqual(
+        expect(generatePartialUpsertSql({ tableName, columnNames, primaryKeyColumnName: "myId"})).toEqual(
             "INSERT INTO `myTable` (`columnA`, `columnZ`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `myId` = LAST_INSERT_ID(`myId`)"
         );
     });
@@ -25,7 +25,7 @@ describe("generateFullUpsertSql", () => {
     });
 
     it("should generate correct SQL when PK is provided", async () => {
-        expect(generateFullUpsertSql({ tableName, columnNames }, "myId")).toEqual(
+        expect(generateFullUpsertSql({ tableName, columnNames, primaryKeyColumnName: "myId"})).toEqual(
             "INSERT INTO `myTable` (`columnA`, `columnZ`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `myId` = LAST_INSERT_ID(`myId`), `columnA` = ?, `columnZ` = ?"
         );
     });
