@@ -5,13 +5,28 @@ import {
     TechRecord,
     toMakeModelTemplateVariables,
     toTechRecordTemplateVariables,
-    toVehicleClassTemplateVariables,
-    toVehicleSubClassTemplateVariables
+    toVehicleClassTemplateVariables
 } from "../models/tech-record";
 import {toContactDetailsTemplateVariables} from "../models/applicant-details-properties";
 import {toBrakesTemplateVariables} from "../models/brakes";
 import {KnownOperationType} from "./operation-types";
-import {execute} from "./connection-pool";
+import {generateFullUpsertSql, generatePartialUpsertSql} from "./sql-generation";
+import {
+    AXLE_SPACING_TABLE,
+    AXLES_TABLE,
+    CONTACT_DETAILS_TABLE,
+    IDENTITY_TABLE,
+    MAKE_MODEL_TABLE,
+    MICROFILM_TABLE,
+    PLATE_TABLE,
+    PSV_BRAKES_TABLE,
+    TECHNICAL_RECORD_TABLE,
+    TYRE_TABLE,
+    VEHICLE_CLASS_TABLE,
+    VEHICLE_SUBCLASS_TABLE,
+    VEHICLE_TABLE
+} from "./table-details";
+import {executeFullUpsert, executePartialUpsert} from "./sql-execution";
 
 export const convertTechRecordDocument = async (operationType: KnownOperationType, image: DynamoDbImage): Promise<void> => {
     const techRecordDocument: TechRecordDocument = parseTechRecordDocument(image);
@@ -45,19 +60,26 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
     for (const techRecord of techRecords) {
         const makeModelId = await upsertMakeModel(techRecord);
         const vehicleClassId = await upsertVehicleClass(techRecord);
-        const contactDetailsId = await upsertContactDetails(techRecord);
+        const vehicleSubclassIds = await upsertVehicleSubclasses(vehicleClassId, techRecord);
         const createdById = await upsertIdentity(techRecord.createdById!, techRecord.createdByName!);
         const lastUpdatedById = await upsertIdentity(techRecord.lastUpdatedById!, techRecord.lastUpdatedByName!);
+        const contactDetailsId = await upsertContactDetails(techRecord);
 
-        const insertTechRecordQuery = "INSERT INTO technical_record (recordCompleteness, createdAt, lastUpdatedAt, functionCode, offRoad, numberOfWheelsDriven, emissionsLimit, departmentalVehicleMarker, alterationMarker, variantVersionNumber, grossEecWeight, trainEecWeight, maxTrainEecWeight, manufactureYear, regnDate, firstUseDate, coifDate, ntaNumber, coifSerialNumber, coifCertifierName, approvalType, approvalTypeNumber, variantNumber, conversionRefNo, seatsLowerDeck, seatsUpperDeck, standingCapacity, speedRestriction, speedLimiterMrk, tachoExemptMrk, dispensations, remarks, reasonForCreation, statusCode, unladenWeight, grossKerbWeight, grossLadenWeight, grossGbWeight, grossDesignWeight, trainGbWeight, trainDesignWeight, maxTrainGbWeight, maxTrainDesignWeight, maxLoadOnCoupling, frameDescription, tyreUseCode, roadFriendly, drawbarCouplingFitted, euroStandard, suspensionType, couplingType, length, height, width, frontAxleTo5thWheelMin, frontAxleTo5thWheelMax, frontAxleTo5thWheelCouplingMin, frontAxleTo5thWheelCouplingMax, frontAxleToRearAxle, rearAxleToRearTrl, couplingCenterToRearAxleMin, couplingCenterToRearAxleMax, couplingCenterToRearTrlMin, couplingCenterToRearTrlMax, centreOfRearmostAxleToRearOfTrl, notes, purchaserNotes, manufacturerNotes, noOfAxles, brakeCode, brakes_dtpNumber, brakes_loadSensingValve, brakes_antilockBrakingSystem, updateType, numberOfSeatbelts, seatbeltInstallationApprovalDate, vehicle_id, make_model_id, vehicle_class_id, applicant_detail_id, purchaser_detail_id, manufacturer_detail_id, createdBy_Id, lastUpdatedBy_Id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         const techRecordTemplateVariables = toTechRecordTemplateVariables(techRecord);
         techRecordTemplateVariables.push(vehicleId, makeModelId, vehicleClassId, contactDetailsId, contactDetailsId, contactDetailsId, createdById, lastUpdatedById);
 
-        await execute(insertTechRecordQuery, techRecordTemplateVariables);
+        const response = await executeFullUpsert(
+            generateFullUpsertSql(TECHNICAL_RECORD_TABLE),
+            techRecordTemplateVariables
+        );
 
-        const techRecordId = (await execute("SELECT LAST_INSERT_ID() AS techRecordId")).rows[0].techRecordId;
-        const brakesId = await upsertBrakes(techRecordId, techRecord);
-        // const vehicleSubclassId = await upsertVehicleSubclass(techRecord);
+        const techRecordId = response.rows.insertId;
+
+        const brakesId = await upsertPsvBrakes(techRecordId, techRecord);
+        const axleSpacingIds = await upsertAxleSpacings(techRecordId, techRecord);
+        const microfilmId = await upsertMicrofilm(techRecordId, techRecord);
+        const plateIds = await upsertPlates(techRecordId, techRecord);
+        const axleIds = await upsertAxles(techRecordId, techRecord);
 
         insertedIds.push(techRecordId);
     }
@@ -70,52 +92,182 @@ const deleteTechRecords = async (techRecordDocument: TechRecordDocument): Promis
 };
 
 const upsertVehicle = async (techRecordDocument: TechRecordDocument): Promise<number> => {
-    const insertVehicleQuery = "INSERT INTO vehicle (system_number, vin, vrm_trm, trailer_id, createdAt) VALUES (?, ?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)";
+    const response = await executePartialUpsert(
+        generatePartialUpsertSql(VEHICLE_TABLE),
+        toVehicleTemplateVariables(techRecordDocument));
 
-    await execute(insertVehicleQuery, toVehicleTemplateVariables(techRecordDocument));
-
-    return (await execute("SELECT LAST_INSERT_ID() AS vehicleId")).rows[0].vehicleId;
+    return response.rows.insertId;
 };
 
 const upsertMakeModel = async (techRecord: TechRecord): Promise<number> => {
-    const insertMakeModelQuery = "SELECT f_upsert_make_model(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) AS makeModelId";
     const templateVariables = toMakeModelTemplateVariables(techRecord);
     templateVariables.push(null); // TODO intentional hack until we know JSON path of make-model dtpCode
-    const insertMakeModelResponse = await execute(insertMakeModelQuery, templateVariables);
-    return insertMakeModelResponse.rows[0].makeModelId;
+
+    const response = await executePartialUpsert(
+        generatePartialUpsertSql(MAKE_MODEL_TABLE),
+        templateVariables
+    );
+
+    return response.rows.insertId;
 };
 
 const upsertVehicleClass = async (techRecord: TechRecord): Promise<number> => {
-    const insertVehicleClassQuery = "SELECT f_upsert_vehicle_class(?, ?, ?, ?, ?, ?) AS vehicleClassId";
-    const insertVehicleClassResponse = await execute(insertVehicleClassQuery, toVehicleClassTemplateVariables(techRecord));
-    return insertVehicleClassResponse.rows[0].vehicleClassId;
+    const response = await executePartialUpsert(
+        generatePartialUpsertSql(VEHICLE_CLASS_TABLE),
+        toVehicleClassTemplateVariables(techRecord)
+    );
+
+    return response.rows.insertId;
 };
 
-const upsertContactDetails = async (techRecord: TechRecord): Promise<number> => {
-    const insertContactDetailsQuery = "SELECT f_upsert_contact_details(?, ?, ?, ?, ?, ?, ?, ?, ?) AS contactDetailsId";
-    const contactDetailsTemplateVariables = toContactDetailsTemplateVariables(techRecord.applicantDetails!); // TODO check nullity
-    contactDetailsTemplateVariables.push(getFaxNumber(techRecord));
-    const insertContactDetailsResponse = await execute(insertContactDetailsQuery, contactDetailsTemplateVariables);
-    return insertContactDetailsResponse.rows[0].contactDetailsId;
+
+const upsertVehicleSubclasses = async (vehicleClassId: number, techRecord: TechRecord): Promise<number[]> => {
+    if (!techRecord.vehicleSubclass) {
+        return [];
+    }
+
+    const insertedIds: number[] = [];
+
+    for (const vehicleSubclass of techRecord.vehicleSubclass) {
+        const response = await executePartialUpsert(
+            generatePartialUpsertSql(VEHICLE_SUBCLASS_TABLE),
+            [
+                vehicleClassId,
+                vehicleSubclass
+            ]
+        );
+        insertedIds.push(response.rows.insertId);
+    }
+
+    return insertedIds;
 };
 
 const upsertIdentity = async (id: string, name: string): Promise<number> => {
-    // TODO check nullity
-    const insertIdentityQuery = "SELECT f_upsert_identity(?, ?) AS identityId";
-    const insertIdentityResponse = await execute(insertIdentityQuery, [id, name]);
-    return insertIdentityResponse.rows[0].identityId;
+    const response = await executePartialUpsert(generatePartialUpsertSql(IDENTITY_TABLE), [id, name]);
+    return response.rows.insertId;
 };
 
-const upsertBrakes = async (techRecordId: string, techRecord: TechRecord): Promise<number> => {
-    const insertBrakesQuery = "INSERT INTO psv_brakes (technical_record_id, brakeCodeOriginal, brakeCode, dataTrBrakeOne, dataTrBrakeTwo, dataTrBrakeThree, retarderBrakeOne, retarderBrakeTwo, serviceBrakeForceA, secondaryBrakeForceA, parkingBrakeForceA, serviceBrakeForceB, secondaryBrakeForceB, parkingBrakeForceB) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+const upsertContactDetails = async (techRecord: TechRecord): Promise<number> => {
+    const contactDetailsTemplateVariables = toContactDetailsTemplateVariables(techRecord.applicantDetails!); // TODO check nullity
+    contactDetailsTemplateVariables.push(getFaxNumber(techRecord));
+
+    const response = await executePartialUpsert(
+        generatePartialUpsertSql(CONTACT_DETAILS_TABLE),
+        contactDetailsTemplateVariables
+    );
+
+    return response.rows.insertId;
+};
+
+const upsertPsvBrakes = async (techRecordId: string, techRecord: TechRecord): Promise<number> => {
     const brakesTemplateVariables = toBrakesTemplateVariables(techRecord.brakes!);
     brakesTemplateVariables.unshift(techRecordId);
-    await execute(insertBrakesQuery, brakesTemplateVariables); // TODO check nullity
-    return (await execute("SELECT LAST_INSERT_ID() AS brakesId")).rows[0].brakesId;
+
+    const response = await executeFullUpsert(generateFullUpsertSql(PSV_BRAKES_TABLE), brakesTemplateVariables);
+    return response.rows.insertId;
 };
 
-const upsertVehicleSubclass = async (techRecord: TechRecord): Promise<number> => {
-    const insertVehicleSubclassQuery = "SELECT f_upsert_vehicle_subclass(?) AS vehicleSubclassId"; // TODO why is this only one field? shouldn't it contain vehicle_class_id?
-    const insertVehicleSubclassResponse = await execute(insertVehicleSubclassQuery, toVehicleSubClassTemplateVariables(techRecord));
-    return insertVehicleSubclassResponse.rows[0].vehicleSubclassId;
+const upsertAxleSpacings = async (techRecordId: string, techRecord: TechRecord): Promise<number[]> => {
+    if (!techRecord.dimensions?.axleSpacing) {
+        return [];
+    }
+
+    const insertedIds: number[] = [];
+
+    for (const axleSpacing of techRecord.dimensions.axleSpacing) {
+        const response = await executeFullUpsert(
+            generateFullUpsertSql(AXLE_SPACING_TABLE),
+            [
+                techRecordId,
+                axleSpacing.axles,
+                axleSpacing.value,
+            ]
+        );
+        insertedIds.push(response.rows.insertId);
+    }
+
+    return insertedIds;
+};
+
+const upsertMicrofilm = async (techRecordId: string, techRecord: TechRecord): Promise<number> => {
+    const response = await executeFullUpsert(
+        generateFullUpsertSql(MICROFILM_TABLE),
+        [
+            techRecordId,
+            techRecord.microfilm?.microfilmDocumentType,
+            techRecord.microfilm?.microfilmRollNumber,
+            techRecord.microfilm?.microfilmSerialNumber
+        ]
+    );
+
+    return response.rows.insertId;
+};
+
+const upsertPlates = async (techRecordId: any, techRecord: TechRecord): Promise<number[]> => {
+    if (!techRecord.plates) {
+        return [];
+    }
+
+    const insertedIds: number[] = [];
+
+    for (const plate of techRecord.plates) {
+        const response = await executeFullUpsert(
+            generateFullUpsertSql(PLATE_TABLE),
+            [
+                techRecordId,
+                plate.plateSerialNumber,
+                plate.plateIssueDate,
+                plate.plateReasonForIssue,
+                plate.plateIssuer,
+            ]
+        );
+        insertedIds.push(response.rows.insertId);
+    }
+
+    return insertedIds;
+};
+
+const upsertAxles = async (techRecordId: any, techRecord: TechRecord): Promise<number[]> => {
+    if (!techRecord.axles) {
+        return [];
+    }
+
+    const insertedIds: number[] = [];
+
+    for (const axle of techRecord.axles) {
+        const tyreUpsertResponse = await executePartialUpsert(
+            generatePartialUpsertSql(TYRE_TABLE),
+            [
+                axle.tyres?.tyreSize,
+                axle.tyres?.plyRating,
+                axle.tyres?.fitmentCode,
+                axle.tyres?.dataTrAxles,
+                axle.tyres?.speedCategorySymbol,
+                axle.tyres?.tyreCode,
+            ]
+        );
+
+        const tyreId = tyreUpsertResponse.rows.insertId;
+
+        const axleUpsertResponse = await executeFullUpsert(
+            generateFullUpsertSql(AXLES_TABLE),
+            [
+                techRecordId,
+                tyreId,
+                axle.axleNumber,
+                axle.parkingBrakeMrk,
+                axle.weights?.kerbWeight,
+                axle.weights?.ladenWeight,
+                axle.weights?.gbWeight,
+                axle.weights?.eecWeight,
+                axle.weights?.designWeight,
+                axle.brakes?.brakeActuator,
+                axle.brakes?.leverLength,
+                axle.brakes?.springBrakeParking,
+            ]
+        );
+        insertedIds.push(axleUpsertResponse.rows.insertId);
+    }
+
+    return insertedIds;
 };
