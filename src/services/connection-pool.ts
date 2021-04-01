@@ -1,7 +1,7 @@
 import * as mysql2 from "mysql2/promise";
 import {FieldPacket, Pool} from "mysql2/promise";
-import {getPoolOptions} from "./database-configuration";
 import {Maybe} from "../models/optionals";
+import {PoolOptions} from "mysql2";
 
 export interface QueryResponse {
     rows?: any;
@@ -9,6 +9,18 @@ export interface QueryResponse {
 }
 
 let pool: Maybe<Pool>;
+
+const poolConfig: PoolOptions = {
+    host: "localhost",
+    port: 3306,
+    user: "root",
+    password: "12345",
+    database: "CVSBNOP"
+};
+
+export const getPoolOptions = (): PoolOptions => {
+    return poolConfig;
+};
 
 export const getConnectionPool = (): Pool => {
     if (!pool) {

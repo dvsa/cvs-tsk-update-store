@@ -3,7 +3,7 @@ import {pathToResources} from "../utils";
 import {GenericContainer, StartedTestContainer} from "testcontainers";
 import {Port} from "testcontainers/dist/port";
 import {PoolOptions} from "mysql2";
-import {getPoolOptions} from "../../src/services/database-configuration";
+import {getPoolOptions} from "../../src/services/connection-pool";
 
 export const containerMySqlPort: Port = 3306;
 
