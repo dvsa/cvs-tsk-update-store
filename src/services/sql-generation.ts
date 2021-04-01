@@ -1,14 +1,16 @@
-export const generatePartialUpsertSql = (tableName: string, columnNames: string[], primaryKeyColumn?: string): string => {
-    return generateUpsertSql(tableName, columnNames, generateUpdatePlaceholders(primaryKeyColumn));
+import {TableDetails} from "./table-details";
+
+export const generatePartialUpsertSql = (tableDetails: TableDetails, primaryKeyColumn?: string): string => {
+    return generateUpsertSql(tableDetails, generateUpdatePlaceholders(primaryKeyColumn));
 };
 
-export const generateFullUpsertSql = (tableName: string, columnNames: string[], primaryKeyColumn?: string): string => {
-    return generateUpsertSql(tableName, columnNames, generateUpdatePlaceholders(primaryKeyColumn, columnNames));
+export const generateFullUpsertSql = (tableDetails: TableDetails, primaryKeyColumn?: string): string => {
+    return generateUpsertSql(tableDetails, generateUpdatePlaceholders(primaryKeyColumn, tableDetails.columnNames));
 };
 
-const generateUpsertSql = (tableName: string, columnNames: string[], updatePlaceholders: string[]): string => {
-    return `INSERT INTO \`${tableName}\` (${columnNames.map((c) => `\`${c}\``).join(", ")})`
-        + ` VALUES (${(nCopies(columnNames.length, "?").join(", "))})`
+const generateUpsertSql = (tableDetails: TableDetails, updatePlaceholders: string[]): string => {
+    return `INSERT INTO \`${tableDetails.tableName}\` (${tableDetails.columnNames.map((c) => `\`${c}\``).join(", ")})`
+        + ` VALUES (${(nCopies(tableDetails.columnNames.length, "?").join(", "))})`
         + ` ON DUPLICATE KEY UPDATE ${updatePlaceholders.join(", ")}`;
 };
 
