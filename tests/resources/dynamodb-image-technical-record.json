@@ -590,7 +590,7 @@
                         "S": "TYRE-SIZE"
                       },
                       "plyRating": {
-                        "S": "PLY-RATING"
+                        "S": "22"
                       },
                       "fitmentCode": {
                         "S": "double"
