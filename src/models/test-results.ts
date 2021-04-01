@@ -65,10 +65,16 @@ export const parseTestResults = (image?: DynamoDbImage): TestResults => {
         return [] as TestResults;
     }
 
+    const testResultsImage = image.getList("testResults");
+
+    if (!testResultsImage) {
+        return [] as TestResults;
+    }
+
     const testResults: TestResults = [];
 
-    for (const key of image.getKeys()) {
-        testResults.push(parseTestResult(image.getMap(key)!));
+    for (const key of testResultsImage.getKeys()) {
+        testResults.push(parseTestResult(testResultsImage.getMap(key)!));
     }
 
     return testResults;
