@@ -1,6 +1,6 @@
 import * as mysql2 from "mysql2/promise";
 import {FieldPacket, Pool} from "mysql2/promise";
-import {getConnectionPoolConfiguration} from "./database-configuration";
+import {getPoolOptions} from "./database-configuration";
 import {Maybe} from "../models/optionals";
 
 export interface QueryResponse {
@@ -12,7 +12,7 @@ let pool: Maybe<Pool>;
 
 export const getConnectionPool = (): Pool => {
     if (!pool) {
-        pool = mysql2.createPool(getConnectionPoolConfiguration());
+        pool = mysql2.createPool(getPoolOptions());
     }
     return pool;
 };

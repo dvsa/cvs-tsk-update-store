@@ -9,6 +9,6 @@ const poolConfig: PoolOptions = {
     database: "CVSBNOP"
 };
 
-export const getConnectionPoolConfiguration = (): PoolOptions => {
+export const getPoolOptions = (): PoolOptions => {
     return poolConfig;
 };
