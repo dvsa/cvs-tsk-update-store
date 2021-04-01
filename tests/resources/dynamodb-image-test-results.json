@@ -10,7 +10,7 @@
             "S": "VRM"
           },
           "trailerId": {
-            "S": "TRAILER-ID"
+            "S": "88888888"
           },
           "vin": {
             "S": "VIN"
@@ -28,7 +28,7 @@
             "S": "REASON-FOR-CREATION"
           },
           "createdAt": {
-            "S": "2020-01-01T00:00:00.000Z"
+            "S": "2020-01-01T00:00:00.000"
           },
           "createdByName": {
             "S": "CREATED-BY-NAME"
@@ -37,7 +37,7 @@
             "S": "CREATED-BY-ID"
           },
           "lastUpdatedAt": {
-            "S": "2020-01-01T00:00:00.000Z"
+            "S": "2020-01-01T00:00:00.000"
           },
           "lastUpdatedByName": {
             "S": "LAST-UPDATED-BY-NAME"
@@ -61,7 +61,7 @@
             "S": "TESTER-NAME"
           },
           "testerStaffId": {
-            "S": "TESTER-STAFF-ID"
+            "S": "999999999"
           },
           "testResultId": {
             "S": "TEST-RESULT-ID"
@@ -70,10 +70,10 @@
             "S": "TESTER-EMAIL-ADDRESS"
           },
           "testStartTimestamp": {
-            "S": "2020-01-01T00:00:00.000Z"
+            "S": "2020-01-01T00:00:00.000"
           },
           "testEndTimestamp": {
-            "S": "2020-01-01T00:00:00.000Z"
+            "S": "2020-01-01T00:00:00.000"
           },
           "testStatus": {
             "S": "submitted"
@@ -114,7 +114,7 @@
             "S": "KILOMETRES"
           },
           "preparerId": {
-            "S": "PREPARER-ID"
+            "S": "999999999"
           },
           "preparerName": {
             "S": "PREPARER-NAME"
@@ -145,16 +145,16 @@
               {
                 "M": {
                   "createdAt": {
-                    "S": "2020-01-01T00:00:00.000Z"
+                    "S": "2020-01-01T00:00:00.000"
                   },
                   "lastUpdatedAt": {
-                    "S": "2020-01-01T00:00:00.000Z"
+                    "S": "2020-01-01T00:00:00.000"
                   },
                   "deletionFlag": {
                     "BOOL": true
                   },
                   "testCode": {
-                    "S": "4444"
+                    "S": "333"
                   },
                   "testTypeClassification": {
                     "S": "TEST-TYPE-CLASSIFICATION"
@@ -172,25 +172,25 @@
                     "S": "TEST-NUMBER"
                   },
                   "certificateNumber": {
-                    "S": "CERTIFICATE-NUMBER"
+                    "S": "999999999"
                   },
                   "secondaryCertificateNumber": {
-                    "S": "SECONDARY-CERTIFICATE-NUMBER"
+                    "S": "999999999"
                   },
                   "certificateLink": {
                     "S": "CERTIFICATE-LINK"
                   },
                   "testExpiryDate": {
-                    "S": "2020-01-01T00:00:00.000Z"
+                    "S": "2020-01-01T00:00:00.000"
                   },
                   "testAnniversaryDate": {
-                    "S": "2020-01-01T00:00:00.000Z"
+                    "S": "2020-01-01T00:00:00.000"
                   },
                   "testTypeStartTimestamp": {
-                    "S": "2020-01-01T00:00:00.000Z"
+                    "S": "2020-01-01T00:00:00.000"
                   },
                   "testTypeEndTimestamp": {
-                    "S": "2020-01-01T00:00:00.000Z"
+                    "S": "2020-01-01T00:00:00.000"
                   },
                   "statusUpdatedFlag": {
                     "BOOL": true
