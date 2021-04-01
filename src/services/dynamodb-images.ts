@@ -76,8 +76,8 @@ export class DynamoDbImage {
      * placeholder
      * @param key
      */
-    public getBoolean(key: string): Maybe<boolean> {
-        return this.parseItem(key, "BOOL", ((v: any) => v as boolean));
+    public getBoolean(key: string): boolean {
+        return this.parse(key, "BOOL", ((v: any) => v as boolean), false);
     }
 
     /**
