@@ -94,7 +94,7 @@ export const parseTestType = (image: DynamoDbImage): TestType => {
         particulateTrapSerialNumber: image.getString("particulateTrapSerialNumber"),
         modificationTypeUsed: image.getString("modificationTypeUsed"),
         smokeTestKLimitApplied: image.getString("smokeTestKLimitApplied"),
-        defects: parseDefects(image.getMap("defects")),
-        customDefects: parseCustomDefects(image.getMap("customDefects"))
+        defects: parseDefects(image.getList("defects")),
+        customDefects: parseCustomDefects(image.getList("customDefects"))
     };
 };
