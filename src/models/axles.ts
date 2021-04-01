@@ -1,6 +1,4 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
-import {SqlParametersList} from "aws-sdk/clients/rdsdataservice";
-import {integerParam, stringParam} from "../services/sql-parameter";
 import {Maybe} from "./optionals";
 
 export type Axles = Axle[];
@@ -81,19 +79,7 @@ export const parseAxles = (axlesImage?: DynamoDbImage): Axles => {
     return axles;
 };
 
-// TODO remove, add toTireTemplateVariables instead
-export const toTireSqlParameters = (tyre: AxleTyreProperties): SqlParametersList => {
-    const sqlParameters: SqlParametersList = [];
-
-    sqlParameters.push(stringParam("tyreSize", tyre.tyreSize!));
-    sqlParameters.push(stringParam("plyRating", tyre.plyRating!));
-    sqlParameters.push(stringParam("fitmentCode", tyre.fitmentCode!));
-    sqlParameters.push(stringParam("dataTrAxles", "" + tyre.dataTrAxles!));
-    sqlParameters.push(stringParam("speedCategorySymbol", tyre.speedCategorySymbol!));
-    sqlParameters.push(integerParam("tyreCode", tyre.tyreCode!));
-
-    return sqlParameters;
-};
+// TODO remove, add toTireTemplateVariables
 
 const parseAxleWeightProperties = (axleWeightPropertiesImage?: DynamoDbImage): Maybe<AxleWeightProperties> => {
     if (!axleWeightPropertiesImage) {
