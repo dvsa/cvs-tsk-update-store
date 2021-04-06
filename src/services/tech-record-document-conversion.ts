@@ -1,14 +1,6 @@
 import {DynamoDbImage} from "./dynamodb-images";
-import {parseTechRecordDocument, TechRecordDocument, toVehicleTemplateVariables} from "../models/tech-record-document";
-import {
-    getFaxNumber,
-    TechRecord,
-    toMakeModelTemplateVariables,
-    toTechRecordTemplateVariables,
-    toVehicleClassTemplateVariables
-} from "../models/tech-record";
-import {toContactDetailsTemplateVariables} from "../models/applicant-details-properties";
-import {toBrakesTemplateVariables} from "../models/brakes";
+import {parseTechRecordDocument, TechRecordDocument} from "../models/tech-record-document";
+import {getFaxNumber, TechRecord} from "../models/tech-record";
 import {KnownOperationType} from "./operation-types";
 import {generateFullUpsertSql, generatePartialUpsertSql} from "./sql-generation";
 import {
@@ -66,12 +58,94 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
         const lastUpdatedById = await upsertIdentity(techRecord.lastUpdatedById!, techRecord.lastUpdatedByName!);
         const contactDetailsId = await upsertContactDetails(techRecord);
 
-        const techRecordTemplateVariables = toTechRecordTemplateVariables(techRecord);
-        techRecordTemplateVariables.push(vehicleId, makeModelId, vehicleClassId, contactDetailsId, contactDetailsId, contactDetailsId, createdById, lastUpdatedById);
-
         const response = await executeFullUpsert(
             generateFullUpsertSql(TECHNICAL_RECORD_TABLE),
-            techRecordTemplateVariables
+            [
+                vehicleId,
+                techRecord.recordCompleteness,
+                techRecord.createdAt,
+                techRecord.lastUpdatedAt,
+                makeModelId,
+                techRecord.functionCode,
+                techRecord.offRoad,
+                techRecord.numberOfWheelsDriven,
+                "" + techRecord.emissionsLimit,
+                techRecord.departmentalVehicleMarker,
+                techRecord.alterationMarker,
+                vehicleClassId,
+                techRecord.variantVersionNumber,
+                techRecord.grossEecWeight,
+                techRecord.trainEecWeight,
+                techRecord.maxTrainEecWeight,
+                contactDetailsId,
+                contactDetailsId,
+                contactDetailsId,
+                techRecord.manufactureYear,
+                techRecord.regnDate,
+                techRecord.firstUseDate,
+                techRecord.coifDate,
+                techRecord.ntaNumber,
+                techRecord.coifSerialNumber,
+                techRecord.coifCertifierName,
+                techRecord.approvalType,
+                techRecord.approvalTypeNumber,
+                techRecord.variantNumber,
+                techRecord.conversionRefNo,
+                techRecord.seatsLowerDeck,
+                techRecord.seatsUpperDeck,
+                techRecord.standingCapacity,
+                techRecord.speedRestriction,
+                techRecord.speedLimiterMrk,
+                techRecord.tachoExemptMrk,
+                techRecord.dispensations,
+                techRecord.remarks,
+                techRecord.reasonForCreation,
+                techRecord.statusCode,
+                techRecord.unladenWeight,
+                techRecord.grossKerbWeight,
+                techRecord.grossLadenWeight,
+                techRecord.grossGbWeight,
+                techRecord.grossDesignWeight,
+                techRecord.trainGbWeight,
+                techRecord.trainDesignWeight,
+                techRecord.maxTrainGbWeight,
+                techRecord.maxTrainDesignWeight,
+                techRecord.maxLoadOnCoupling,
+                techRecord.frameDescription,
+                techRecord.tyreUseCode,
+                techRecord.roadFriendly,
+                techRecord.drawbarCouplingFitted,
+                techRecord.euroStandard,
+                techRecord.suspensionType,
+                techRecord.couplingType,
+                techRecord.dimensions?.length,
+                techRecord.dimensions?.height,
+                techRecord.dimensions?.width,
+                techRecord.frontAxleTo5thWheelMin,
+                techRecord.frontAxleTo5thWheelMax,
+                techRecord.frontAxleTo5thWheelCouplingMin,
+                techRecord.frontAxleTo5thWheelCouplingMax,
+                techRecord.frontAxleToRearAxle,
+                techRecord.rearAxleToRearTrl,
+                techRecord.couplingCenterToRearAxleMin,
+                techRecord.couplingCenterToRearAxleMax,
+                techRecord.couplingCenterToRearTrlMin,
+                techRecord.couplingCenterToRearTrlMax,
+                techRecord.centreOfRearmostAxleToRearOfTrl,
+                techRecord.notes,
+                techRecord.purchaserDetails?.purchaserNotes,
+                techRecord.manufacturerDetails?.manufacturerNotes,
+                techRecord.noOfAxles,
+                techRecord.brakeCode,
+                techRecord.brakes?.dtpNumber,
+                techRecord.brakes?.loadSensingValve,
+                techRecord.brakes?.antilockBrakingSystem,
+                createdById,
+                lastUpdatedById,
+                techRecord.updateType,
+                techRecord.numberOfSeatbelts,
+                techRecord.seatbeltInstallationApprovalDate,
+            ]
         );
 
         const techRecordId = response.rows.insertId;
@@ -109,18 +183,33 @@ const deleteTechRecords = async (techRecordDocument: TechRecordDocument): Promis
 const upsertVehicle = async (techRecordDocument: TechRecordDocument): Promise<number> => {
     const response = await executePartialUpsert(
         generatePartialUpsertSql(VEHICLE_TABLE),
-        toVehicleTemplateVariables(techRecordDocument));
+        [
+            techRecordDocument.systemNumber,
+            techRecordDocument.vin,
+            techRecordDocument.primaryVrm,
+            techRecordDocument.trailerId,
+        ]
+    );
 
     return response.rows.insertId;
 };
 
 const upsertMakeModel = async (techRecord: TechRecord): Promise<number> => {
-    const templateVariables = toMakeModelTemplateVariables(techRecord);
-    templateVariables.push(null); // TODO intentional hack until we know JSON path of make-model dtpCode
-
     const response = await executePartialUpsert(
         generatePartialUpsertSql(MAKE_MODEL_TABLE),
-        templateVariables
+        [
+            techRecord.make,
+            techRecord.model,
+            techRecord.chassisMake,
+            techRecord.chassisModel,
+            techRecord.bodyMake,
+            techRecord.bodyModel,
+            techRecord.modelLiteral,
+            techRecord.bodyType?.code,
+            techRecord.bodyType?.description,
+            techRecord.fuelPropulsionSystem,
+            null // TODO intentional hack until we know JSON path of make-model dtpCode
+        ]
     );
 
     return response.rows.insertId;
@@ -129,12 +218,18 @@ const upsertMakeModel = async (techRecord: TechRecord): Promise<number> => {
 const upsertVehicleClass = async (techRecord: TechRecord): Promise<number> => {
     const response = await executePartialUpsert(
         generatePartialUpsertSql(VEHICLE_CLASS_TABLE),
-        toVehicleClassTemplateVariables(techRecord)
+        [
+            techRecord.vehicleClass?.code,
+            techRecord.vehicleClass?.description,
+            techRecord.vehicleType,
+            techRecord.vehicleSize,
+            techRecord.vehicleConfiguration,
+            techRecord.euVehicleCategory,
+        ]
     );
 
     return response.rows.insertId;
 };
-
 
 const upsertVehicleSubclasses = async (vehicleClassId: number, techRecord: TechRecord): Promise<number[]> => {
     if (!techRecord.vehicleSubclass) {
@@ -158,27 +253,56 @@ const upsertVehicleSubclasses = async (vehicleClassId: number, techRecord: TechR
 };
 
 const upsertIdentity = async (id: string, name: string): Promise<number> => {
-    const response = await executePartialUpsert(generatePartialUpsertSql(IDENTITY_TABLE), [id, name]);
+    const response = await executePartialUpsert(
+        generatePartialUpsertSql(IDENTITY_TABLE),
+        [
+            id,
+            name
+        ]
+    );
     return response.rows.insertId;
 };
 
 const upsertContactDetails = async (techRecord: TechRecord): Promise<number> => {
-    const contactDetailsTemplateVariables = toContactDetailsTemplateVariables(techRecord.applicantDetails!); // TODO check nullity
-    contactDetailsTemplateVariables.push(getFaxNumber(techRecord));
-
     const response = await executePartialUpsert(
         generatePartialUpsertSql(CONTACT_DETAILS_TABLE),
-        contactDetailsTemplateVariables
+        [
+            techRecord.applicantDetails?.name,
+            techRecord.applicantDetails?.address1,
+            techRecord.applicantDetails?.address2,
+            techRecord.applicantDetails?.postTown,
+            techRecord.applicantDetails?.address3,
+            techRecord.applicantDetails?.postCode,
+            techRecord.applicantDetails?.emailAddress,
+            techRecord.applicantDetails?.telephoneNumber,
+            getFaxNumber(techRecord)
+        ]
     );
 
     return response.rows.insertId;
 };
 
 const upsertPsvBrakes = async (techRecordId: string, techRecord: TechRecord): Promise<number> => {
-    const brakesTemplateVariables = toBrakesTemplateVariables(techRecord.brakes!);
-    brakesTemplateVariables.unshift(techRecordId);
+    const response = await executeFullUpsert(
+        generateFullUpsertSql(PSV_BRAKES_TABLE),
+        [
+            techRecordId,
+            techRecord.brakes?.brakeCodeOriginal,
+            techRecord.brakes?.brakeCode,
+            techRecord.brakes?.dataTrBrakeOne,
+            techRecord.brakes?.dataTrBrakeTwo,
+            techRecord.brakes?.dataTrBrakeThree,
+            techRecord.brakes?.retarderBrakeOne,
+            techRecord.brakes?.retarderBrakeTwo,
+            techRecord.brakes?.brakeForceWheelsNotLocked?.serviceBrakeForceA,
+            techRecord.brakes?.brakeForceWheelsNotLocked?.secondaryBrakeForceA,
+            techRecord.brakes?.brakeForceWheelsNotLocked?.parkingBrakeForceA,
+            techRecord.brakes?.brakeForceWheelsUpToHalfLocked?.serviceBrakeForceB,
+            techRecord.brakes?.brakeForceWheelsUpToHalfLocked?.secondaryBrakeForceB,
+            techRecord.brakes?.brakeForceWheelsUpToHalfLocked?.parkingBrakeForceB,
+        ]
+    );
 
-    const response = await executeFullUpsert(generateFullUpsertSql(PSV_BRAKES_TABLE), brakesTemplateVariables);
     return response.rows.insertId;
 };
 

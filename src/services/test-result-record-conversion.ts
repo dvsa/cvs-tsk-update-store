@@ -1,7 +1,6 @@
 import {KnownOperationType} from "./operation-types";
 import {DynamoDbImage} from "./dynamodb-images";
 import {parseTestResults, TestResult, TestResults} from "../models/test-results";
-import {execute} from "./connection-pool";
 import {TestType} from "../models/test-types";
 import {generatePartialUpsertSql} from "./sql-generation";
 import {
@@ -63,7 +62,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
             const fuelEmissionId = await upsertFuelEmission(testType);
             const testTypeId = await upsertTestType(testType);
 
-            const response = await execute(
+            const response = await executePartialUpsert(
                 generatePartialUpsertSql(TEST_RESULT_TABLE),
                 [
                     vehicleId,
