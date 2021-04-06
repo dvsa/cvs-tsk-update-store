@@ -382,4 +382,4 @@ export const TEST_RESULT_TABLE: TableDetails = {
         "createdBy_Id",
         "lastUpdatedBy_Id",
     ]
-}
+};

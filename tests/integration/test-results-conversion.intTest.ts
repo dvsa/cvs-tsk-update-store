@@ -85,5 +85,27 @@ describe("convertTestResults() integration tests", () => {
         );
         expect(testTypeResultSet.rows.length).toEqual(1);
         expect(testTypeResultSet.rows[0].testTypeClassification).toEqual("2323232323232323232323");
+
+        expect(upsertResult.defectIds.length).toEqual(1);
+        const defectResultSet = await execute(
+            `SELECT \`imNumber\` FROM \`defect\` WHERE \`defect\`.\`id\` = ${upsertResult.defectIds[0]}`
+        );
+        expect(defectResultSet.rows.length).toEqual(1);
+        expect(defectResultSet.rows[0].imNumber).toEqual(1);
+
+        const testDefectResultSet = await execute(
+            `SELECT \`test_result_id\`, \`defect_id\` FROM \`test_defect\` WHERE \`test_defect\`.\`test_result_id\` = ${upsertResult.testResultId}`
+        );
+        expect(testDefectResultSet.rows.length).toEqual(1);
+        expect(testDefectResultSet.rows[0].test_result_id).toEqual(upsertResult.testResultId);
+        expect(testDefectResultSet.rows[0].defect_id).toEqual(upsertResult.defectIds[0]);
+
+        expect(upsertResult.customDefectIds.length).toEqual(1);
+        const customDefectResultSet = await execute(
+            `SELECT \`test_result_id\`, \`referenceNumber\` FROM \`custom_defect\` WHERE \`custom_defect\`.\`id\` = ${upsertResult.customDefectIds[0]}`
+        );
+        expect(customDefectResultSet.rows.length).toEqual(1);
+        expect(customDefectResultSet.rows[0].test_result_id).toEqual(upsertResult.testResultId);
+        expect(customDefectResultSet.rows[0].referenceNumber).toEqual("1010101010");
     });
 });
