@@ -243,3 +243,98 @@ export const TYRE_TABLE: TableDetails = {
         "tyreCode",
     ]
 };
+
+export const TEST_STATION_TABLE: TableDetails = {
+    tableName: "test_station",
+    columnNames: [
+        "pNumber",
+        "name",
+        "type",
+    ]
+};
+
+export const TESTER_TABLE: TableDetails = {
+    tableName: "tester",
+    columnNames: [
+        "staffId",
+        "name",
+        "email_address",
+    ]
+};
+
+export const FUEL_EMISSION_TABLE: TableDetails = {
+    tableName: "fuel_emission",
+    columnNames: [
+        "modTypeCode",
+        "description",
+        "emissionStandard",
+        "fuelType",
+    ]
+};
+
+export const TEST_TYPE_TABLE: TableDetails = {
+    tableName: "test_type",
+    columnNames: [
+        "testTypeClassification",
+        "testTypeName",
+    ]
+};
+
+export const PREPARER_TABLE: TableDetails = {
+    tableName: "preparer",
+    columnNames: [
+        "preparerId",
+        "name",
+    ]
+};
+
+export const DEFECTS_TABLE: TableDetails = {
+    tableName: "defect",
+    columnNames: [
+        "imNumber",
+        "imDescription",
+        "itemNumber",
+        "itemDescription",
+        "deficiencyRef",
+        "deficiencyId",
+        "deficiencySubId",
+        "deficiencyCategory",
+        "deficiencyText",
+        "stdForProhibition",
+    ]
+};
+
+export const LOCATION_TABLE: TableDetails = {
+    tableName: "location",
+    columnNames: [
+        "vertical",
+        "horizontal",
+        "lateral",
+        "longitudinal",
+        "rowNumber",
+        "seatNumber",
+        "axleNumber",
+    ]
+};
+
+export const TEST_DEFECT_TABLE: TableDetails = {
+    tableName: "test_defect",
+    columnNames: [
+        "test_result_id",
+        "defect_id",
+        "location_id",
+        "notes",
+        "prs",
+        "prohibitionIssued",
+    ]
+};
+
+export const CUSTOM_DEFECT_TABLE: TableDetails = {
+    tableName: "custom_defect",
+    columnNames: [
+        "test_result_id",
+        "referenceNumber",
+        "defectName",
+        "defectNotes",
+    ]
+};

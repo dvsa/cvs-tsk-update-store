@@ -4,6 +4,20 @@ import {parseTestResults, TestResult, TestResults} from "../models/test-results"
 import {execute} from "./connection-pool";
 import {toVehicleTemplateVariables} from "../models/tech-record-document";
 import {TestType} from "../models/test-types";
+import {generatePartialUpsertSql} from "./sql-generation";
+import {
+    CUSTOM_DEFECT_TABLE,
+    DEFECTS_TABLE,
+    FUEL_EMISSION_TABLE,
+    IDENTITY_TABLE,
+    LOCATION_TABLE,
+    PREPARER_TABLE,
+    TEST_DEFECT_TABLE,
+    TEST_STATION_TABLE,
+    TEST_TYPE_TABLE,
+    TESTER_TABLE,
+    VEHICLE_CLASS_TABLE
+} from "./table-details";
 
 export const convertTestResults = async (operationType: KnownOperationType, image: DynamoDbImage): Promise<void> => {
     const testResults: TestResults = parseTestResults(image);
@@ -37,6 +51,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<number[]> =>
         const testStationId = await upsertTestStation(testResult);
         const testerId = await upsertTester(testResult);
         const vehicleClassId = await upsertVehicleClass(testResult);
+        // TODO vehicle subclass - not clear on insert procedure here
         const preparerId = await upsertPreparer(testResult);
         const createdById = await upsertIdentity(testResult.createdById!, testResult.createdByName!);
         const lastUpdatedById = await upsertIdentity(testResult.lastUpdatedById!, testResult.lastUpdatedByName!);
@@ -108,11 +123,11 @@ const upsertVehicle = async (testResult: TestResult): Promise<number> => {
 
 const upsertTestStation = async (testResult: TestResult): Promise<number> => {
     const response = await execute(
-        "INSERT INTO `test_station` (`pNumber`, `name`, `type`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)",
+        generatePartialUpsertSql(TEST_STATION_TABLE),
         [
             testResult.testStationPNumber,
             testResult.testStationName,
-            testResult.testStationType,
+            testResult.testStationType
         ]
     );
     return response.rows.insertId;
@@ -120,7 +135,7 @@ const upsertTestStation = async (testResult: TestResult): Promise<number> => {
 
 const upsertTester = async (testResult: TestResult): Promise<number> => {
     const response = await execute(
-        "INSERT INTO `tester` (`staffId`, `name`, `email_address`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)",
+        generatePartialUpsertSql(TESTER_TABLE),
         [
             testResult.testerStaffId,
             testResult.testerName,
@@ -131,21 +146,23 @@ const upsertTester = async (testResult: TestResult): Promise<number> => {
 };
 
 const upsertVehicleClass = async (testResult: TestResult): Promise<number> => {
-    const insertVehicleClassQuery = "INSERT INTO `vehicle_class` (`code`, `description`, `vehicleType`, `vehicleSize`, `vehicleConfiguration`, `euVehicleCategory`) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)";
-    const insertVehicleClassResponse = await execute(insertVehicleClassQuery, [
-        testResult.vehicleClass?.code,
-        testResult.vehicleClass?.description,
-        testResult.vehicleType,
-        testResult.vehicleSize,
-        testResult.vehicleConfiguration,
-        testResult.euVehicleCategory,
-    ]);
-    return insertVehicleClassResponse.rows.insertId;
+    const response = await execute(
+        generatePartialUpsertSql(VEHICLE_CLASS_TABLE),
+        [
+            testResult.vehicleClass?.code,
+            testResult.vehicleClass?.description,
+            testResult.vehicleType,
+            testResult.vehicleSize,
+            testResult.vehicleConfiguration,
+            testResult.euVehicleCategory,
+        ]
+    );
+    return response.rows.insertId;
 };
 
 const upsertFuelEmission = async (testType: TestType): Promise<number> => {
     const response = await execute(
-        "INSERT INTO fuel_emission (`modTypeCode`, `description`, `emissionStandard`, `fuelType`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)",
+        generatePartialUpsertSql(FUEL_EMISSION_TABLE),
         [
             testType.modType!.code,
             testType.modType!.description,
@@ -158,7 +175,7 @@ const upsertFuelEmission = async (testType: TestType): Promise<number> => {
 
 const upsertTestType = async (testType: TestType): Promise<number> => {
     const response = await execute(
-        "INSERT INTO `test_type` (`testTypeClassification`, `testTypeName`) VALUES (?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)",
+        generatePartialUpsertSql(TEST_TYPE_TABLE),
         [
             testType.testTypeClassification,
             testType.testTypeName,
@@ -169,7 +186,7 @@ const upsertTestType = async (testType: TestType): Promise<number> => {
 
 const upsertPreparer = async (testResult: TestResult): Promise<number> => {
     const response = await execute(
-        "INSERT INTO preparer (`preparerId`, `name`) VALUES (?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)",
+        generatePartialUpsertSql(PREPARER_TABLE),
         [
             testResult.preparerId,
             testResult.preparerName,
@@ -180,7 +197,7 @@ const upsertPreparer = async (testResult: TestResult): Promise<number> => {
 
 const upsertIdentity = async (id: string, name: string): Promise<number> => {
     const response = await execute(
-        "INSERT INTO `identity` (`identityId`, `name`) VALUES (?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)",
+        generatePartialUpsertSql(IDENTITY_TABLE),
         [
             id,
             name
@@ -196,7 +213,7 @@ const upsertDefects = async (testResultId: number, testType: TestType): Promise<
 
     for (const defect of testType.defects) {
         const insertDefectResponse = await execute(
-            "INSERT INTO `defect` (`imNumber`, `imDescription`, `itemNumber`, `itemDescription`, `deficiencyRef`, `deficiencyId`, `deficiencySubId`, `deficiencyCategory`, `deficiencyText`, `stdForProhibition` ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+            generatePartialUpsertSql(DEFECTS_TABLE),
             [
                 defect.imNumber,
                 defect.imDescription,
@@ -214,7 +231,7 @@ const upsertDefects = async (testResultId: number, testType: TestType): Promise<
         const defectId = insertDefectResponse.rows.insertId;
 
         const insertLocationResponse = await execute(
-            "INSERT INTO `location` (`vertical`, `horizontal`, `lateral`, `longitudinal`, `rowNumber`, `seatNumber`, `axleNumber`) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+            generatePartialUpsertSql(LOCATION_TABLE),
             [
                 defect.additionalInformation?.location?.vertical,
                 defect.additionalInformation?.location?.horizontal,
@@ -229,7 +246,7 @@ const upsertDefects = async (testResultId: number, testType: TestType): Promise<
         const locationId = insertLocationResponse.rows.insertId;
 
         await execute(
-            "INSERT INTO `test_defect` (`test_result_id`, `defect_id`, `location_id`, `notes`, `prs`, `prohibitionIssued`) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+            generatePartialUpsertSql(TEST_DEFECT_TABLE),
             [
                 testResultId,
                 defectId,
@@ -249,7 +266,7 @@ const upsertCustomDefects = async (testResultId: number, testType: TestType): Pr
 
     for (const customDefect of testType.customDefects) {
         await execute(
-            "INSERT INTO `custom_defect` (`test_result_id`, `referenceNumber`, `defectName`, `defectNotes`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+            generatePartialUpsertSql(CUSTOM_DEFECT_TABLE),
             [
                 testResultId,
                 customDefect.referenceNumber,
