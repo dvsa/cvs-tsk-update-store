@@ -1,7 +1,7 @@
 import {StartedTestContainer} from "testcontainers";
 import {destroyConnectionPool, execute} from "../../src/services/connection-pool";
 import {castToImageShape} from "../utils";
-import {convertTechRecordDocument} from "../../src/services/tech-record-conversion";
+import {convertTechRecordDocument} from "../../src/services/tech-record-document-conversion";
 import techRecordDocumentJson from "../resources/dynamodb-image-technical-record.json";
 import {DynamoDbImage} from "../../src/services/dynamodb-images";
 import {getContainerizedDatabase} from "./cvsbnop-container";

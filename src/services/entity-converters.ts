@@ -1,5 +1,5 @@
 import {DynamoDbImage} from "./dynamodb-images";
-import {convertTechRecordDocument} from "./tech-record-conversion";
+import {convertTechRecordDocument} from "./tech-record-document-conversion";
 import {KnownOperationType} from "./operation-types";
 import {Maybe} from "../models/optionals";
 import {convertTestResults} from "./test-result-record-conversion";
