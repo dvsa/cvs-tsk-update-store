@@ -13,3 +13,18 @@ export interface TechRecordUpsertResult {
     plateIds: number[];
     axleIds: number[];
 }
+
+export interface TestResultUpsertResult {
+    vehicleId: number;
+    testResultId: number;
+    testStationId: number;
+    testerId: number;
+    vehicleClassId: number;
+    preparerId: number;
+    createdById: number;
+    lastUpdatedById: number;
+    fuelEmissionId: number;
+    testTypeId: number;
+    defectIds: number[];
+    customDefectIds: number[];
+}

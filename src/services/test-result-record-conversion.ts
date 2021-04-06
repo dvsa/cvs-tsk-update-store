@@ -2,7 +2,6 @@ import {KnownOperationType} from "./operation-types";
 import {DynamoDbImage} from "./dynamodb-images";
 import {parseTestResults, TestResult, TestResults} from "../models/test-results";
 import {execute} from "./connection-pool";
-import {toVehicleTemplateVariables} from "../models/tech-record-document";
 import {TestType} from "../models/test-types";
 import {generatePartialUpsertSql} from "./sql-generation";
 import {
@@ -13,11 +12,15 @@ import {
     LOCATION_TABLE,
     PREPARER_TABLE,
     TEST_DEFECT_TABLE,
+    TEST_RESULT_TABLE,
     TEST_STATION_TABLE,
     TEST_TYPE_TABLE,
     TESTER_TABLE,
-    VEHICLE_CLASS_TABLE
+    VEHICLE_CLASS_TABLE,
+    VEHICLE_TABLE
 } from "./table-details";
+import {executePartialUpsert} from "./sql-execution";
+import {TestResultUpsertResult} from "../models/upsert-results";
 
 export const convertTestResults = async (operationType: KnownOperationType, image: DynamoDbImage): Promise<void> => {
     const testResults: TestResults = parseTestResults(image);
@@ -37,12 +40,12 @@ const deriveSqlOperation = (operationType: KnownOperationType): ((testResults: T
     }
 };
 
-const upsertTestResults = async (testResults: TestResults): Promise<number[]> => {
+const upsertTestResults = async (testResults: TestResults): Promise<TestResultUpsertResult[]> => {
     if (!testResults) {
         return [];
     }
 
-    const insertedIds: number[] = [];
+    const upsertResults: TestResultUpsertResult[] = [];
 
     for (const testResult of testResults) {
         validateTestResult(testResult);
@@ -60,69 +63,96 @@ const upsertTestResults = async (testResults: TestResults): Promise<number[]> =>
             const fuelEmissionId = await upsertFuelEmission(testType);
             const testTypeId = await upsertTestType(testType);
 
-            const insertTestResultQuery = "INSERT INTO test_result (testStatus, reasonForCancellation, numberOfSeats, odometerReading, odometerReadingUnits, countryOfRegistration, noOfAxles, regnDate, firstUseDate, createdAt, lastUpdatedAt, testCode, testNumber, certificateNumber, secondaryCertificateNumber, testExpiryDate, testAnniversaryDate, testTypeStartTimestamp, testTypeEndTimestamp, numberOfSeatbeltsFitted, lastSeatbeltInstallationCheckDate, seatbeltInstallationCheckDate, testResult, reasonForAbandoning, additionalNotesRecorded, additionalCommentsForAbandon, particulateTrapFitted, particulateTrapSerialNumber, modificationTypeUsed, smokeTestKLimitApplied, vehicle_id, test_station_id, tester_id, vehicle_class_id, preparer_id, createdBy_Id, lastUpdatedBy_Id, fuel_emission_id, test_type_id ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)"; // TODO
-            const testResultTemplateVariables: any[] = [
-                testResult.testStatus,
-                testResult.reasonForCancellation,
-                testResult.numberOfSeats,
-                testResult.odometerReading,
-                testResult.odometerReadingUnits,
-                testResult.countryOfRegistration,
-                testResult.noOfAxles,
-                testResult.regnDate,
-                testResult.firstUseDate,
-                testResult.createdAt,
-                testResult.lastUpdatedAt,
-                testType.testCode,
-                testType.testNumber,
-                testType.certificateNumber,
-                testType.secondaryCertificateNumber,
-                testType.testExpiryDate,
-                testType.testAnniversaryDate,
-                testType.testTypeStartTimestamp,
-                testType.testTypeEndTimestamp,
-                testType.numberOfSeatbeltsFitted,
-                testType.lastSeatbeltInstallationCheckDate,
-                testType.seatbeltInstallationCheckDate,
-                testType.testResult,
-                testType.reasonForAbandoning,
-                testType.additionalNotesRecorded,
-                testType.additionalCommentsForAbandon,
-                testType.particulateTrapFitted,
-                testType.particulateTrapSerialNumber,
-                testType.modificationTypeUsed,
-                testType.smokeTestKLimitApplied,
-            ];
-            testResultTemplateVariables.push(vehicleId, testStationId, testerId, vehicleClassId, preparerId, createdById, lastUpdatedById, fuelEmissionId, testTypeId);
+            const response = await execute(
+                generatePartialUpsertSql(TEST_RESULT_TABLE),
+                [
+                    vehicleId,
+                    fuelEmissionId,
+                    testStationId,
+                    testerId,
+                    preparerId,
+                    vehicleClassId,
+                    testTypeId,
+                    testResult.testStatus,
+                    testResult.reasonForCancellation,
+                    testResult.numberOfSeats,
+                    testResult.odometerReading,
+                    testResult.odometerReadingUnits,
+                    testResult.countryOfRegistration,
+                    testResult.noOfAxles,
+                    testResult.regnDate,
+                    testResult.firstUseDate,
+                    testResult.createdAt,
+                    testResult.lastUpdatedAt,
+                    testType.testCode,
+                    testType.testNumber,
+                    testType.certificateNumber,
+                    testType.secondaryCertificateNumber,
+                    testType.testExpiryDate,
+                    testType.testAnniversaryDate,
+                    testType.testTypeStartTimestamp,
+                    testType.testTypeEndTimestamp,
+                    testType.numberOfSeatbeltsFitted,
+                    testType.lastSeatbeltInstallationCheckDate,
+                    testType.seatbeltInstallationCheckDate,
+                    testType.testResult,
+                    testType.reasonForAbandoning,
+                    testType.additionalNotesRecorded,
+                    testType.additionalCommentsForAbandon,
+                    testType.particulateTrapFitted,
+                    testType.particulateTrapSerialNumber,
+                    testType.modificationTypeUsed,
+                    testType.smokeTestKLimitApplied,
+                    createdById,
+                    lastUpdatedById
+                ]
+            );
 
-            await execute(insertTestResultQuery, testResultTemplateVariables);
+            const testResultId = response.rows.insertId;
 
-            const testResultId = (await execute("SELECT LAST_INSERT_ID() AS testResultId")).rows[0].testResultId;
+            const defectIds = await upsertDefects(testResultId, testType);
+            const customDefectIds = await upsertCustomDefects(testResultId, testType);
 
-            await upsertDefects(testResultId, testType);
-            await upsertCustomDefects(testResultId, testType);
-
-            insertedIds.push(testResultId);
+            upsertResults.push({
+                vehicleId,
+                testResultId,
+                testStationId,
+                testerId,
+                vehicleClassId,
+                preparerId,
+                createdById,
+                lastUpdatedById,
+                fuelEmissionId,
+                testTypeId,
+                defectIds,
+                customDefectIds,
+            });
         }
     }
 
-    return insertedIds;
+    return upsertResults;
 };
 
 const deleteTestResults = async (testResult: TestResults): Promise<void> => {
     // TODO
 };
 
+// TODO confirm with Chris - might instead need to assume vehicle is present and execute SELECT here
 const upsertVehicle = async (testResult: TestResult): Promise<number> => {
-    const insertVehicleQuery = "INSERT INTO vehicle (system_number, vin, vrm_trm, trailer_id, createdAt) VALUES (?, ?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)";
-
-    await execute(insertVehicleQuery, toVehicleTemplateVariables(testResult)); // TODO
-
-    return (await execute("SELECT LAST_INSERT_ID() AS vehicleId")).rows[0].vehicleId;
+    const response = await executePartialUpsert(
+        generatePartialUpsertSql(VEHICLE_TABLE),
+        [
+            testResult.systemNumber,
+            testResult.vin,
+            testResult.vrm,
+            testResult.trailerId,
+        ]
+    );
+    return response.rows.insertId;
 };
 
 const upsertTestStation = async (testResult: TestResult): Promise<number> => {
-    const response = await execute(
+    const response = await executePartialUpsert(
         generatePartialUpsertSql(TEST_STATION_TABLE),
         [
             testResult.testStationPNumber,
@@ -134,7 +164,7 @@ const upsertTestStation = async (testResult: TestResult): Promise<number> => {
 };
 
 const upsertTester = async (testResult: TestResult): Promise<number> => {
-    const response = await execute(
+    const response = await executePartialUpsert(
         generatePartialUpsertSql(TESTER_TABLE),
         [
             testResult.testerStaffId,
@@ -146,7 +176,7 @@ const upsertTester = async (testResult: TestResult): Promise<number> => {
 };
 
 const upsertVehicleClass = async (testResult: TestResult): Promise<number> => {
-    const response = await execute(
+    const response = await executePartialUpsert(
         generatePartialUpsertSql(VEHICLE_CLASS_TABLE),
         [
             testResult.vehicleClass?.code,
@@ -161,7 +191,7 @@ const upsertVehicleClass = async (testResult: TestResult): Promise<number> => {
 };
 
 const upsertFuelEmission = async (testType: TestType): Promise<number> => {
-    const response = await execute(
+    const response = await executePartialUpsert(
         generatePartialUpsertSql(FUEL_EMISSION_TABLE),
         [
             testType.modType!.code,
@@ -174,7 +204,7 @@ const upsertFuelEmission = async (testType: TestType): Promise<number> => {
 };
 
 const upsertTestType = async (testType: TestType): Promise<number> => {
-    const response = await execute(
+    const response = await executePartialUpsert(
         generatePartialUpsertSql(TEST_TYPE_TABLE),
         [
             testType.testTypeClassification,
@@ -185,7 +215,7 @@ const upsertTestType = async (testType: TestType): Promise<number> => {
 };
 
 const upsertPreparer = async (testResult: TestResult): Promise<number> => {
-    const response = await execute(
+    const response = await executePartialUpsert(
         generatePartialUpsertSql(PREPARER_TABLE),
         [
             testResult.preparerId,
@@ -196,7 +226,7 @@ const upsertPreparer = async (testResult: TestResult): Promise<number> => {
 };
 
 const upsertIdentity = async (id: string, name: string): Promise<number> => {
-    const response = await execute(
+    const response = await executePartialUpsert(
         generatePartialUpsertSql(IDENTITY_TABLE),
         [
             id,
@@ -206,13 +236,15 @@ const upsertIdentity = async (id: string, name: string): Promise<number> => {
     return response.rows.insertId;
 };
 
-const upsertDefects = async (testResultId: number, testType: TestType): Promise<void> => {
+const upsertDefects = async (testResultId: number, testType: TestType): Promise<number[]> => {
     if (!testType.defects) {
-        return;
+        return [];
     }
 
+    const insertedIds: number[] = [];
+
     for (const defect of testType.defects) {
-        const insertDefectResponse = await execute(
+        const insertDefectResponse = await executePartialUpsert(
             generatePartialUpsertSql(DEFECTS_TABLE),
             [
                 defect.imNumber,
@@ -229,8 +261,9 @@ const upsertDefects = async (testResultId: number, testType: TestType): Promise<
         );
 
         const defectId = insertDefectResponse.rows.insertId;
+        insertedIds.push(defectId);
 
-        const insertLocationResponse = await execute(
+        const insertLocationResponse = await executePartialUpsert(
             generatePartialUpsertSql(LOCATION_TABLE),
             [
                 defect.additionalInformation?.location?.vertical,
@@ -245,7 +278,7 @@ const upsertDefects = async (testResultId: number, testType: TestType): Promise<
 
         const locationId = insertLocationResponse.rows.insertId;
 
-        await execute(
+        await executePartialUpsert(
             generatePartialUpsertSql(TEST_DEFECT_TABLE),
             [
                 testResultId,
@@ -257,15 +290,19 @@ const upsertDefects = async (testResultId: number, testType: TestType): Promise<
             ]
         );
     }
+
+    return insertedIds;
 };
 
-const upsertCustomDefects = async (testResultId: number, testType: TestType): Promise<void> => {
+const upsertCustomDefects = async (testResultId: number, testType: TestType): Promise<number[]> => {
     if (!testType.customDefects) {
-        return;
+        return [];
     }
 
+    const insertedIds: number[] = [];
+
     for (const customDefect of testType.customDefects) {
-        await execute(
+        const response = await executePartialUpsert(
             generatePartialUpsertSql(CUSTOM_DEFECT_TABLE),
             [
                 testResultId,
@@ -274,7 +311,10 @@ const upsertCustomDefects = async (testResultId: number, testType: TestType): Pr
                 customDefect.defectNotes,
             ]
         );
+        insertedIds.push(response.rows.insertId);
     }
+
+    return insertedIds;
 };
 
 const validateTestResult = (testResult: TestResult): void => {
