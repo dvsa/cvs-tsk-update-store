@@ -14,7 +14,6 @@ import {Brakes, parseBrakes} from "./brakes";
 import {Axles, parseAxles} from "./axles";
 import {Dda} from "./dda";
 import {Maybe} from "./optionals";
-import {undefinedToNull} from "../services/connection-pool";
 import {EuVehicleCategory, VehicleConfiguration, VehicleSize, VehicleType} from "./shared-enums";
 
 export type TechRecords = TechRecord[];
@@ -256,129 +255,6 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
         axles: parseAxles(image.getList("axles")),
         dda: undefined, // intentional - not implemented. parseDda(image.getMap("dda"))
     };
-};
-
-export const toTechRecordTemplateVariables = (techRecord: TechRecord): any[] => {
-    const templateVariables: any[] = [];
-
-    // TODO check nullity
-    templateVariables.push(techRecord.recordCompleteness);
-    templateVariables.push(techRecord.createdAt);
-    templateVariables.push(techRecord.lastUpdatedAt);
-    templateVariables.push(techRecord.functionCode);
-    templateVariables.push(techRecord.offRoad);
-    templateVariables.push(techRecord.numberOfWheelsDriven);
-    templateVariables.push("" + techRecord.emissionsLimit);
-    templateVariables.push(techRecord.departmentalVehicleMarker);
-    templateVariables.push(techRecord.alterationMarker);
-    templateVariables.push(techRecord.variantVersionNumber);
-    templateVariables.push(techRecord.grossEecWeight);
-    templateVariables.push(techRecord.trainEecWeight);
-    templateVariables.push(techRecord.maxTrainEecWeight);
-    templateVariables.push(techRecord.manufactureYear);
-    templateVariables.push(techRecord.regnDate);
-    templateVariables.push(techRecord.firstUseDate);
-    templateVariables.push(techRecord.coifDate);
-    templateVariables.push(techRecord.ntaNumber);
-    templateVariables.push(techRecord.coifSerialNumber);
-    templateVariables.push(techRecord.coifCertifierName);
-    templateVariables.push(techRecord.approvalType);
-    templateVariables.push(techRecord.approvalTypeNumber);
-    templateVariables.push(techRecord.variantNumber);
-    templateVariables.push(techRecord.conversionRefNo);
-    templateVariables.push(techRecord.seatsLowerDeck);
-    templateVariables.push(techRecord.seatsUpperDeck);
-    templateVariables.push(techRecord.standingCapacity);
-    templateVariables.push(techRecord.speedRestriction);
-    templateVariables.push(techRecord.speedLimiterMrk);
-    templateVariables.push(techRecord.tachoExemptMrk);
-    templateVariables.push(techRecord.dispensations);
-    templateVariables.push(techRecord.remarks);
-    templateVariables.push(techRecord.reasonForCreation);
-    templateVariables.push(techRecord.statusCode);
-    templateVariables.push(techRecord.unladenWeight);
-    templateVariables.push(techRecord.grossKerbWeight);
-    templateVariables.push(techRecord.grossLadenWeight);
-    templateVariables.push(techRecord.grossGbWeight);
-    templateVariables.push(techRecord.grossDesignWeight);
-    templateVariables.push(techRecord.trainGbWeight);
-    templateVariables.push(techRecord.trainDesignWeight);
-    templateVariables.push(techRecord.maxTrainGbWeight);
-    templateVariables.push(techRecord.maxTrainDesignWeight);
-    templateVariables.push(techRecord.maxLoadOnCoupling);
-    templateVariables.push(techRecord.frameDescription);
-    templateVariables.push(techRecord.tyreUseCode);
-    templateVariables.push(techRecord.roadFriendly);
-    templateVariables.push(techRecord.drawbarCouplingFitted);
-    templateVariables.push(techRecord.euroStandard);
-    templateVariables.push(techRecord.suspensionType);
-    templateVariables.push(techRecord.couplingType);
-    templateVariables.push(techRecord.dimensions!.length);
-    templateVariables.push(techRecord.dimensions!.height);
-    templateVariables.push(techRecord.dimensions!.width);
-    templateVariables.push(techRecord.frontAxleTo5thWheelMin);
-    templateVariables.push(techRecord.frontAxleTo5thWheelMax);
-    templateVariables.push(techRecord.frontAxleTo5thWheelCouplingMin);
-    templateVariables.push(techRecord.frontAxleTo5thWheelCouplingMax);
-    templateVariables.push(techRecord.frontAxleToRearAxle);
-    templateVariables.push(techRecord.rearAxleToRearTrl);
-    templateVariables.push(techRecord.couplingCenterToRearAxleMin);
-    templateVariables.push(techRecord.couplingCenterToRearAxleMax);
-    templateVariables.push(techRecord.couplingCenterToRearTrlMin);
-    templateVariables.push(techRecord.couplingCenterToRearTrlMax);
-    templateVariables.push(techRecord.centreOfRearmostAxleToRearOfTrl);
-    templateVariables.push(techRecord.notes);
-    templateVariables.push(techRecord.purchaserDetails!.purchaserNotes);
-    templateVariables.push(techRecord.manufacturerDetails!.manufacturerNotes);
-    templateVariables.push(techRecord.noOfAxles);
-    templateVariables.push(techRecord.brakeCode);
-    templateVariables.push(techRecord.brakes?.dtpNumber);
-    templateVariables.push(techRecord.brakes?.loadSensingValve);
-    templateVariables.push(techRecord.brakes?.antilockBrakingSystem);
-    templateVariables.push(techRecord.updateType);
-    templateVariables.push(techRecord.numberOfSeatbelts);
-    templateVariables.push(techRecord.seatbeltInstallationApprovalDate);
-
-    return undefinedToNull(templateVariables);
-};
-
-export const toMakeModelTemplateVariables = (techRecord: TechRecord): any[] => {
-    const templateVariables: any[] = [];
-
-    templateVariables.push(techRecord.make);
-    templateVariables.push(techRecord.model);
-    templateVariables.push(techRecord.chassisMake);
-    templateVariables.push(techRecord.chassisModel);
-    templateVariables.push(techRecord.bodyMake);
-    templateVariables.push(techRecord.bodyModel);
-    templateVariables.push(techRecord.modelLiteral);
-    templateVariables.push(techRecord.bodyType!.code);
-    templateVariables.push(techRecord.bodyType!.description);
-    templateVariables.push(techRecord.fuelPropulsionSystem);
-
-    return undefinedToNull(templateVariables);
-};
-
-export const toVehicleClassTemplateVariables = (techRecord: TechRecord): any[] => {
-    const templateVariables: any[] = [];
-
-    templateVariables.push(techRecord.vehicleClass!.code);
-    templateVariables.push(techRecord.vehicleClass!.description);
-    templateVariables.push(techRecord.vehicleType);
-    templateVariables.push(techRecord.vehicleSize);
-    templateVariables.push(techRecord.vehicleConfiguration);
-    templateVariables.push(techRecord.euVehicleCategory);
-
-    return undefinedToNull(templateVariables);
-};
-
-export const toVehicleSubClassTemplateVariables = (techRecord: TechRecord): any[] => {
-    const templateVariables: any[] = [];
-
-    // TODO first element only?
-    templateVariables.push(techRecord.vehicleSubclass![0]);
-
-    return undefinedToNull(templateVariables);
 };
 
 export const getFaxNumber = (techRecord: TechRecord): Maybe<string> => {

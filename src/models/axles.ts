@@ -79,8 +79,6 @@ export const parseAxles = (axlesImage?: DynamoDbImage): Axles => {
     return axles;
 };
 
-// TODO remove, add toTireTemplateVariables
-
 const parseAxleWeightProperties = (axleWeightPropertiesImage?: DynamoDbImage): Maybe<AxleWeightProperties> => {
     if (!axleWeightPropertiesImage) {
         return undefined;

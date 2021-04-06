@@ -1,6 +1,5 @@
 import {DynamoDbImage} from "../services/dynamodb-images";
 import {Maybe} from "./optionals";
-import {undefinedToNull} from "../services/connection-pool";
 
 export interface ApplicantDetailsProperties {
     name?: string;
@@ -30,17 +29,3 @@ export const parseApplicantDetailsProperties = (applicantDetailsProperties?: Dyn
     };
 };
 
-export const toContactDetailsTemplateVariables = (applicantDetailsProperties: ApplicantDetailsProperties): any[] => {
-    const templateVariables: any[] = [];
-
-    templateVariables.push(applicantDetailsProperties.name);
-    templateVariables.push(applicantDetailsProperties.address1);
-    templateVariables.push(applicantDetailsProperties.address2);
-    templateVariables.push(applicantDetailsProperties.postTown);
-    templateVariables.push(applicantDetailsProperties.address3);
-    templateVariables.push(applicantDetailsProperties.postCode);
-    templateVariables.push(applicantDetailsProperties.emailAddress);
-    templateVariables.push(applicantDetailsProperties.telephoneNumber);
-
-    return undefinedToNull(templateVariables);
-};

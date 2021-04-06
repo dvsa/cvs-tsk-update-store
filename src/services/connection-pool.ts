@@ -46,6 +46,8 @@ export const execute = async (sql: string, templateVariables?: any[]): Promise<Q
     };
 };
 
+// npm packages mysql and mysql2 will throw an error on encountering JS "undefined".
+// In contrast, an explicit JS "null" translates to SQL "NULL".
 export const undefinedToNull = (array: any[]): any[] => {
     array.forEach((v, i) => {
         if (v === undefined) {

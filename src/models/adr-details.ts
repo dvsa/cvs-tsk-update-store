@@ -178,7 +178,3 @@ export const parseAdrDetails = (adrDetails?: DynamoDbImage): Maybe<AdrDetails> =
         tank
     };
 };
-
-// TODO add toAdrDetailsTemplateVariables, whenever it's needed
-
-// TODO add variants toPermittedDangerousGoods, toDangerousGoods, toAdditionalNotes, toAdditionalGuidance, etc

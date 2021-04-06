@@ -22,5 +22,3 @@ export const parseAuthIntoService = (authIntoService?: DynamoDbImage): Maybe<Aut
         dateRejected: authIntoService.getString("dateRejected")
     };
 };
-
-// TODO add authIntoServiceToTemplateVariables, whenever it's needed

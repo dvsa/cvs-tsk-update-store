@@ -39,5 +39,3 @@ export const parsePlates = (platesImage?: DynamoDbImage): Plates => {
 
     return plates;
 };
-
-// TODO add toPlateTemplateVariables

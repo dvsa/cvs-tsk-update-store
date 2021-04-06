@@ -36,5 +36,3 @@ export const parseDda = (dda?: DynamoDbImage): Maybe<Dda> => {
         ddaNotes: dda.getString("ddaNotes")
     };
 };
-
-// TODO add toDdaTemplateVariables, whenever it's needed
