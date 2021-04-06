@@ -20,6 +20,8 @@ import {
 } from "./table-details";
 import {executeFullUpsert, executePartialUpsert} from "./sql-execution";
 import {TechRecordUpsertResult} from "../models/upsert-results";
+import {getConnectionPool} from "./connection-pool";
+import {Connection} from "mysql2/promise";
 
 export const convertTechRecordDocument = async (operationType: KnownOperationType, image: DynamoDbImage): Promise<any> => {
     const techRecordDocument: TechRecordDocument = parseTechRecordDocument(image);
@@ -40,7 +42,22 @@ const deriveSqlOperation = (operationType: KnownOperationType): ((techRecordDocu
 };
 
 const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promise<TechRecordUpsertResult[]> => {
-    const vehicleId = await upsertVehicle(techRecordDocument);
+    const pool = await getConnectionPool();
+
+    let vehicleId;
+    const vehicleConnection = await pool.getConnection();
+
+    try {
+        await vehicleConnection.beginTransaction();
+
+        vehicleId = await upsertVehicle(vehicleConnection, techRecordDocument);
+
+        await vehicleConnection.commit();
+    } catch (err) {
+        console.error(err);
+        await vehicleConnection.rollback();
+        throw err;
+    }
 
     const techRecords = techRecordDocument.techRecord;
 
@@ -51,126 +68,139 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
     }
 
     for (const techRecord of techRecords) {
-        const makeModelId = await upsertMakeModel(techRecord);
-        const vehicleClassId = await upsertVehicleClass(techRecord);
-        const vehicleSubclassIds = await upsertVehicleSubclasses(vehicleClassId, techRecord);
-        const createdById = await upsertIdentity(techRecord.createdById!, techRecord.createdByName!);
-        const lastUpdatedById = await upsertIdentity(techRecord.lastUpdatedById!, techRecord.lastUpdatedByName!);
-        const contactDetailsId = await upsertContactDetails(techRecord);
+        const techRecordConnection = await pool.getConnection();
 
-        const response = await executeFullUpsert(
-            generateFullUpsertSql(TECHNICAL_RECORD_TABLE),
-            [
+        try {
+            await techRecordConnection.beginTransaction();
+
+            const makeModelId = await upsertMakeModel(techRecordConnection, techRecord);
+            const vehicleClassId = await upsertVehicleClass(techRecordConnection, techRecord);
+            const vehicleSubclassIds = await upsertVehicleSubclasses(techRecordConnection, vehicleClassId, techRecord);
+            const createdById = await upsertIdentity(techRecordConnection, techRecord.createdById!, techRecord.createdByName!);
+            const lastUpdatedById = await upsertIdentity(techRecordConnection, techRecord.lastUpdatedById!, techRecord.lastUpdatedByName!);
+            const contactDetailsId = await upsertContactDetails(techRecordConnection, techRecord);
+
+            const response = await executeFullUpsert(
+                generateFullUpsertSql(TECHNICAL_RECORD_TABLE),
+                [
+                    vehicleId,
+                    techRecord.recordCompleteness,
+                    techRecord.createdAt,
+                    techRecord.lastUpdatedAt,
+                    makeModelId,
+                    techRecord.functionCode,
+                    techRecord.offRoad,
+                    techRecord.numberOfWheelsDriven,
+                    "" + techRecord.emissionsLimit,
+                    techRecord.departmentalVehicleMarker,
+                    techRecord.alterationMarker,
+                    vehicleClassId,
+                    techRecord.variantVersionNumber,
+                    techRecord.grossEecWeight,
+                    techRecord.trainEecWeight,
+                    techRecord.maxTrainEecWeight,
+                    contactDetailsId,
+                    contactDetailsId,
+                    contactDetailsId,
+                    techRecord.manufactureYear,
+                    techRecord.regnDate,
+                    techRecord.firstUseDate,
+                    techRecord.coifDate,
+                    techRecord.ntaNumber,
+                    techRecord.coifSerialNumber,
+                    techRecord.coifCertifierName,
+                    techRecord.approvalType,
+                    techRecord.approvalTypeNumber,
+                    techRecord.variantNumber,
+                    techRecord.conversionRefNo,
+                    techRecord.seatsLowerDeck,
+                    techRecord.seatsUpperDeck,
+                    techRecord.standingCapacity,
+                    techRecord.speedRestriction,
+                    techRecord.speedLimiterMrk,
+                    techRecord.tachoExemptMrk,
+                    techRecord.dispensations,
+                    techRecord.remarks,
+                    techRecord.reasonForCreation,
+                    techRecord.statusCode,
+                    techRecord.unladenWeight,
+                    techRecord.grossKerbWeight,
+                    techRecord.grossLadenWeight,
+                    techRecord.grossGbWeight,
+                    techRecord.grossDesignWeight,
+                    techRecord.trainGbWeight,
+                    techRecord.trainDesignWeight,
+                    techRecord.maxTrainGbWeight,
+                    techRecord.maxTrainDesignWeight,
+                    techRecord.maxLoadOnCoupling,
+                    techRecord.frameDescription,
+                    techRecord.tyreUseCode,
+                    techRecord.roadFriendly,
+                    techRecord.drawbarCouplingFitted,
+                    techRecord.euroStandard,
+                    techRecord.suspensionType,
+                    techRecord.couplingType,
+                    techRecord.dimensions?.length,
+                    techRecord.dimensions?.height,
+                    techRecord.dimensions?.width,
+                    techRecord.frontAxleTo5thWheelMin,
+                    techRecord.frontAxleTo5thWheelMax,
+                    techRecord.frontAxleTo5thWheelCouplingMin,
+                    techRecord.frontAxleTo5thWheelCouplingMax,
+                    techRecord.frontAxleToRearAxle,
+                    techRecord.rearAxleToRearTrl,
+                    techRecord.couplingCenterToRearAxleMin,
+                    techRecord.couplingCenterToRearAxleMax,
+                    techRecord.couplingCenterToRearTrlMin,
+                    techRecord.couplingCenterToRearTrlMax,
+                    techRecord.centreOfRearmostAxleToRearOfTrl,
+                    techRecord.notes,
+                    techRecord.purchaserDetails?.purchaserNotes,
+                    techRecord.manufacturerDetails?.manufacturerNotes,
+                    techRecord.noOfAxles,
+                    techRecord.brakeCode,
+                    techRecord.brakes?.dtpNumber,
+                    techRecord.brakes?.loadSensingValve,
+                    techRecord.brakes?.antilockBrakingSystem,
+                    createdById,
+                    lastUpdatedById,
+                    techRecord.updateType,
+                    techRecord.numberOfSeatbelts,
+                    techRecord.seatbeltInstallationApprovalDate,
+                ],
+                techRecordConnection
+            );
+
+            const techRecordId = response.rows.insertId;
+
+            const psvBrakesId = await upsertPsvBrakes(techRecordConnection, techRecordId, techRecord);
+            const axleSpacingIds = await upsertAxleSpacings(techRecordConnection, techRecordId, techRecord);
+            const microfilmId = await upsertMicrofilm(techRecordConnection, techRecordId, techRecord);
+            const plateIds = await upsertPlates(techRecordConnection, techRecordId, techRecord);
+            const axleIds = await upsertAxles(techRecordConnection, techRecordId, techRecord);
+
+            await techRecordConnection.commit();
+
+            upsertResults.push({
                 vehicleId,
-                techRecord.recordCompleteness,
-                techRecord.createdAt,
-                techRecord.lastUpdatedAt,
+                techRecordId,
                 makeModelId,
-                techRecord.functionCode,
-                techRecord.offRoad,
-                techRecord.numberOfWheelsDriven,
-                "" + techRecord.emissionsLimit,
-                techRecord.departmentalVehicleMarker,
-                techRecord.alterationMarker,
                 vehicleClassId,
-                techRecord.variantVersionNumber,
-                techRecord.grossEecWeight,
-                techRecord.trainEecWeight,
-                techRecord.maxTrainEecWeight,
-                contactDetailsId,
-                contactDetailsId,
-                contactDetailsId,
-                techRecord.manufactureYear,
-                techRecord.regnDate,
-                techRecord.firstUseDate,
-                techRecord.coifDate,
-                techRecord.ntaNumber,
-                techRecord.coifSerialNumber,
-                techRecord.coifCertifierName,
-                techRecord.approvalType,
-                techRecord.approvalTypeNumber,
-                techRecord.variantNumber,
-                techRecord.conversionRefNo,
-                techRecord.seatsLowerDeck,
-                techRecord.seatsUpperDeck,
-                techRecord.standingCapacity,
-                techRecord.speedRestriction,
-                techRecord.speedLimiterMrk,
-                techRecord.tachoExemptMrk,
-                techRecord.dispensations,
-                techRecord.remarks,
-                techRecord.reasonForCreation,
-                techRecord.statusCode,
-                techRecord.unladenWeight,
-                techRecord.grossKerbWeight,
-                techRecord.grossLadenWeight,
-                techRecord.grossGbWeight,
-                techRecord.grossDesignWeight,
-                techRecord.trainGbWeight,
-                techRecord.trainDesignWeight,
-                techRecord.maxTrainGbWeight,
-                techRecord.maxTrainDesignWeight,
-                techRecord.maxLoadOnCoupling,
-                techRecord.frameDescription,
-                techRecord.tyreUseCode,
-                techRecord.roadFriendly,
-                techRecord.drawbarCouplingFitted,
-                techRecord.euroStandard,
-                techRecord.suspensionType,
-                techRecord.couplingType,
-                techRecord.dimensions?.length,
-                techRecord.dimensions?.height,
-                techRecord.dimensions?.width,
-                techRecord.frontAxleTo5thWheelMin,
-                techRecord.frontAxleTo5thWheelMax,
-                techRecord.frontAxleTo5thWheelCouplingMin,
-                techRecord.frontAxleTo5thWheelCouplingMax,
-                techRecord.frontAxleToRearAxle,
-                techRecord.rearAxleToRearTrl,
-                techRecord.couplingCenterToRearAxleMin,
-                techRecord.couplingCenterToRearAxleMax,
-                techRecord.couplingCenterToRearTrlMin,
-                techRecord.couplingCenterToRearTrlMax,
-                techRecord.centreOfRearmostAxleToRearOfTrl,
-                techRecord.notes,
-                techRecord.purchaserDetails?.purchaserNotes,
-                techRecord.manufacturerDetails?.manufacturerNotes,
-                techRecord.noOfAxles,
-                techRecord.brakeCode,
-                techRecord.brakes?.dtpNumber,
-                techRecord.brakes?.loadSensingValve,
-                techRecord.brakes?.antilockBrakingSystem,
+                vehicleSubclassIds,
                 createdById,
                 lastUpdatedById,
-                techRecord.updateType,
-                techRecord.numberOfSeatbelts,
-                techRecord.seatbeltInstallationApprovalDate,
-            ]
-        );
-
-        const techRecordId = response.rows.insertId;
-
-        const psvBrakesId = await upsertPsvBrakes(techRecordId, techRecord);
-        const axleSpacingIds = await upsertAxleSpacings(techRecordId, techRecord);
-        const microfilmId = await upsertMicrofilm(techRecordId, techRecord);
-        const plateIds = await upsertPlates(techRecordId, techRecord);
-        const axleIds = await upsertAxles(techRecordId, techRecord);
-
-        upsertResults.push({
-            vehicleId,
-            techRecordId,
-            makeModelId,
-            vehicleClassId,
-            vehicleSubclassIds,
-            createdById,
-            lastUpdatedById,
-            contactDetailsId,
-            psvBrakesId,
-            axleSpacingIds,
-            microfilmId,
-            plateIds,
-            axleIds,
-        });
+                contactDetailsId,
+                psvBrakesId,
+                axleSpacingIds,
+                microfilmId,
+                plateIds,
+                axleIds,
+            });
+        } catch (err) {
+            console.error(err);
+            await techRecordConnection.rollback();
+            throw err;
+        }
     }
 
     return upsertResults;
@@ -180,7 +210,7 @@ const deleteTechRecords = async (techRecordDocument: TechRecordDocument): Promis
     // TODO
 };
 
-const upsertVehicle = async (techRecordDocument: TechRecordDocument): Promise<number> => {
+const upsertVehicle = async (connection: Connection, techRecordDocument: TechRecordDocument): Promise<number> => {
     const response = await executePartialUpsert(
         generatePartialUpsertSql(VEHICLE_TABLE),
         [
@@ -188,13 +218,14 @@ const upsertVehicle = async (techRecordDocument: TechRecordDocument): Promise<nu
             techRecordDocument.vin,
             techRecordDocument.primaryVrm,
             techRecordDocument.trailerId,
-        ]
+        ],
+        connection
     );
 
     return response.rows.insertId;
 };
 
-const upsertMakeModel = async (techRecord: TechRecord): Promise<number> => {
+const upsertMakeModel = async (connection: Connection, techRecord: TechRecord): Promise<number> => {
     const response = await executePartialUpsert(
         generatePartialUpsertSql(MAKE_MODEL_TABLE),
         [
@@ -209,13 +240,14 @@ const upsertMakeModel = async (techRecord: TechRecord): Promise<number> => {
             techRecord.bodyType?.description,
             techRecord.fuelPropulsionSystem,
             null // TODO intentional hack until we know JSON path of make-model dtpCode
-        ]
+        ],
+        connection
     );
 
     return response.rows.insertId;
 };
 
-const upsertVehicleClass = async (techRecord: TechRecord): Promise<number> => {
+const upsertVehicleClass = async (connection: Connection, techRecord: TechRecord): Promise<number> => {
     const response = await executePartialUpsert(
         generatePartialUpsertSql(VEHICLE_CLASS_TABLE),
         [
@@ -225,13 +257,14 @@ const upsertVehicleClass = async (techRecord: TechRecord): Promise<number> => {
             techRecord.vehicleSize,
             techRecord.vehicleConfiguration,
             techRecord.euVehicleCategory,
-        ]
+        ],
+        connection
     );
 
     return response.rows.insertId;
 };
 
-const upsertVehicleSubclasses = async (vehicleClassId: number, techRecord: TechRecord): Promise<number[]> => {
+const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: number, techRecord: TechRecord): Promise<number[]> => {
     if (!techRecord.vehicleSubclass) {
         return [];
     }
@@ -244,7 +277,8 @@ const upsertVehicleSubclasses = async (vehicleClassId: number, techRecord: TechR
             [
                 vehicleClassId,
                 vehicleSubclass
-            ]
+            ],
+            connection
         );
         insertedIds.push(response.rows.insertId);
     }
@@ -252,18 +286,19 @@ const upsertVehicleSubclasses = async (vehicleClassId: number, techRecord: TechR
     return insertedIds;
 };
 
-const upsertIdentity = async (id: string, name: string): Promise<number> => {
+const upsertIdentity = async (connection: Connection, id: string, name: string): Promise<number> => {
     const response = await executePartialUpsert(
         generatePartialUpsertSql(IDENTITY_TABLE),
         [
             id,
             name
-        ]
+        ],
+        connection
     );
     return response.rows.insertId;
 };
 
-const upsertContactDetails = async (techRecord: TechRecord): Promise<number> => {
+const upsertContactDetails = async (connection: Connection, techRecord: TechRecord): Promise<number> => {
     const response = await executePartialUpsert(
         generatePartialUpsertSql(CONTACT_DETAILS_TABLE),
         [
@@ -276,13 +311,14 @@ const upsertContactDetails = async (techRecord: TechRecord): Promise<number> => 
             techRecord.applicantDetails?.emailAddress,
             techRecord.applicantDetails?.telephoneNumber,
             getFaxNumber(techRecord)
-        ]
+        ],
+        connection
     );
 
     return response.rows.insertId;
 };
 
-const upsertPsvBrakes = async (techRecordId: string, techRecord: TechRecord): Promise<number> => {
+const upsertPsvBrakes = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<number> => {
     const response = await executeFullUpsert(
         generateFullUpsertSql(PSV_BRAKES_TABLE),
         [
@@ -300,13 +336,14 @@ const upsertPsvBrakes = async (techRecordId: string, techRecord: TechRecord): Pr
             techRecord.brakes?.brakeForceWheelsUpToHalfLocked?.serviceBrakeForceB,
             techRecord.brakes?.brakeForceWheelsUpToHalfLocked?.secondaryBrakeForceB,
             techRecord.brakes?.brakeForceWheelsUpToHalfLocked?.parkingBrakeForceB,
-        ]
+        ],
+        connection
     );
 
     return response.rows.insertId;
 };
 
-const upsertAxleSpacings = async (techRecordId: string, techRecord: TechRecord): Promise<number[]> => {
+const upsertAxleSpacings = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<number[]> => {
     if (!techRecord.dimensions?.axleSpacing) {
         return [];
     }
@@ -320,7 +357,8 @@ const upsertAxleSpacings = async (techRecordId: string, techRecord: TechRecord):
                 techRecordId,
                 axleSpacing.axles,
                 axleSpacing.value,
-            ]
+            ],
+            connection
         );
         insertedIds.push(response.rows.insertId);
     }
@@ -328,7 +366,7 @@ const upsertAxleSpacings = async (techRecordId: string, techRecord: TechRecord):
     return insertedIds;
 };
 
-const upsertMicrofilm = async (techRecordId: string, techRecord: TechRecord): Promise<number> => {
+const upsertMicrofilm = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<number> => {
     const response = await executeFullUpsert(
         generateFullUpsertSql(MICROFILM_TABLE),
         [
@@ -336,13 +374,14 @@ const upsertMicrofilm = async (techRecordId: string, techRecord: TechRecord): Pr
             techRecord.microfilm?.microfilmDocumentType,
             techRecord.microfilm?.microfilmRollNumber,
             techRecord.microfilm?.microfilmSerialNumber
-        ]
+        ],
+        connection
     );
 
     return response.rows.insertId;
 };
 
-const upsertPlates = async (techRecordId: any, techRecord: TechRecord): Promise<number[]> => {
+const upsertPlates = async (connection: Connection, techRecordId: any, techRecord: TechRecord): Promise<number[]> => {
     if (!techRecord.plates) {
         return [];
     }
@@ -358,7 +397,8 @@ const upsertPlates = async (techRecordId: any, techRecord: TechRecord): Promise<
                 plate.plateIssueDate,
                 plate.plateReasonForIssue,
                 plate.plateIssuer,
-            ]
+            ],
+            connection
         );
         insertedIds.push(response.rows.insertId);
     }
@@ -366,7 +406,7 @@ const upsertPlates = async (techRecordId: any, techRecord: TechRecord): Promise<
     return insertedIds;
 };
 
-const upsertAxles = async (techRecordId: any, techRecord: TechRecord): Promise<number[]> => {
+const upsertAxles = async (connection: Connection, techRecordId: any, techRecord: TechRecord): Promise<number[]> => {
     if (!techRecord.axles) {
         return [];
     }
@@ -383,7 +423,8 @@ const upsertAxles = async (techRecordId: any, techRecord: TechRecord): Promise<n
                 axle.tyres?.dataTrAxles,
                 axle.tyres?.speedCategorySymbol,
                 axle.tyres?.tyreCode,
-            ]
+            ],
+            connection
         );
 
         const tyreId = tyreUpsertResponse.rows.insertId;
@@ -403,7 +444,8 @@ const upsertAxles = async (techRecordId: any, techRecord: TechRecord): Promise<n
                 axle.brakes?.brakeActuator,
                 axle.brakes?.leverLength,
                 axle.brakes?.springBrakeParking,
-            ]
+            ],
+            connection
         );
         insertedIds.push(axleUpsertResponse.rows.insertId);
     }

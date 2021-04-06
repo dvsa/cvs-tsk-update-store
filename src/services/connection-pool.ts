@@ -1,5 +1,5 @@
 import * as mysql2 from "mysql2/promise";
-import {FieldPacket, Pool} from "mysql2/promise";
+import {Connection, FieldPacket, Pool} from "mysql2/promise";
 import {Maybe} from "../models/optionals";
 import {PoolOptions} from "mysql2";
 
@@ -35,15 +35,18 @@ export const destroyConnectionPool = async (): Promise<void> => {
     }
 };
 
-export const execute = async (sql: string, templateVariables?: any[]): Promise<QueryResponse> => {
+export const execute = async (sql: string, templateVariables?: any[], connection?: Connection): Promise<QueryResponse> => {
     if (templateVariables) {
         templateVariables = undefinedToNull(templateVariables);
     }
-    const [rows, fields] = await getConnectionPool().execute(sql, templateVariables);
-    return {
-        rows,
-        fields
-    };
+
+    if (connection) {
+        const [rows, fields] = await connection.execute(sql, templateVariables);
+        return { rows, fields };
+    } else {
+        const [rows, fields] = await getConnectionPool().execute(sql, templateVariables);
+        return { rows, fields };
+    }
 };
 
 // npm packages mysql and mysql2 will throw an error on encountering JS "undefined".
