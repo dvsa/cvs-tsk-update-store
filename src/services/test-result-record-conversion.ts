@@ -22,12 +22,12 @@ import {
 import {executePartialUpsert} from "./sql-execution";
 import {TestResultUpsertResult} from "../models/upsert-results";
 
-export const convertTestResults = async (operationType: KnownOperationType, image: DynamoDbImage): Promise<void> => {
+export const convertTestResults = async (operationType: KnownOperationType, image: DynamoDbImage): Promise<any> => {
     const testResults: TestResults = parseTestResults(image);
 
     const sqlOperation: (testResults: TestResults) => Promise<void> = deriveSqlOperation(operationType);
 
-    await sqlOperation(testResults);
+    return sqlOperation(testResults);
 };
 
 const deriveSqlOperation = (operationType: KnownOperationType): ((testResults: TestResults) => Promise<any>) => {

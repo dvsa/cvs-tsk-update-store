@@ -67,6 +67,7 @@ export const parseTestType = (image: DynamoDbImage): TestType => {
         lastUpdatedAt: image.getString("lastUpdatedAt"),
         deletionFlag: image.getBoolean("deletionFlag"),
         testCode: image.getString("testCode"),
+        testTypeClassification: image.getString("testTypeClassification"),
         testTypeName: image.getString("testTypeName"),
         name: image.getString("name"),
         testTypeId: image.getString("testTypeId"),
