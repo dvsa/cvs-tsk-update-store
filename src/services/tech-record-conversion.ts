@@ -27,13 +27,14 @@ import {
     VEHICLE_TABLE
 } from "./table-details";
 import {executeFullUpsert, executePartialUpsert} from "./sql-execution";
+import {TechRecordUpsertResult} from "../models/upsert-results";
 
-export const convertTechRecordDocument = async (operationType: KnownOperationType, image: DynamoDbImage): Promise<void> => {
+export const convertTechRecordDocument = async (operationType: KnownOperationType, image: DynamoDbImage): Promise<any> => {
     const techRecordDocument: TechRecordDocument = parseTechRecordDocument(image);
 
     const sqlOperation: (techRecordDocument: TechRecordDocument) => Promise<void> = deriveSqlOperation(operationType);
 
-    await sqlOperation(techRecordDocument);
+    return sqlOperation(techRecordDocument);
 };
 
 const deriveSqlOperation = (operationType: KnownOperationType): ((techRecordDocument: TechRecordDocument) => Promise<any>) => {
@@ -46,12 +47,12 @@ const deriveSqlOperation = (operationType: KnownOperationType): ((techRecordDocu
     }
 };
 
-const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promise<number[]> => {
+const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promise<TechRecordUpsertResult[]> => {
     const vehicleId = await upsertVehicle(techRecordDocument);
 
     const techRecords = techRecordDocument.techRecord;
 
-    const insertedIds: number[] = [];
+    const upsertResults: TechRecordUpsertResult[] = [];
 
     if (!techRecords) {
         return [];
@@ -75,16 +76,30 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
 
         const techRecordId = response.rows.insertId;
 
-        const brakesId = await upsertPsvBrakes(techRecordId, techRecord);
+        const psvBrakesId = await upsertPsvBrakes(techRecordId, techRecord);
         const axleSpacingIds = await upsertAxleSpacings(techRecordId, techRecord);
         const microfilmId = await upsertMicrofilm(techRecordId, techRecord);
         const plateIds = await upsertPlates(techRecordId, techRecord);
         const axleIds = await upsertAxles(techRecordId, techRecord);
 
-        insertedIds.push(techRecordId);
+        upsertResults.push({
+            vehicleId,
+            techRecordId,
+            makeModelId,
+            vehicleClassId,
+            vehicleSubclassIds,
+            createdById,
+            lastUpdatedById,
+            contactDetailsId,
+            psvBrakesId,
+            axleSpacingIds,
+            microfilmId,
+            plateIds,
+            axleIds,
+        });
     }
 
-    return insertedIds;
+    return upsertResults;
 };
 
 const deleteTechRecords = async (techRecordDocument: TechRecordDocument): Promise<void> => {
