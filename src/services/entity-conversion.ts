@@ -1,7 +1,7 @@
 import {DynamoDbImage} from "./dynamodb-images";
 import {techRecordDocumentConverter} from "./tech-record-document-conversion";
 import {testResultsConverter} from "./test-result-record-conversion";
-import {SqlOperation} from "./operation-types";
+import {SqlOperation} from "./sql-operations";
 import {Maybe} from "../models/optionals";
 
 export interface EntityConverter<T> {

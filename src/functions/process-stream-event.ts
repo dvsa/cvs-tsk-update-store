@@ -3,7 +3,7 @@ import {DynamoDBRecord} from "aws-lambda/trigger/dynamodb-stream";
 import {EventSourceArn, stringToArn} from "../services/event-source-arn";
 import {convert} from "../services/entity-conversion";
 import {DynamoDbImage} from "../services/dynamodb-images";
-import {deriveSqlOperation, SqlOperation} from "../services/operation-types";
+import {deriveSqlOperation, SqlOperation} from "../services/sql-operations";
 import {destroyConnectionPool} from "../services/connection-pool";
 
 /**

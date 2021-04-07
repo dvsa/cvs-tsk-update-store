@@ -1,4 +1,4 @@
-import {deriveSqlOperation} from "../../../src/services/operation-types";
+import {deriveSqlOperation} from "../../../src/services/sql-operations";
 
 describe("deriveSqlOperation()", () => {
     it("should return 'INSERT' for input 'INSERT'", () => {
