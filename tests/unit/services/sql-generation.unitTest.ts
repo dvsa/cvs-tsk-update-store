@@ -1,4 +1,4 @@
-import {generateFullUpsertSql, generatePartialUpsertSql} from "../../src/services/sql-generation";
+import {generateFullUpsertSql, generatePartialUpsertSql} from "../../../src/services/sql-generation";
 
 const tableName = "myTable";
 const columnNames = ["columnA", "columnZ"];
