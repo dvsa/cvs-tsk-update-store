@@ -11,24 +11,8 @@ export interface DynamoDbField {
     value: any;
 }
 
-// maps type "L", subtype "S" to string[]
-// note difference with DynamoDbImage::getStrings, which maps type "SS" to string[]
-export const parseStringArray = (listOfStrings?: DynamoDbImage): string[] => {
-    if (!listOfStrings) {
-        return [];
-    }
-
-    const strings: string[] = [];
-
-    for (const key of listOfStrings.getKeys()) {
-        strings.push(listOfStrings.getString(key)!);
-    }
-
-    return strings;
-};
-
 /**
- * placeholder
+ * Concise, utility-focused representation of a DynamoDb "image", i.e. a document snapshot.
  */
 export class DynamoDbImage {
     private readonly fields: Map<string, DynamoDbField>;
@@ -44,7 +28,9 @@ export class DynamoDbImage {
     }
 
     /**
-     * placeholder
+     * Parse DynamoDB's native format into a {@link DynamoDbImage}.
+     *
+     * This is the only way to instantiate this class.
      * @param image
      */
     public static parse(image: { [key: string]: AttributeValue }): DynamoDbImage {
@@ -65,15 +51,18 @@ export class DynamoDbImage {
     }
 
     /**
-     * placeholder
+     * Parse a {@code NULL} field with any name as a {@code null}.
+     *
+     * Does nothing. Returns {@code null} in all cases.
      * @param _
+     * @returns {@code null}, regardless of input
      */
     public getNull(_: string): null {
         return null;
     }
 
     /**
-     * placeholder
+     * Parse the {@code BOOL} field under {@code key} as a {@code boolean}.
      * @param key
      */
     public getBoolean(key: string): boolean {
@@ -81,7 +70,7 @@ export class DynamoDbImage {
     }
 
     /**
-     * placeholder
+     * Parse the {@code S} field under {@code key} as a {@code string}.
      * @param key
      */
     public getString(key: string): Maybe<string> {
@@ -89,7 +78,7 @@ export class DynamoDbImage {
     }
 
     /**
-     * placeholder
+     * Parse the {@code SS} field under {@code key} as a {@code string[]}.
      * @param key
      */
     public getStrings(key: string): string[] {
@@ -97,7 +86,7 @@ export class DynamoDbImage {
     }
 
     /**
-     * placeholder
+     * Parse the {@code N} field under {@code key} as a {@code number}.
      * @param key
      */
     public getNumber(key: string): Maybe<number> {
@@ -105,7 +94,7 @@ export class DynamoDbImage {
     }
 
     /**
-     * placeholder
+     * Parse the {@code NS} field under {@code key} as a {@code number[]}.
      * @param key
      */
     public getNumbers(key: string): number[] {
@@ -113,7 +102,7 @@ export class DynamoDbImage {
     }
 
     /**
-     * placeholder
+     * Parse the {@code B} field under {@code key} as a {@code Buffer}.
      * @param key
      */
     public getBinary(key: string): Maybe<Buffer> {
@@ -121,7 +110,7 @@ export class DynamoDbImage {
     }
 
     /**
-     * placeholder
+     * Parse the {@code BS} field under {@code key} as a {@code Buffer[]}.
      * @param key
      */
     public getBinaries(key: string): Buffer[] {
@@ -129,7 +118,7 @@ export class DynamoDbImage {
     }
 
     /**
-     * placeholder
+     * Parse the {@code M} field under {@code key} as a {@link DynamoDbImage}.
      * @param key
      */
     public getMap(key: string): Maybe<DynamoDbImage> {
@@ -137,7 +126,9 @@ export class DynamoDbImage {
     }
 
     /**
-     * placeholder
+     * Parse the {@code L} field under {@code key} as a {@link DynamoDbImage}.
+     *
+     * The resulting image's field keys will all be numeric indexes ("0", "1", "2", ...).
      * @param key
      */
     public getList(key: string): Maybe<DynamoDbImage> {
@@ -158,14 +149,16 @@ export class DynamoDbImage {
     }
 
     /**
-     * placeholder
+     * Return all field keys this instance knows about.
+     *
+     * Use this function instead of Object::keys when iterating over type {@code L} fields.
      */
     public getKeys(): string[] {
         return Array.from(this.fields.keys());
     }
 
     /**
-     * placeholder
+     * Parse a field of type {@link DynamoDbItemType}.
      * @param key
      * @param expectedType
      * @param parser
@@ -176,7 +169,7 @@ export class DynamoDbImage {
     }
 
     /**
-     * placeholder
+     * Parse a field of type {@link DynamoDbArrayType}.
      * @param key
      * @param expectedType
      * @param parser
@@ -186,14 +179,6 @@ export class DynamoDbImage {
         return this.parse(key, expectedType, parser, []);
     }
 
-    /**
-     * placeholder
-     * @param key
-     * @param expectedType
-     * @param parser
-     * @param defaultValue
-     * @private
-     */
     private parse<ANY>(key: string, expectedType: DynamoDbType, parser: (value: any) => ANY, defaultValue: ANY): ANY {
         const field: Maybe<DynamoDbField> = this.fields.get(key);
 
@@ -203,6 +188,7 @@ export class DynamoDbImage {
 
         switch (field.type) {
             case "NULL": {
+                // account for explicit nulls in source data
                 return defaultValue;
             }
             default: {
@@ -229,4 +215,20 @@ const typeValuePair = (value: AttributeValue): [DynamoDbType, any] => {
     const typeKey: DynamoDbType = typeKeys[0] as DynamoDbType;
 
     return [typeKey, value[typeKey]];
+};
+
+// maps type "L", subtype "S" to string[]
+// note difference with DynamoDbImage::getStrings, which maps type "SS" to string[]
+export const parseStringArray = (listOfStrings?: DynamoDbImage): string[] => {
+    if (!listOfStrings) {
+        return [];
+    }
+
+    const strings: string[] = [];
+
+    for (const key of listOfStrings.getKeys()) {
+        strings.push(listOfStrings.getString(key)!);
+    }
+
+    return strings;
 };
