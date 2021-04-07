@@ -12,7 +12,7 @@ export const stringToArn = (input: string): EventSourceArn => {
         throw new Error("ARN is null or blank");
     }
 
-    const parts = input.split(":");
+    const parts: string[] = split(input, ":", 5);
 
     if (parts.length !== 6) {
         throw new Error("ARN does not consist of six colon-delimited parts");
@@ -50,4 +50,27 @@ export const stringToArn = (input: string): EventSourceArn => {
         table: pathParts[1],
         timestamp: DateTime.fromISO(pathParts[3]).toUTC(),
     };
+};
+
+/**
+ * Split a string into substrings using the specified separator, and return them as an array.
+ *
+ * This differs from String.prototype.slice() in that using a limit does not truncate the input string.
+ *
+ * Example: given const s: string = "a:b:c:d",
+ * s.split(":", 2)  = ["a", "b"]
+ * split(s, ":", 2) = ["a", "b", "c:d"]
+ *
+ * @param s the string to split
+ * @param separator the separator or delimiter to use
+ * @param limit the number of separators to encounter before returning (see example above)
+ */
+const split = (s: string, separator: string, limit: number): string[] => {
+    const tmp = s.split(separator);
+
+    const parts = tmp.splice(0, limit);
+
+    parts.push(tmp.join(separator));
+
+    return parts;
 };
