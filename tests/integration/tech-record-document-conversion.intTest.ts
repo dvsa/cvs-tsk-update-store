@@ -5,7 +5,7 @@ import techRecordDocumentJson from "../resources/dynamodb-image-technical-record
 import {DynamoDbImage} from "../../src/services/dynamodb-images";
 import {getContainerizedDatabase} from "./cvsbnop-container";
 import {TechRecordUpsertResult} from "../../src/models/upsert-results";
-import {convert} from "../../src/services/entity-converters";
+import {convert} from "../../src/services/entity-conversion";
 
 describe("convertTechRecordDocument() integration tests", () => {
     let container: StartedTestContainer;

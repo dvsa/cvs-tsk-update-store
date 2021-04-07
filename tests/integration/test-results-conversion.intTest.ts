@@ -5,7 +5,7 @@ import testResultsJson from "../resources/dynamodb-image-test-results.json";
 import {DynamoDbImage} from "../../src/services/dynamodb-images";
 import {getContainerizedDatabase} from "./cvsbnop-container";
 import {TestResultUpsertResult} from "../../src/models/upsert-results";
-import {convert} from "../../src/services/entity-converters";
+import {convert} from "../../src/services/entity-conversion";
 
 describe("convertTestResults() integration tests", () => {
     let container: StartedTestContainer;

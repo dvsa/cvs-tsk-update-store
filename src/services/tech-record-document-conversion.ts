@@ -20,7 +20,7 @@ import {executeFullUpsert, executePartialUpsert} from "./sql-execution";
 import {TechRecordUpsertResult} from "../models/upsert-results";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
-import {EntityConverter} from "./entity-converters";
+import {EntityConverter} from "./entity-conversion";
 
 export const techRecordDocumentConverter = (): EntityConverter<TechRecordDocument> => {
     return {

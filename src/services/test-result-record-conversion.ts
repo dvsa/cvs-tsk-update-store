@@ -20,7 +20,7 @@ import {executePartialUpsert} from "./sql-execution";
 import {TestResultUpsertResult} from "../models/upsert-results";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
-import {EntityConverter} from "./entity-converters";
+import {EntityConverter} from "./entity-conversion";
 
 export const testResultsConverter = (): EntityConverter<TestResults> => {
     return {

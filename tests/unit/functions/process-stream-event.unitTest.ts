@@ -1,6 +1,6 @@
 import {processStreamEvent} from "../../../src/functions/process-stream-event";
 import {Context} from "aws-lambda";
-import {convert} from "../../../src/services/entity-converters";
+import {convert} from "../../../src/services/entity-conversion";
 
 describe("processStreamEvent()", () => {
 

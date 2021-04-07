@@ -1,5 +1,5 @@
 import {techRecordDocumentConverter} from "../../../src/services/tech-record-document-conversion";
-import {convert} from "../../../src/services/entity-converters";
+import {convert} from "../../../src/services/entity-conversion";
 import {DynamoDbImage} from "../../../src/services/dynamodb-images";
 
 jest.mock("../../../src/services/tech-record-document-conversion", () => {
