@@ -3,7 +3,7 @@ import {pathToResources} from "../utils";
 import {GenericContainer, StartedTestContainer} from "testcontainers";
 import {Port} from "testcontainers/dist/port";
 import {PoolOptions} from "mysql2";
-import {getPoolOptions} from "../../src/services/connection-pool";
+import {getConnectionPoolOptions} from "../../src/services/connection-pool";
 
 export const containerMySqlPort: Port = 3306;
 
@@ -39,9 +39,9 @@ export const getContainerizedDatabase = async (): Promise<StartedTestContainer> 
 };
 
 const mockPoolOptions = (container: StartedTestContainer): void => {
-    const poolOptions: PoolOptions = getPoolOptions();
+    const poolOptions: PoolOptions = getConnectionPoolOptions();
 
-    (getPoolOptions as jest.Mock) = jest.fn().mockReturnValue({
+    (getConnectionPoolOptions as jest.Mock) = jest.fn().mockReturnValue({
         ...poolOptions,
         port: container.getMappedPort(containerMySqlPort)
     });

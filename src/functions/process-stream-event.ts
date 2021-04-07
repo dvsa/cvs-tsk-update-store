@@ -4,6 +4,7 @@ import {EventSourceArn, stringToArn} from "../services/event-source-arn";
 import {EntityConverter, getEntityConverter} from "../services/entity-converters";
 import {DynamoDbImage} from "../services/dynamodb-images";
 import {KnownOperationType, parseOperationType} from "../services/operation-types";
+import {destroyConnectionPool} from "../services/connection-pool";
 
 /**
  * λ function: convert a DynamoDB document to Aurora RDS rows
@@ -36,6 +37,8 @@ export const processStreamEvent: Handler = async (event: DynamoDBStreamEvent, co
             dumpArguments(event, context);
         }
     }
+
+    await destroyConnectionPool();
 };
 
 const selectImage = (operationType: KnownOperationType, streamRecord: StreamRecord): DynamoDbImage => {

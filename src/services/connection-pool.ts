@@ -1,15 +1,16 @@
 import * as mysql2 from "mysql2/promise";
-import {Connection, FieldPacket, Pool} from "mysql2/promise";
+import {Connection, FieldPacket, Pool, PoolOptions} from "mysql2/promise";
 import {Maybe} from "../models/optionals";
-import {PoolOptions} from "mysql2";
 
 export interface QueryResponse {
     rows?: any;
     fields?: FieldPacket[];
 }
 
+// Lazy
 let pool: Maybe<Pool>;
 
+// TODO obtain from secrets manager
 const poolConfig: PoolOptions = {
     host: "localhost",
     port: 3306,
@@ -18,13 +19,13 @@ const poolConfig: PoolOptions = {
     database: "CVSBNOP"
 };
 
-export const getPoolOptions = (): PoolOptions => {
+export const getConnectionPoolOptions = (): PoolOptions => {
     return poolConfig;
 };
 
 export const getConnectionPool = (): Pool => {
     if (!pool) {
-        pool = mysql2.createPool(getPoolOptions());
+        pool = mysql2.createPool(getConnectionPoolOptions());
     }
     return pool;
 };
@@ -32,10 +33,11 @@ export const getConnectionPool = (): Pool => {
 export const destroyConnectionPool = async (): Promise<void> => {
     if (pool) {
         await pool.end();
+        pool = undefined;
     }
 };
 
-export const execute = async (sql: string, templateVariables?: any[], connection?: Connection): Promise<QueryResponse> => {
+export const executeSql = async (sql: string, templateVariables?: any[], connection?: Connection): Promise<QueryResponse> => {
     if (templateVariables) {
         templateVariables = undefinedToNull(templateVariables);
     }
@@ -44,14 +46,16 @@ export const execute = async (sql: string, templateVariables?: any[], connection
         const [rows, fields] = await connection.execute(sql, templateVariables);
         return { rows, fields };
     } else {
-        const [rows, fields] = await getConnectionPool().execute(sql, templateVariables);
+        const connectionPool = getConnectionPool();
+        const [rows, fields] = await connectionPool.execute(sql, templateVariables);
         return { rows, fields };
     }
 };
 
 // npm packages mysql and mysql2 will throw an error on encountering JS "undefined".
 // In contrast, an explicit JS "null" translates to SQL "NULL".
-export const undefinedToNull = (array: any[]): any[] => {
+// hence, transform all "undefined" to "null".
+const undefinedToNull = (array: any[]): any[] => {
     array.forEach((v, i) => {
         if (v === undefined) {
             array[i] = null;
