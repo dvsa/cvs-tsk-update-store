@@ -1,11 +1,11 @@
 import {StartedTestContainer} from "testcontainers";
 import {destroyConnectionPool, executeSql} from "../../src/services/connection-pool";
 import {castToImageShape} from "../utils";
-import {convertTechRecordDocument} from "../../src/services/tech-record-document-conversion";
 import techRecordDocumentJson from "../resources/dynamodb-image-technical-record.json";
 import {DynamoDbImage} from "../../src/services/dynamodb-images";
 import {getContainerizedDatabase} from "./cvsbnop-container";
 import {TechRecordUpsertResult} from "../../src/models/upsert-results";
+import {convert} from "../../src/services/entity-converters";
 
 describe("convertTechRecordDocument() integration tests", () => {
     let container: StartedTestContainer;
@@ -21,7 +21,8 @@ describe("convertTechRecordDocument() integration tests", () => {
     });
 
     it("should correctly convert a DynamoDB event into Aurora rows", async () => {
-        const upsertResults: TechRecordUpsertResult[] = await convertTechRecordDocument(
+        const upsertResults: TechRecordUpsertResult[] = await convert(
+            "Technical_Records",
             "INSERT",
             DynamoDbImage.parse(castToImageShape(techRecordDocumentJson))
         );

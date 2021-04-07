@@ -1,15 +1,11 @@
 import {processStreamEvent} from "../../../src/functions/process-stream-event";
 import {Context} from "aws-lambda";
-import {getEntityConverter} from "../../../src/services/entity-converters";
-import {KnownOperationType} from "../../../src/services/operation-types";
-import {DynamoDbImage} from "../../../src/services/dynamodb-images";
+import {convert} from "../../../src/services/entity-converters";
 
 describe("processStreamEvent()", () => {
 
-    it("should allow valid events to reach entity conversion procedure", async () => {
-        (getEntityConverter as jest.Mock) = jest.fn().mockReturnValueOnce(
-            (operationType: KnownOperationType, image: DynamoDbImage) => { return; }
-        );
+    it("should allow valid events to reach the entity conversion procedure", async () => {
+        (convert as jest.Mock) = jest.fn().mockResolvedValue({});
 
         await expect(processStreamEvent(
             {
@@ -28,6 +24,8 @@ describe("processStreamEvent()", () => {
                 return;
             })
         ).resolves.not.toThrowError();
+
+        expect(convert).toHaveBeenCalledTimes(1);
     });
 
     it("should fail on null event", async () => {

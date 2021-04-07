@@ -1,9 +1,9 @@
 import {Context, DynamoDBStreamEvent, Handler, StreamRecord} from "aws-lambda";
 import {DynamoDBRecord} from "aws-lambda/trigger/dynamodb-stream";
 import {EventSourceArn, stringToArn} from "../services/event-source-arn";
-import {EntityConverter, getEntityConverter} from "../services/entity-converters";
+import {convert} from "../services/entity-converters";
 import {DynamoDbImage} from "../services/dynamodb-images";
-import {KnownOperationType, parseOperationType} from "../services/operation-types";
+import {deriveSqlOperation, SqlOperation} from "../services/operation-types";
 import {destroyConnectionPool} from "../services/connection-pool";
 
 /**
@@ -21,19 +21,16 @@ export const processStreamEvent: Handler = async (event: DynamoDBStreamEvent, co
         const eventSourceArn: EventSourceArn = stringToArn(record.eventSourceARN!);
 
         // is this an INSERT, UPDATE, or DELETE?
-        const operationType: KnownOperationType = parseOperationType(record.eventName!);
+        const operationType: SqlOperation = deriveSqlOperation(record.eventName!);
 
         // parse native DynamoDB format to usable TS map
         const image: DynamoDbImage = selectImage(operationType, record.dynamodb!);
 
-        // use the source table name to figure out which conversion procedure we want to run
-        const entityConverter: EntityConverter = getEntityConverter(eventSourceArn.table);
-
         try {
-            // perform conversion
-            await entityConverter(operationType, image);
-        } catch (e) {
-            console.error("couldn't convert DynamoDB entity to Aurora", e);
+            // perform conversion (DynamoDB ---> Aurora)
+            await convert(eventSourceArn.table, operationType, image);
+        } catch (err) {
+            console.error("couldn't convert DynamoDB entity to Aurora", err);
             dumpArguments(event, context);
         }
     }
@@ -41,7 +38,7 @@ export const processStreamEvent: Handler = async (event: DynamoDBStreamEvent, co
     await destroyConnectionPool();
 };
 
-const selectImage = (operationType: KnownOperationType, streamRecord: StreamRecord): DynamoDbImage => {
+const selectImage = (operationType: SqlOperation, streamRecord: StreamRecord): DynamoDbImage => {
     switch (operationType) {
         case "INSERT":
         case "UPDATE":

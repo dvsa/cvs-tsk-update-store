@@ -1,7 +1,5 @@
-import {DynamoDbImage} from "./dynamodb-images";
 import {parseTechRecordDocument, TechRecordDocument} from "../models/tech-record-document";
 import {getFaxNumber, TechRecord} from "../models/tech-record";
-import {KnownOperationType} from "./operation-types";
 import {generateFullUpsertSql, generatePartialUpsertSql} from "./sql-generation";
 import {
     AXLE_SPACING_TABLE,
@@ -22,23 +20,14 @@ import {executeFullUpsert, executePartialUpsert} from "./sql-execution";
 import {TechRecordUpsertResult} from "../models/upsert-results";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
+import {EntityConverter} from "./entity-converters";
 
-export const convertTechRecordDocument = async (operationType: KnownOperationType, image: DynamoDbImage): Promise<any> => {
-    const techRecordDocument: TechRecordDocument = parseTechRecordDocument(image);
-
-    const sqlOperation: (techRecordDocument: TechRecordDocument) => Promise<void> = deriveSqlOperation(operationType);
-
-    return sqlOperation(techRecordDocument);
-};
-
-const deriveSqlOperation = (operationType: KnownOperationType): ((techRecordDocument: TechRecordDocument) => Promise<any>) => {
-    switch (operationType) {
-        case "INSERT":
-        case "UPDATE":
-            return upsertTechRecords;
-        case "DELETE":
-            return deleteTechRecords;
-    }
+export const techRecordDocumentConverter = (): EntityConverter<TechRecordDocument> => {
+    return {
+        parseRootImage: parseTechRecordDocument,
+        upsertEntity: upsertTechRecords,
+        deleteEntity: deleteTechRecords
+    };
 };
 
 const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promise<TechRecordUpsertResult[]> => {

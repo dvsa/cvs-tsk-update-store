@@ -1,22 +1,40 @@
 import {DynamoDbImage} from "./dynamodb-images";
-import {convertTechRecordDocument} from "./tech-record-document-conversion";
-import {KnownOperationType} from "./operation-types";
+import {techRecordDocumentConverter} from "./tech-record-document-conversion";
+import {testResultsConverter} from "./test-result-record-conversion";
+import {SqlOperation} from "./operation-types";
 import {Maybe} from "../models/optionals";
-import {convertTestResults} from "./test-result-record-conversion";
 
-export type EntityConverter = (operationType: KnownOperationType, image: DynamoDbImage) => Promise<void>;
+export interface EntityConverter<T> {
+    parseRootImage: (image: DynamoDbImage) => T;
+    upsertEntity: (entity: T) => Promise<any>;
+    deleteEntity: (entity: T) => Promise<any>;
+}
 
-const entityHandlers: Map<string, EntityConverter> = new Map();
+const entityConverters: Map<string, EntityConverter<any>> = new Map();
 
-entityHandlers.set("Technical_Records", convertTechRecordDocument); // TODO actual table names
-entityHandlers.set("Test_Results", convertTestResults); // TODO actual table names
+entityConverters.set("Technical_Records", techRecordDocumentConverter());
+entityConverters.set("Test_Results", testResultsConverter());
 
-export const getEntityConverter = (tableName: string): EntityConverter => {
-    const entityFactory: Maybe<(operationType: KnownOperationType, image: DynamoDbImage) => Promise<void>> = entityHandlers.get(tableName);
+export const convert = async <T> (tableName: string, sqlOperation: SqlOperation, image: DynamoDbImage): Promise<any> => {
+    const converter = getEntityConverter(tableName);
 
-    if (!entityFactory) {
-        throw new Error(`no entity factory for table "${tableName}"`);
+    const entity: T = converter.parseRootImage(image) as T;
+
+    switch (sqlOperation) {
+        case "INSERT":
+        case "UPDATE":
+            return converter.upsertEntity(entity);
+        case "DELETE":
+            return converter.deleteEntity(entity);
+    }
+};
+
+const getEntityConverter = <T> (tableName: string): EntityConverter<T> => {
+    const entityConverter: Maybe<EntityConverter<T>> = entityConverters.get(tableName);
+
+    if (!entityConverter) {
+        throw new Error(`no entity converter for table "${tableName}"`);
     }
 
-    return entityFactory;
+    return entityConverter;
 };

@@ -4,8 +4,8 @@ import {castToImageShape} from "../utils";
 import testResultsJson from "../resources/dynamodb-image-test-results.json";
 import {DynamoDbImage} from "../../src/services/dynamodb-images";
 import {getContainerizedDatabase} from "./cvsbnop-container";
-import {convertTestResults} from "../../src/services/test-result-record-conversion";
 import {TestResultUpsertResult} from "../../src/models/upsert-results";
+import {convert} from "../../src/services/entity-converters";
 
 describe("convertTestResults() integration tests", () => {
     let container: StartedTestContainer;
@@ -21,7 +21,8 @@ describe("convertTestResults() integration tests", () => {
     });
 
     it("should correctly convert a DynamoDB event into Aurora rows", async () => {
-        const upsertResults: TestResultUpsertResult[] = await convertTestResults(
+        const upsertResults: TestResultUpsertResult[] = await convert(
+            "Test_Results",
             "INSERT",
             DynamoDbImage.parse(castToImageShape(testResultsJson))
         );

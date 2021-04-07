@@ -1,5 +1,3 @@
-import {KnownOperationType} from "./operation-types";
-import {DynamoDbImage} from "./dynamodb-images";
 import {parseTestResults, TestResult, TestResults} from "../models/test-results";
 import {TestType} from "../models/test-types";
 import {generatePartialUpsertSql} from "./sql-generation";
@@ -22,23 +20,14 @@ import {executePartialUpsert} from "./sql-execution";
 import {TestResultUpsertResult} from "../models/upsert-results";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
+import {EntityConverter} from "./entity-converters";
 
-export const convertTestResults = async (operationType: KnownOperationType, image: DynamoDbImage): Promise<any> => {
-    const testResults: TestResults = parseTestResults(image);
-
-    const sqlOperation: (testResults: TestResults) => Promise<void> = deriveSqlOperation(operationType);
-
-    return sqlOperation(testResults);
-};
-
-const deriveSqlOperation = (operationType: KnownOperationType): ((testResults: TestResults) => Promise<any>) => {
-    switch (operationType) {
-        case "INSERT":
-        case "UPDATE":
-            return upsertTestResults;
-        case "DELETE":
-            return deleteTestResults;
-    }
+export const testResultsConverter = (): EntityConverter<TestResults> => {
+    return {
+        parseRootImage: parseTestResults,
+        upsertEntity: upsertTestResults,
+        deleteEntity: deleteTestResults
+    };
 };
 
 const upsertTestResults = async (testResults: TestResults): Promise<TestResultUpsertResult[]> => {

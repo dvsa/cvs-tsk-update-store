@@ -1,8 +1,8 @@
 import {OperationType} from "aws-sdk/clients/dynamodbstreams";
 
-export type KnownOperationType = "INSERT" | "UPDATE" | "DELETE";
+export type SqlOperation = "INSERT" | "UPDATE" | "DELETE";
 
-export const parseOperationType = (operationType: OperationType): KnownOperationType => {
+export const deriveSqlOperation = (operationType: OperationType): SqlOperation => {
     switch (operationType) {
         case "INSERT":
             return "INSERT";
