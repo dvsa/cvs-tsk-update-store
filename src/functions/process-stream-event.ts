@@ -14,6 +14,8 @@ import {destroyConnectionPool} from "../services/connection-pool";
 export const processStreamEvent: Handler = async (event: DynamoDBStreamEvent, context: Context): Promise<any> => {
     validateEvent(event);
 
+    const upsertResults: any[] = [];
+
     for await (const record of event.Records) {
         validateRecord(record);
 
@@ -28,7 +30,8 @@ export const processStreamEvent: Handler = async (event: DynamoDBStreamEvent, co
 
         try {
             // perform conversion (DynamoDB ---> Aurora)
-            await convert(eventSourceArn.table, operationType, image);
+            const upsertResult = await convert(eventSourceArn.table, operationType, image);
+            upsertResults.push(upsertResult);
         } catch (err) {
             console.error("couldn't convert DynamoDB entity to Aurora", err);
             dumpArguments(event, context);
@@ -36,6 +39,8 @@ export const processStreamEvent: Handler = async (event: DynamoDBStreamEvent, co
     }
 
     await destroyConnectionPool();
+
+    return upsertResults;
 };
 
 const selectImage = (operationType: SqlOperation, streamRecord: StreamRecord): DynamoDbImage => {

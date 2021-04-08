@@ -2,6 +2,7 @@ import {AttributeValue} from "aws-sdk/clients/dynamodbstreams";
 import path from "path";
 import {getSecretValue} from "../src/services/secrets-manager";
 import {SecretsManagerConfig} from "../src/models/aws-sm-config";
+import {Context} from "aws-lambda";
 
 // DO NOT MOVE THIS FILE.
 const resourcesDirectory = path.resolve(__dirname, "./resources");
@@ -34,4 +35,24 @@ export const useLocalDb = (): void => {
         }
         throw new Error(`TEST SECRETS MANAGER - unrecognized key ${secretName}`);
     });
+};
+
+export const exampleContext = (): Context => {
+    return {
+        callbackWaitsForEmptyEventLoop: false,
+        functionName: "test",
+        functionVersion: "0.0.0",
+        invokedFunctionArn: "arn:aws:execute-api:eu-west-1:TEST",
+        memoryLimitInMB: "128",
+        awsRequestId: "TEST-AWS-REQUEST-ID",
+        logGroupName: "TEST-LOG-GROUP-NAME",
+        logStreamName: "TEST-LOG-STREAM-NAME",
+        getRemainingTimeInMillis: (): number => 86400000,
+        done: (): void => { /* circumvent TSLint no-empty */
+        },
+        fail: (): void => { /* circumvent TSLint no-empty */
+        },
+        succeed: (): void => { /* circumvent TSLint no-empty */
+        },
+    };
 };

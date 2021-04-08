@@ -1,6 +1,6 @@
 import {processStreamEvent} from "../../../src/functions/process-stream-event";
-import {Context} from "aws-lambda";
 import {convert} from "../../../src/services/entity-conversion";
+import {exampleContext} from "../../utils";
 
 describe("processStreamEvent()", () => {
 
@@ -138,25 +138,5 @@ describe("processStreamEvent()", () => {
             })
         ).rejects.toThrowError();
     });
-
-    const exampleContext = (): Context => {
-        return {
-            callbackWaitsForEmptyEventLoop: false,
-            functionName: "test",
-            functionVersion: "0.0.0",
-            invokedFunctionArn: "arn:aws:execute-api:eu-west-1:TEST",
-            memoryLimitInMB: "128",
-            awsRequestId: "TEST-AWS-REQUEST-ID",
-            logGroupName: "TEST-LOG-GROUP-NAME",
-            logStreamName: "TEST-LOG-STREAM-NAME",
-            getRemainingTimeInMillis: (): number => 86400000,
-            done: (): void => { /* circumvent TSLint no-empty */
-            },
-            fail: (): void => { /* circumvent TSLint no-empty */
-            },
-            succeed: (): void => { /* circumvent TSLint no-empty */
-            },
-        };
-    };
 });
 

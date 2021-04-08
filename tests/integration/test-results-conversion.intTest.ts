@@ -1,11 +1,11 @@
 import {StartedTestContainer} from "testcontainers";
 import {destroyConnectionPool, executeSql} from "../../src/services/connection-pool";
-import {castToImageShape, useLocalDb} from "../utils";
+import {exampleContext, useLocalDb} from "../utils";
 import testResultsJson from "../resources/dynamodb-image-test-results.json";
-import {DynamoDbImage} from "../../src/services/dynamodb-images";
 import {getContainerizedDatabase} from "./cvsbnop-container";
 import {TestResultUpsertResult} from "../../src/models/upsert-results";
-import {convert} from "../../src/services/entity-conversion";
+import {DynamoDBStreamEvent} from "aws-lambda";
+import {processStreamEvent} from "../../src/functions/process-stream-event";
 
 useLocalDb();
 
@@ -23,15 +23,31 @@ describe("convertTestResults() integration tests", () => {
     });
 
     it("should correctly convert a DynamoDB event into Aurora rows", async () => {
-        const upsertResults: TestResultUpsertResult[] = await convert(
-            "Test_Results",
-            "INSERT",
-            DynamoDbImage.parse(castToImageShape(testResultsJson))
+        const event: DynamoDBStreamEvent = {
+            Records: [
+                {
+                    eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/Test_Results/stream/2020-01-01T00:00:00.000",
+                    eventName: "INSERT",
+                    dynamodb: {
+                        NewImage: testResultsJson
+                    }
+                }
+            ]
+        };
+
+        // array of arrays: event contains array of records, each with array of test result entities
+        const upsertResults: TestResultUpsertResult[][] = await processStreamEvent(
+            event,
+            exampleContext(),
+            () => {
+                return;
+            }
         );
 
         expect(upsertResults.length).toEqual(1);
+        expect(upsertResults[0].length).toEqual(1);
 
-        const upsertResult = upsertResults[0];
+        const upsertResult = upsertResults[0][0];
 
         const vehicleResultSet = await executeSql(
             `SELECT \`system_number\` FROM \`vehicle\` WHERE \`vehicle\`.\`id\` = ${upsertResult.vehicleId}`

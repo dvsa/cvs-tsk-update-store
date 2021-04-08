@@ -1,11 +1,11 @@
 import {StartedTestContainer} from "testcontainers";
 import {destroyConnectionPool, executeSql} from "../../src/services/connection-pool";
-import {castToImageShape, useLocalDb} from "../utils";
+import {exampleContext, useLocalDb} from "../utils";
 import techRecordDocumentJson from "../resources/dynamodb-image-technical-record.json";
-import {DynamoDbImage} from "../../src/services/dynamodb-images";
 import {getContainerizedDatabase} from "./cvsbnop-container";
 import {TechRecordUpsertResult} from "../../src/models/upsert-results";
-import {convert} from "../../src/services/entity-conversion";
+import {processStreamEvent} from "../../src/functions/process-stream-event";
+import {DynamoDBStreamEvent} from "aws-lambda";
 
 useLocalDb();
 
@@ -23,15 +23,31 @@ describe("convertTechRecordDocument() integration tests", () => {
     });
 
     it("should correctly convert a DynamoDB event into Aurora rows", async () => {
-        const upsertResults: TechRecordUpsertResult[] = await convert(
-            "Technical_Records",
-            "INSERT",
-            DynamoDbImage.parse(castToImageShape(techRecordDocumentJson))
+        const event: DynamoDBStreamEvent = {
+            Records: [
+                {
+                    eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/Technical_Records/stream/2020-01-01T00:00:00.000",
+                    eventName: "INSERT",
+                    dynamodb: {
+                        NewImage: techRecordDocumentJson
+                    }
+                }
+            ]
+        };
+
+        // array of arrays: event contains array of records, each with array of tech record entities
+        const upsertResults: TechRecordUpsertResult[][] = await processStreamEvent(
+            event,
+            exampleContext(),
+            () => {
+                return;
+            }
         );
 
         expect(upsertResults.length).toEqual(1);
+        expect(upsertResults[0].length).toEqual(1);
 
-        const upsertResult = upsertResults[0];
+        const upsertResult = upsertResults[0][0];
 
         const vehicleResultSet = await executeSql(
             `SELECT \`system_number\` FROM \`vehicle\` WHERE \`vehicle\`.\`id\` = ${upsertResult.vehicleId}`
