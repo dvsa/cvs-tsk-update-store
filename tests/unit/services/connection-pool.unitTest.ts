@@ -1,5 +1,6 @@
 import {destroyConnectionPool, executeSql, getConnectionPool} from "../../../src/services/connection-pool";
 import {createPool} from "mysql2/promise";
+import {useLocalDb} from "../../utils";
 
 jest.mock("mysql2/promise", () => {
     return {
@@ -10,11 +11,13 @@ jest.mock("mysql2/promise", () => {
     };
 });
 
+useLocalDb();
+
 describe("getConnectionPool()", () => {
-    it("should create connection pool exactly once", () => {
-        getConnectionPool();
-        getConnectionPool();
-        getConnectionPool();
+    it("should create connection pool exactly once", async () => {
+        await getConnectionPool();
+        await getConnectionPool();
+        await getConnectionPool();
 
         expect(createPool).toHaveBeenCalledTimes(1);
     });
@@ -33,14 +36,14 @@ describe("destroyConnectionPool()", () => {
     it("should do nothing if connection pool is undefined", async () => {
         await destroyConnectionPool();
 
-        expect(getConnectionPool().end).not.toHaveBeenCalled();
+        expect((await getConnectionPool()).end).not.toHaveBeenCalled();
     });
 
     it("should destroy connection pool if present", async () => {
-        getConnectionPool();
+        await getConnectionPool();
         await destroyConnectionPool();
 
-        expect(getConnectionPool().end).toHaveBeenCalledTimes(1);
+        expect((await getConnectionPool()).end).toHaveBeenCalledTimes(1);
     });
 });
 
@@ -58,7 +61,7 @@ describe("executeSql()", () => {
     it("should accept single SQL statement", async () => {
         await executeSql("SELECT 1");
 
-        expect(getConnectionPool().execute).toHaveBeenCalledWith("SELECT 1", undefined);
+        expect((await getConnectionPool()).execute).toHaveBeenCalledWith("SELECT 1", undefined);
     });
 
     it("should accept SQL statement + template variables", async () => {
@@ -66,7 +69,7 @@ describe("executeSql()", () => {
         const templateVariables = ["a", "b"];
         await executeSql(sql, templateVariables);
 
-        expect(getConnectionPool().execute).toHaveBeenCalledWith(sql, templateVariables);
+        expect((await getConnectionPool()).execute).toHaveBeenCalledWith(sql, templateVariables);
     });
 
     it("should use explicit connection if provided", async () => {

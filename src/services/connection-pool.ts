@@ -1,6 +1,7 @@
 import * as mysql2 from "mysql2/promise";
-import {Connection, FieldPacket, Pool, PoolOptions} from "mysql2/promise";
+import {Connection, FieldPacket, Pool} from "mysql2/promise";
 import {Maybe} from "../models/optionals";
+import {getConnectionPoolOptions} from "./connection-pool-options";
 
 export interface QueryResponse {
     rows?: any;
@@ -10,22 +11,10 @@ export interface QueryResponse {
 // Lazy
 let pool: Maybe<Pool>;
 
-// TODO obtain from secrets manager
-const poolConfig: PoolOptions = {
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    password: "12345",
-    database: "CVSBNOP"
-};
-
-export const getConnectionPoolOptions = (): PoolOptions => {
-    return poolConfig;
-};
-
-export const getConnectionPool = (): Pool => {
+export const getConnectionPool = async (): Promise<Pool> => {
     if (!pool) {
-        pool = mysql2.createPool(getConnectionPoolOptions());
+        const config = await getConnectionPoolOptions();
+        pool = mysql2.createPool(config);
     }
     return pool;
 };
@@ -46,7 +35,7 @@ export const executeSql = async (sql: string, templateVariables?: any[], connect
         const [rows, fields] = await connection.execute(sql, templateVariables);
         return { rows, fields };
     } else {
-        const connectionPool = getConnectionPool();
+        const connectionPool = await getConnectionPool();
         const [rows, fields] = await connectionPool.execute(sql, templateVariables);
         return { rows, fields };
     }

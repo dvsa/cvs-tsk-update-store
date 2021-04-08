@@ -1,11 +1,13 @@
 import {StartedTestContainer} from "testcontainers";
 import {destroyConnectionPool, executeSql} from "../../src/services/connection-pool";
-import {castToImageShape} from "../utils";
+import {castToImageShape, useLocalDb} from "../utils";
 import testResultsJson from "../resources/dynamodb-image-test-results.json";
 import {DynamoDbImage} from "../../src/services/dynamodb-images";
 import {getContainerizedDatabase} from "./cvsbnop-container";
 import {TestResultUpsertResult} from "../../src/models/upsert-results";
 import {convert} from "../../src/services/entity-conversion";
+
+useLocalDb();
 
 describe("convertTestResults() integration tests", () => {
     let container: StartedTestContainer;

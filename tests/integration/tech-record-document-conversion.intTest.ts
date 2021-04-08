@@ -1,11 +1,13 @@
 import {StartedTestContainer} from "testcontainers";
 import {destroyConnectionPool, executeSql} from "../../src/services/connection-pool";
-import {castToImageShape} from "../utils";
+import {castToImageShape, useLocalDb} from "../utils";
 import techRecordDocumentJson from "../resources/dynamodb-image-technical-record.json";
 import {DynamoDbImage} from "../../src/services/dynamodb-images";
 import {getContainerizedDatabase} from "./cvsbnop-container";
 import {TechRecordUpsertResult} from "../../src/models/upsert-results";
 import {convert} from "../../src/services/entity-conversion";
+
+useLocalDb();
 
 describe("convertTechRecordDocument() integration tests", () => {
     let container: StartedTestContainer;

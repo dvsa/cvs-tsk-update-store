@@ -3,7 +3,7 @@ import {pathToResources} from "../utils";
 import {GenericContainer, StartedTestContainer} from "testcontainers";
 import {Port} from "testcontainers/dist/port";
 import {PoolOptions} from "mysql2";
-import {getConnectionPoolOptions} from "../../src/services/connection-pool";
+import {getConnectionPoolOptions} from "../../src/services/connection-pool-options";
 
 export const containerMySqlPort: Port = 3306;
 
@@ -33,13 +33,13 @@ export const getContainerizedDatabase = async (): Promise<StartedTestContainer> 
     console.log(`Liquibase process started with PID ${liquibaseProcess.pid}`);
     console.log(liquibaseProcess.output.toString());
 
-    mockPoolOptions(container);
+    await mockPoolOptions(container);
 
     return container;
 };
 
-const mockPoolOptions = (container: StartedTestContainer): void => {
-    const poolOptions: PoolOptions = getConnectionPoolOptions();
+const mockPoolOptions = async (container: StartedTestContainer): Promise<void> => {
+    const poolOptions: PoolOptions = await getConnectionPoolOptions();
 
     (getConnectionPoolOptions as jest.Mock) = jest.fn().mockReturnValue({
         ...poolOptions,
