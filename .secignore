@@ -1,2 +1,3 @@
 .npmrc
 cvs-nop/
+src/services/secrets-manager.ts
