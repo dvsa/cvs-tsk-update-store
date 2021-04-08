@@ -7,7 +7,7 @@ Lambda handler and business logic for the CVS task "Update Store":
 2. Converts these images to a TypeScript model, then to an SQL-friendly tuple.
 3. Upserts (inserts or updates) tuples into RDS [Aurora][aurora], a relational SQL database.
 
-See full conversion procedure in following section.
+See full conversion procedure in sections below.
 
 This Lambda currently supports the following conversions:
 
@@ -17,6 +17,40 @@ This Lambda currently supports the following conversions:
 | `Test_Results`      | `test_result`        |
 
 See full list of affected Aurora tables in sections below.
+
+### Cloning
+This project makes use of [Git submodules][git-submodules] to import [cvs-nop][cvs-nop]. Instead of the regular `git clone`, use:
+
+```shell
+git clone git@github.com:dvsa/cvs-tsk-update-store.git --recurse-submodules
+```
+
+Or, if already cloned:
+
+```shell
+git submodule update --init --recursive
+```
+
+### Tests
+```shell
+npm run test
+```
+
+### Integration tests
+Integration tests depend on:
+* a local Docker installation, with `docker` on the system's path
+* a local Liquibase installation, with `liquibase` or `liquibase.bat` (on Windows) on the system's path
+
+They work by:
+1. Creating a MySQL container
+2. Spawning a Liquibase executable
+3. Applying a Liquibase changelog to the running container
+4. Overriding connection pool configuration to connect to container
+
+Run them using:
+```shell
+npm run test-i
+```
 
 ## Full conversion procedure
 Rough ordering - may not follow code exactly.
@@ -70,21 +104,6 @@ For the full field-to-column mapping, see `test-result-record-conversion.ts`.
   * `test_defect`
   * `custom_defect`
 
-## Tests
-`npm run test`
-
-## Integration tests
-Integration tests depend on:
-* a local Docker installation, with `docker` on the system's path
-* a local Liquibase installation, with `liquibase` or `liquibase.bat` (on Windows) on the system's path
-  
-They work by:
-1. Creating a MySQL container
-2. Spawning a Liquibase executable
-3. Applying a Liquibase changelog to the running container
-4. Overriding connection pool configuration to connect to container
-
-Run them using:
-`npm run test-i`
-
-[aurora]: https://aws.amazon.com/rds/aurora/?aurora-whats-new.sort-by=item.additionalFields.postDateTime&aurora-whats-new.sort-order=desc
+[aurora]: https://aws.amazon.com/rds/aurora
+[git-submodules]: https://git-scm.com/book/en/v2/Git-Tools-Submodules
+[cvs-nop]: https://github.com/dvsa/cvs-nop
