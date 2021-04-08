@@ -1,6 +1,5 @@
 import {parseTestResults, TestResult, TestResults} from "../models/test-results";
 import {TestType} from "../models/test-types";
-import {generatePartialUpsertSql} from "./sql-generation";
 import {
     CUSTOM_DEFECT_TABLE,
     DEFECTS_TABLE,
@@ -75,7 +74,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
                 const testTypeId = await upsertTestType(testResultConnection, testType);
 
                 const response = await executePartialUpsert(
-                    generatePartialUpsertSql(TEST_RESULT_TABLE),
+                    TEST_RESULT_TABLE,
                     [
                         vehicleId,
                         fuelEmissionId,
@@ -158,7 +157,7 @@ const deleteTestResults = async (testResult: TestResults): Promise<void> => {
 // TODO confirm with Chris - might instead need to assume vehicle is present and execute SELECT here
 const upsertVehicle = async (connection: Connection, testResult: TestResult): Promise<number> => {
     const response = await executePartialUpsert(
-        generatePartialUpsertSql(VEHICLE_TABLE),
+        VEHICLE_TABLE,
         [
             testResult.systemNumber,
             testResult.vin,
@@ -172,7 +171,7 @@ const upsertVehicle = async (connection: Connection, testResult: TestResult): Pr
 
 const upsertTestStation = async (connection: Connection, testResult: TestResult): Promise<number> => {
     const response = await executePartialUpsert(
-        generatePartialUpsertSql(TEST_STATION_TABLE),
+        TEST_STATION_TABLE,
         [
             testResult.testStationPNumber,
             testResult.testStationName,
@@ -185,7 +184,7 @@ const upsertTestStation = async (connection: Connection, testResult: TestResult)
 
 const upsertTester = async (connection: Connection, testResult: TestResult): Promise<number> => {
     const response = await executePartialUpsert(
-        generatePartialUpsertSql(TESTER_TABLE),
+        TESTER_TABLE,
         [
             testResult.testerStaffId,
             testResult.testerName,
@@ -198,7 +197,7 @@ const upsertTester = async (connection: Connection, testResult: TestResult): Pro
 
 const upsertVehicleClass = async (connection: Connection, testResult: TestResult): Promise<number> => {
     const response = await executePartialUpsert(
-        generatePartialUpsertSql(VEHICLE_CLASS_TABLE),
+        VEHICLE_CLASS_TABLE,
         [
             testResult.vehicleClass?.code,
             testResult.vehicleClass?.description,
@@ -214,7 +213,7 @@ const upsertVehicleClass = async (connection: Connection, testResult: TestResult
 
 const upsertFuelEmission = async (connection: Connection, testType: TestType): Promise<number> => {
     const response = await executePartialUpsert(
-        generatePartialUpsertSql(FUEL_EMISSION_TABLE),
+        FUEL_EMISSION_TABLE,
         [
             testType.modType!.code,
             testType.modType!.description,
@@ -228,7 +227,7 @@ const upsertFuelEmission = async (connection: Connection, testType: TestType): P
 
 const upsertTestType = async (connection: Connection, testType: TestType): Promise<number> => {
     const response = await executePartialUpsert(
-        generatePartialUpsertSql(TEST_TYPE_TABLE),
+        TEST_TYPE_TABLE,
         [
             testType.testTypeClassification,
             testType.testTypeName,
@@ -240,7 +239,7 @@ const upsertTestType = async (connection: Connection, testType: TestType): Promi
 
 const upsertPreparer = async (connection: Connection, testResult: TestResult): Promise<number> => {
     const response = await executePartialUpsert(
-        generatePartialUpsertSql(PREPARER_TABLE),
+        PREPARER_TABLE,
         [
             testResult.preparerId,
             testResult.preparerName,
@@ -252,7 +251,7 @@ const upsertPreparer = async (connection: Connection, testResult: TestResult): P
 
 const upsertIdentity = async (connection: Connection, id: string, name: string): Promise<number> => {
     const response = await executePartialUpsert(
-        generatePartialUpsertSql(IDENTITY_TABLE),
+        IDENTITY_TABLE,
         [
             id,
             name
@@ -271,7 +270,7 @@ const upsertDefects = async (connection: Connection, testResultId: number, testT
 
     for (const defect of testType.defects) {
         const insertDefectResponse = await executePartialUpsert(
-            generatePartialUpsertSql(DEFECTS_TABLE),
+            DEFECTS_TABLE,
             [
                 defect.imNumber,
                 defect.imDescription,
@@ -291,7 +290,7 @@ const upsertDefects = async (connection: Connection, testResultId: number, testT
         insertedIds.push(defectId);
 
         const insertLocationResponse = await executePartialUpsert(
-            generatePartialUpsertSql(LOCATION_TABLE),
+            LOCATION_TABLE,
             [
                 defect.additionalInformation?.location?.vertical,
                 defect.additionalInformation?.location?.horizontal,
@@ -307,7 +306,7 @@ const upsertDefects = async (connection: Connection, testResultId: number, testT
         const locationId = insertLocationResponse.rows.insertId;
 
         await executePartialUpsert(
-            generatePartialUpsertSql(TEST_DEFECT_TABLE),
+            TEST_DEFECT_TABLE,
             [
                 testResultId,
                 defectId,
@@ -332,7 +331,7 @@ const upsertCustomDefects = async (connection: Connection, testResultId: number,
 
     for (const customDefect of testType.customDefects) {
         const response = await executePartialUpsert(
-            generatePartialUpsertSql(CUSTOM_DEFECT_TABLE),
+            CUSTOM_DEFECT_TABLE,
             [
                 testResultId,
                 customDefect.referenceNumber,

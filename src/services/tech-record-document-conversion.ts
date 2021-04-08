@@ -1,6 +1,5 @@
 import {parseTechRecordDocument, TechRecordDocument} from "../models/tech-record-document";
 import {getFaxNumber, TechRecord} from "../models/tech-record";
-import {generateFullUpsertSql, generatePartialUpsertSql} from "./sql-generation";
 import {
     AXLE_SPACING_TABLE,
     AXLES_TABLE,
@@ -70,7 +69,7 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
             const contactDetailsId = await upsertContactDetails(techRecordConnection, techRecord);
 
             const response = await executeFullUpsert(
-                generateFullUpsertSql(TECHNICAL_RECORD_TABLE),
+                TECHNICAL_RECORD_TABLE,
                 [
                     vehicleId,
                     techRecord.recordCompleteness,
@@ -201,7 +200,7 @@ const deleteTechRecords = async (techRecordDocument: TechRecordDocument): Promis
 
 const upsertVehicle = async (connection: Connection, techRecordDocument: TechRecordDocument): Promise<number> => {
     const response = await executePartialUpsert(
-        generatePartialUpsertSql(VEHICLE_TABLE),
+        VEHICLE_TABLE,
         [
             techRecordDocument.systemNumber,
             techRecordDocument.vin,
@@ -216,7 +215,7 @@ const upsertVehicle = async (connection: Connection, techRecordDocument: TechRec
 
 const upsertMakeModel = async (connection: Connection, techRecord: TechRecord): Promise<number> => {
     const response = await executePartialUpsert(
-        generatePartialUpsertSql(MAKE_MODEL_TABLE),
+        MAKE_MODEL_TABLE,
         [
             techRecord.make,
             techRecord.model,
@@ -238,7 +237,7 @@ const upsertMakeModel = async (connection: Connection, techRecord: TechRecord): 
 
 const upsertVehicleClass = async (connection: Connection, techRecord: TechRecord): Promise<number> => {
     const response = await executePartialUpsert(
-        generatePartialUpsertSql(VEHICLE_CLASS_TABLE),
+        VEHICLE_CLASS_TABLE,
         [
             techRecord.vehicleClass?.code,
             techRecord.vehicleClass?.description,
@@ -262,7 +261,7 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
 
     for (const vehicleSubclass of techRecord.vehicleSubclass) {
         const response = await executePartialUpsert(
-            generatePartialUpsertSql(VEHICLE_SUBCLASS_TABLE),
+            VEHICLE_SUBCLASS_TABLE,
             [
                 vehicleClassId,
                 vehicleSubclass
@@ -277,7 +276,7 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
 
 const upsertIdentity = async (connection: Connection, id: string, name: string): Promise<number> => {
     const response = await executePartialUpsert(
-        generatePartialUpsertSql(IDENTITY_TABLE),
+        IDENTITY_TABLE,
         [
             id,
             name
@@ -289,7 +288,7 @@ const upsertIdentity = async (connection: Connection, id: string, name: string):
 
 const upsertContactDetails = async (connection: Connection, techRecord: TechRecord): Promise<number> => {
     const response = await executePartialUpsert(
-        generatePartialUpsertSql(CONTACT_DETAILS_TABLE),
+        CONTACT_DETAILS_TABLE,
         [
             techRecord.applicantDetails?.name,
             techRecord.applicantDetails?.address1,
@@ -309,7 +308,7 @@ const upsertContactDetails = async (connection: Connection, techRecord: TechReco
 
 const upsertPsvBrakes = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<number> => {
     const response = await executeFullUpsert(
-        generateFullUpsertSql(PSV_BRAKES_TABLE),
+        PSV_BRAKES_TABLE,
         [
             techRecordId,
             techRecord.brakes?.brakeCodeOriginal,
@@ -341,7 +340,7 @@ const upsertAxleSpacings = async (connection: Connection, techRecordId: string, 
 
     for (const axleSpacing of techRecord.dimensions.axleSpacing) {
         const response = await executeFullUpsert(
-            generateFullUpsertSql(AXLE_SPACING_TABLE),
+            AXLE_SPACING_TABLE,
             [
                 techRecordId,
                 axleSpacing.axles,
@@ -357,7 +356,7 @@ const upsertAxleSpacings = async (connection: Connection, techRecordId: string, 
 
 const upsertMicrofilm = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<number> => {
     const response = await executeFullUpsert(
-        generateFullUpsertSql(MICROFILM_TABLE),
+        MICROFILM_TABLE,
         [
             techRecordId,
             techRecord.microfilm?.microfilmDocumentType,
@@ -379,7 +378,7 @@ const upsertPlates = async (connection: Connection, techRecordId: any, techRecor
 
     for (const plate of techRecord.plates) {
         const response = await executeFullUpsert(
-            generateFullUpsertSql(PLATE_TABLE),
+            PLATE_TABLE,
             [
                 techRecordId,
                 plate.plateSerialNumber,
@@ -404,7 +403,7 @@ const upsertAxles = async (connection: Connection, techRecordId: any, techRecord
 
     for (const axle of techRecord.axles) {
         const tyreUpsertResponse = await executePartialUpsert(
-            generatePartialUpsertSql(TYRE_TABLE),
+            TYRE_TABLE,
             [
                 axle.tyres?.tyreSize,
                 axle.tyres?.plyRating,
@@ -419,7 +418,7 @@ const upsertAxles = async (connection: Connection, techRecordId: any, techRecord
         const tyreId = tyreUpsertResponse.rows.insertId;
 
         const axleUpsertResponse = await executeFullUpsert(
-            generateFullUpsertSql(AXLES_TABLE),
+            AXLES_TABLE,
             [
                 techRecordId,
                 tyreId,
