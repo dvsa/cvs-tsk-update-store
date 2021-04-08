@@ -195,7 +195,7 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
 };
 
 const deleteTechRecords = async (techRecordDocument: TechRecordDocument): Promise<void> => {
-    // TODO
+    throw new Error("deleting tech record documents is not implemented yet");
 };
 
 const upsertVehicle = async (connection: Connection, techRecordDocument: TechRecordDocument): Promise<number> => {
@@ -227,7 +227,7 @@ const upsertMakeModel = async (connection: Connection, techRecord: TechRecord): 
             techRecord.bodyType?.code,
             techRecord.bodyType?.description,
             techRecord.fuelPropulsionSystem,
-            null // TODO intentional hack until we know JSON path of make-model dtpCode
+            null // intentional hack until JSON path of make-model dtpCode is documented
         ],
         connection
     );

@@ -55,8 +55,6 @@ describe("convertTestResults() integration tests", () => {
         expect(vehicleClassResultSet.rows.length).toEqual(1);
         expect(vehicleClassResultSet.rows[0].code).toEqual("2");
 
-        // TODO vehicle subclass expectations - not clear from specification
-
         const preparerResultSet = await executeSql(
             `SELECT \`preparerId\` FROM \`preparer\` WHERE \`preparer\`.\`id\` = ${upsertResult.preparerId}`
         );

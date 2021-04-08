@@ -15,6 +15,13 @@ const entityConverters: Map<string, EntityConverter<any>> = new Map();
 entityConverters.set("Technical_Records", techRecordDocumentConverter());
 entityConverters.set("Test_Results", testResultsConverter());
 
+/**
+ * Shared conversion code: convert from DynamoDB document snapshot to Aurora RDS rows
+ *
+ * @param tableName source DynamoDB table name
+ * @param sqlOperation
+ * @param image DynamoDB document snapshot
+ */
 export const convert = async <T> (tableName: string, sqlOperation: SqlOperation, image: DynamoDbImage): Promise<any> => {
     const converter = getEntityConverter(tableName);
 

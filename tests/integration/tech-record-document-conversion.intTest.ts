@@ -49,8 +49,6 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect(vehicleClassResultSet.rows.length).toEqual(1);
         expect(vehicleClassResultSet.rows[0].code).toEqual("2");
 
-        // TODO vehicle subclass expectations - not clear from specification
-
         const createdByResultSet = await executeSql(
             `SELECT \`identityId\` FROM \`identity\` WHERE \`identity\`.\`id\` = ${upsertResult.createdById}`
         );
@@ -116,7 +114,5 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect(axlesResultSet.rows.length).toEqual(1);
         expect(axlesResultSet.rows[0].technical_record_id).toEqual(upsertResult.techRecordId);
         expect(axlesResultSet.rows[0].axleNumber).toEqual(1);
-
-        // TODO might want to write some expectations for `axles`'s child: `tyre`?
     });
 });

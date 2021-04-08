@@ -13,6 +13,7 @@ import {
     TEST_TYPE_TABLE,
     TESTER_TABLE,
     VEHICLE_CLASS_TABLE,
+    VEHICLE_SUBCLASS_TABLE,
     VEHICLE_TABLE
 } from "./table-details";
 import {executePartialUpsert} from "./sql-execution";
@@ -64,7 +65,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
             const testStationId = await upsertTestStation(testResultConnection, testResult);
             const testerId = await upsertTester(testResultConnection, testResult);
             const vehicleClassId = await upsertVehicleClass(testResultConnection, testResult);
-            // TODO vehicle subclass - not clear on insert procedure here
+            const vehicleSubclassIds = await upsertVehicleSubclasses(testResultConnection, vehicleClassId, testResult);
             const preparerId = await upsertPreparer(testResultConnection, testResult);
             const createdById = await upsertIdentity(testResultConnection, testResult.createdById!, testResult.createdByName!);
             const lastUpdatedById = await upsertIdentity(testResultConnection, testResult.lastUpdatedById!, testResult.lastUpdatedByName!);
@@ -132,6 +133,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
                     testStationId,
                     testerId,
                     vehicleClassId,
+                    vehicleSubclassIds,
                     preparerId,
                     createdById,
                     lastUpdatedById,
@@ -151,10 +153,9 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
 };
 
 const deleteTestResults = async (testResult: TestResults): Promise<void> => {
-    // TODO
+    throw new Error("deleting test results is not implemented yet");
 };
 
-// TODO confirm with Chris - might instead need to assume vehicle is present and execute SELECT here
 const upsertVehicle = async (connection: Connection, testResult: TestResult): Promise<number> => {
     const response = await executePartialUpsert(
         VEHICLE_TABLE,
@@ -209,6 +210,28 @@ const upsertVehicleClass = async (connection: Connection, testResult: TestResult
         connection
     );
     return response.rows.insertId;
+};
+
+const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: number, testResult: TestResult): Promise<number[]> => {
+    if (!testResult.vehicleSubclass) {
+        return [];
+    }
+
+    const insertedIds: number[] = [];
+
+    for (const vehicleSubclass of testResult.vehicleSubclass) {
+        const response = await executePartialUpsert(
+            VEHICLE_SUBCLASS_TABLE,
+            [
+                vehicleClassId,
+                vehicleSubclass
+            ],
+            connection
+        );
+        insertedIds.push(response.rows.insertId);
+    }
+
+    return insertedIds;
 };
 
 const upsertFuelEmission = async (connection: Connection, testType: TestType): Promise<number> => {

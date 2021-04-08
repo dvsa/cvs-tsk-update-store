@@ -1,5 +1,10 @@
 import {TableDetails} from "./table-details";
 
+/**
+ * Generate partial upsert SQL. See sql-execution.ts for a definition of partial upsert.
+ *
+ * @param tableDetails the table to generate upsert SQL for
+ */
 export const generatePartialUpsertSql = (tableDetails: TableDetails): string => {
     return generateUpsertSql(
         tableDetails,
@@ -7,6 +12,11 @@ export const generatePartialUpsertSql = (tableDetails: TableDetails): string => 
     );
 };
 
+/**
+ * Generate full upsert SQL. See sql-execution.ts for a definition of full upsert.
+ *
+ * @param tableDetails the table to generate upsert SQL for
+ */
 export const generateFullUpsertSql = (tableDetails: TableDetails): string => {
     return generateUpsertSql(
         tableDetails,

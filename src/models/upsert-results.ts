@@ -20,6 +20,7 @@ export interface TestResultUpsertResult {
     testStationId: number;
     testerId: number;
     vehicleClassId: number;
+    vehicleSubclassIds: number[];
     preparerId: number;
     createdById: number;
     lastUpdatedById: number;

@@ -82,7 +82,6 @@ export interface Tc3DetailsItem {
 
 export type Tc3Type = "intermediate" | "periodic" | "exceptional";
 
-// TODO fix this function to work with nullable values if it's ever needed
 export const parseAdrDetails = (adrDetails?: DynamoDbImage): Maybe<AdrDetails> => {
     if (!adrDetails) {
         return undefined;
