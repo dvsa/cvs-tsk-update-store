@@ -1,1 +1,90 @@
- # cvs-tsk-update-store
+# cvs-tsk-update-store
+
+## Overview
+Lambda handler and business logic for the CVS task "Update Store":
+
+1. Receives DynamoDB stream events, containing NoSQL document snapshots ("**images**")
+2. Converts these images to a TypeScript model, then to an SQL-friendly tuple.
+3. Upserts (inserts or updates) tuples into RDS [Aurora][aurora], a relational SQL database.
+
+See full conversion procedure in following section.
+
+This Lambda currently supports the following conversions:
+
+| Source (DynamoDB)   | Destination (Aurora) |
+|---------------------|----------------------|
+| `Technical_Records` | `technical_record`   |
+| `Test_Results`      | `test_result`        |
+
+See full list of affected Aurora tables in sections below.
+
+## Full conversion procedure
+Rough ordering - may not follow code exactly.
+
+1. DynamoDB table emits event on `INSERT`, `MODIFY` or `REMOVE`
+2. Event validation: is this really a DynamoDB stream event?
+3. Derive correct SQL operation `INSERT` (supported), `UPDATE` (supported) or `DELETE` (not implemented)
+4. Parse DynamoDB document snapshot into usable image object
+5. Obtain source table name from event source ARN
+6. Get conversion procedure by table name
+7. Start conversion procedure given image, table name and SQL operation
+8. Parse root image: map all applicable fields to equivalent TypeScript object hierarchy
+9. Generate `INSERT INTO (...) ON DUPLICATE KEY UPDATE (...)` for each destination table
+10. Transactionally execute all SQL statements, rolling back on error
+11. Return upsertion result containing all primary and foreign keys
+
+## Technical Record conversion
+For the full field-to-column mapping, see `tech-record-document-conversion.ts`.
+
+* Source (DynamoDB) table: `Technical_Records`
+* Destination (Aurora) tables, in upsertion order:
+  * `vehicle`
+  * `make_model`
+  * `vehicle_class`
+  * `vehicle_subclass`
+  * `identity`
+  * `contact_details`
+  * `technical_record`
+  * `psv_brakes`
+  * `axle_spacing`
+  * `microfilm`
+  * `plate`
+  * `axle`
+
+## Test Result conversion
+For the full field-to-column mapping, see `test-result-record-conversion.ts`.
+
+* Source (DynamoDB) table: `Test_Results`
+* Destination (Aurora) tables, in upsertion order:
+  * `vehicle`
+  * `test_station`
+  * `tester`
+  * `vehicle_class`
+  * `preparer`
+  * `identity`
+  * `fuel_emission`
+  * `test_type`
+  * `test_result`
+  * `defect`
+  * `location`
+  * `test_defect`
+  * `custom_defect`
+
+## Tests
+`npm run test`
+
+## Integration tests
+Integration tests depend on:
+* a local Docker installation, with `docker` on the system's path
+* a local Liquibase installation, with `liquibase` or `liquibase.bat` (on Windows) on the system's path
+  
+They work by:
+1. Creating a MySQL container
+2. Spawning a Liquibase executable
+3. Applying a Liquibase changelog to the running container
+4. Overriding connection pool configuration to connect to container
+
+Run them using:
+`npm run test-i`
+
+[aurora]: https://aws.amazon.com/rds/aurora/?aurora-whats-new.sort-by=item.additionalFields.postDateTime&aurora-whats-new.sort-order=desc
