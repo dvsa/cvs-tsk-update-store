@@ -49,6 +49,15 @@ They work by:
 
 Run them using:
 ```shell
+npm run test-local-i
+```
+
+On Tanio Artino's advice, there is a distinction between running integration tests locally, and running them on Jenkins.
+* `USE_CONTAINERIZED_DATABASE=0` will attempt to talk to `localhost:3306`. This only works if you manually start a DB or, in the case of Jenkins, if there is a pre-existing DB running on port `3306`.
+* `USE_CONTAINERIZED_DATABASE=1` will spin up a TC container as described above.
+
+To run the "Jenkins" version, e.g. `USE_CONTAINERIZED_DATABASE=0`, use:
+```shell
 npm run test-i
 ```
 

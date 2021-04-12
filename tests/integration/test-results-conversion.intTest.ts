@@ -6,6 +6,7 @@ import {getContainerizedDatabase} from "./cvsbnop-container";
 import {TestResultUpsertResult} from "../../src/models/upsert-results";
 import {DynamoDBStreamEvent} from "aws-lambda";
 import {processStreamEvent} from "../../src/functions/process-stream-event";
+import {getConnectionPoolOptions} from "../../src/services/connection-pool-options";
 
 useLocalDb();
 
@@ -14,12 +15,26 @@ describe("convertTestResults() integration tests", () => {
 
     beforeAll(async () => {
         jest.setTimeout(60_000);
-        container = await getContainerizedDatabase();
+
+        // see README for why this environment variable exists
+        if (process.env.USE_CONTAINERIZED_DATABASE) {
+            container = await getContainerizedDatabase();
+        } else {
+            (getConnectionPoolOptions as jest.Mock) = jest.fn().mockResolvedValue({
+                host: "localhost",
+                port: "3306",
+                user: "root",
+                password: "12345",
+                database: "CVSBNOP"
+            });
+        }
     });
 
     afterAll(async () => {
         await destroyConnectionPool();
-        await container.stop();
+        if (process.env.USE_CONTAINERIZED_DATABASE) {
+            await container.stop();
+        }
     });
 
     it("should correctly convert a DynamoDB event into Aurora rows", async () => {
