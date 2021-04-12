@@ -1,6 +1,7 @@
 const liquibase = require("liquibase");
 const path = require("path");
 
+// see README > "Integration tests" for why this awful code exists
 (async () => await liquibase({
     liquibase: path.join(__dirname, "../node_modules/liquibase/lib/liquibase-4.0.0/liquibase"),
     changeLogFile: path.join(__dirname, "../cvs-nop/changelog-master.xml"),
