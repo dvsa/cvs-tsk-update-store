@@ -7,6 +7,10 @@
     "node": "10.18.1",
     "npm": "5.6.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dvsa/cvs-tsk-update-store.git"
+  },
   "scripts": {
     "start": "npm run kill:offline && npm run start:offline && serverless invoke local -f main --path tests/resources/queue-event.json",
     "start:offline": "node_modules/gulp/bin/gulp.js start-serverless",
@@ -51,7 +55,6 @@
   "license": "ISC",
   "dependencies": {
     "@types/lambda-tester": "^3.6.0",
-    "@types/mysql2": "github:types/mysql2",
     "aws-lambda": "^0.1.2",
     "aws-sdk": "^2.562.0",
     "aws-xray-sdk": "^2.4.0",
