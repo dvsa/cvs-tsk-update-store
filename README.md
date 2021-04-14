@@ -52,6 +52,10 @@ Run them using:
 npm run test-local-i
 ```
 
+On Windows, you will need to manually run:
+* `SET USE_CONTAINERIZED_DATABASE=1`
+* Confirm: `echo %USE_CONTAINERIZED_DATABASE%` should return `1`before the above, or run these tests with an IntelliJ configuration which sets the right environment variable for you.
+
 On Tanio Artino's advice, there is a distinction between running integration tests locally, and running them on Jenkins.
 * `USE_CONTAINERIZED_DATABASE=0` will attempt to talk to `localhost:3306`. This only works if you manually start a DB or, in the case of Jenkins, if there is a pre-existing DB running on port `3306`.
 * `USE_CONTAINERIZED_DATABASE=1` will spin up a TC container as described above.

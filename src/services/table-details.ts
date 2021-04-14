@@ -383,3 +383,31 @@ export const TEST_RESULT_TABLE: TableDetails = {
         "lastUpdatedBy_Id",
     ]
 };
+
+export const allTables = (): TableDetails[] => {
+    return [
+        VEHICLE_TABLE,
+        MAKE_MODEL_TABLE,
+        VEHICLE_CLASS_TABLE,
+        VEHICLE_SUBCLASS_TABLE,
+        IDENTITY_TABLE,
+        CONTACT_DETAILS_TABLE,
+        TECHNICAL_RECORD_TABLE,
+        PSV_BRAKES_TABLE,
+        AXLE_SPACING_TABLE,
+        MICROFILM_TABLE,
+        PLATE_TABLE,
+        AXLES_TABLE,
+        TYRE_TABLE,
+        TEST_STATION_TABLE,
+        TESTER_TABLE,
+        FUEL_EMISSION_TABLE,
+        TEST_TYPE_TABLE,
+        PREPARER_TABLE,
+        DEFECTS_TABLE,
+        LOCATION_TABLE,
+        TEST_DEFECT_TABLE,
+        CUSTOM_DEFECT_TABLE,
+        TEST_RESULT_TABLE,
+    ];
+};
