@@ -31,6 +31,14 @@ Or, if already cloned:
 git submodule update --init --recursive
 ```
 
+By default, the submodule will be in a detached `HEAD` state. If you need a specific branch on `cvs-nop`, you will need to:
+
+```shell
+cd cvs-nop
+git checkout feature/CVSB-XXXXX
+git pull
+```
+
 ### Tests
 ```shell
 npm run test
