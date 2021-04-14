@@ -7,7 +7,6 @@ import {TestResultUpsertResult} from "../../src/models/upsert-results";
 import {DynamoDBStreamEvent} from "aws-lambda";
 import {processStreamEvent} from "../../src/functions/process-stream-event";
 import {getConnectionPoolOptions} from "../../src/services/connection-pool-options";
-import {databaseTearDown} from "./database-teardown";
 
 useLocalDb();
 
@@ -36,7 +35,7 @@ describe("convertTestResults() integration tests", () => {
         if (process.env.USE_CONTAINERIZED_DATABASE) {
             await container.stop();
         }
-        await databaseTearDown();
+        // await databaseTearDown(); - PENDING PIPELINE FIX FROM TANIO
     });
 
     it("should correctly convert a DynamoDB event into Aurora rows", async () => {
