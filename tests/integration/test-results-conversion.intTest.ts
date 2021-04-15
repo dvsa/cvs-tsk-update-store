@@ -4,7 +4,6 @@ import {exampleContext, useLocalDb} from "../utils";
 import testResultsJson from "../resources/dynamodb-image-test-results.json";
 import {getContainerizedDatabase} from "./cvsbnop-container";
 import {TestResultUpsertResult} from "../../src/models/upsert-results";
-import {DynamoDBStreamEvent} from "aws-lambda";
 import {processStreamEvent} from "../../src/functions/process-stream-event";
 import {getConnectionPoolOptions} from "../../src/services/connection-pool-options";
 
@@ -39,14 +38,16 @@ describe("convertTestResults() integration tests", () => {
     });
 
     it("should correctly convert a DynamoDB event into Aurora rows", async () => {
-        const event: DynamoDBStreamEvent = {
+        const event = {
             Records: [
                 {
-                    eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/Test_Results/stream/2020-01-01T00:00:00.000",
-                    eventName: "INSERT",
-                    dynamodb: {
-                        NewImage: testResultsJson
-                    }
+                    body: JSON.stringify({
+                        eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
+                        eventName: "INSERT",
+                        dynamodb: {
+                            NewImage: testResultsJson
+                        }
+                    })
                 }
             ]
         };
