@@ -164,6 +164,7 @@ const upsertVehicle = async (connection: Connection, testResult: TestResult): Pr
             testResult.vin,
             testResult.vrm,
             testResult.trailerId,
+            new Date().toISOString()
         ],
         connection
     );
