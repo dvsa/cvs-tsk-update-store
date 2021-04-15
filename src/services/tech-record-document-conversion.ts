@@ -206,7 +206,7 @@ const upsertVehicle = async (connection: Connection, techRecordDocument: TechRec
             techRecordDocument.vin,
             techRecordDocument.primaryVrm,
             techRecordDocument.trailerId,
-            new Date().toISOString()
+            new Date().toISOString().substr(0, 23)
         ],
         connection
     );
