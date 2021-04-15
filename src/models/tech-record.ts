@@ -186,7 +186,7 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
         chassisModel: image.getString("chassisModel"),
         bodyMake: image.getString("bodyMake"),
         bodyModel: image.getString("bodyModel"),
-        modelLiteral: image.getString("bodyModel"),
+        modelLiteral: image.getString("modelLiteral"),
         bodyType: parseBodyType(image.getMap("bodyType")),
         manufactureYear: image.getNumber("manufactureYear"),
         regnDate: image.getString("regnDate"),

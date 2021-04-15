@@ -11,6 +11,7 @@ export const VEHICLE_TABLE: TableDetails = {
         "vin",
         "vrm_trm",
         "trailer_id",
+        "createdAt",
     ]
 };
 

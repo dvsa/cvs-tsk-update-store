@@ -206,6 +206,7 @@ const upsertVehicle = async (connection: Connection, techRecordDocument: TechRec
             techRecordDocument.vin,
             techRecordDocument.primaryVrm,
             techRecordDocument.trailerId,
+            null // todo add createdAt
         ],
         connection
     );
