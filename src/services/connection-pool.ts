@@ -13,8 +13,12 @@ let pool: Maybe<Pool>;
 
 export const getConnectionPool = async (): Promise<Pool> => {
     if (!pool) {
+        console.info("getConnectionPool: Creating connection pool");
+
         const config = await getConnectionPoolOptions();
         pool = mysql2.createPool(config);
+
+        console.info("getConnectionPool: Connection pool created");
     }
     return pool;
 };
@@ -23,6 +27,9 @@ export const destroyConnectionPool = async (): Promise<void> => {
     if (pool) {
         await pool.end();
         pool = undefined;
+        console.info(`destroyConnectionPool: connection pool destroyed`);
+    } else {
+        console.info(`destroyConnectionPool: nothing to do`);
     }
 };
 
@@ -31,13 +38,16 @@ export const executeSql = async (sql: string, templateVariables?: any[], connect
         templateVariables = undefinedToNull(templateVariables);
     }
 
+    console.info(`Executing SQL: ${sql}`);
+    console.info(`Template vars: ${templateVariables}`);
+
     if (connection) {
         const [rows, fields] = await connection.execute(sql, templateVariables);
-        return { rows, fields };
+        return {rows, fields};
     } else {
         const connectionPool = await getConnectionPool();
         const [rows, fields] = await connectionPool.execute(sql, templateVariables);
-        return { rows, fields };
+        return {rows, fields};
     }
 };
 

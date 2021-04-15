@@ -31,6 +31,8 @@ export const testResultsConverter = (): EntityConverter<TestResults> => {
 };
 
 const upsertTestResults = async (testResults: TestResults): Promise<TestResultUpsertResult[]> => {
+    console.info(`upsertTestResults: START`);
+
     if (!testResults) {
         return [];
     }
@@ -48,9 +50,13 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
         try {
             await vehicleConnection.beginTransaction();
 
+            console.info(`upsertTestResults: Upserting vehicle...`);
+
             vehicleId = await upsertVehicle(vehicleConnection, testResult);
 
             await vehicleConnection.commit();
+
+            console.info(`upsertTestResults: Upserted vehicle (ID: ${vehicleId})`);
         } catch (err) {
             console.error(err);
             await vehicleConnection.rollback();
@@ -144,10 +150,12 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
                 });
             }
         } catch (err) {
-            testResultConnection.rollback();
+            await testResultConnection.rollback();
             throw err;
         }
     }
+
+    console.info(`upsertTestResults: END`);
 
     return upsertResults;
 };

@@ -17,6 +17,8 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
 
         const upsertResults: any[] = [];
 
+        console.log(`Received valid SQS event (${event.Records.length} records)`);
+
         for await (const record of event.Records) {
             const dynamoRecord: DynamoDBRecord = JSON.parse(record.body) as DynamoDBRecord;
 
@@ -25,6 +27,10 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
             // parse source ARN
             const eventSourceArn: EventSourceArn = stringToArn(dynamoRecord.eventSourceARN!);
 
+            console.info(`source ARN region:     '${eventSourceArn.region}'`);
+            console.info(`source ARN account ID: '${eventSourceArn.accountId}'`);
+            console.info(`source ARN timestamp:  '${eventSourceArn.timestamp}'`);
+
             // is this an INSERT, UPDATE, or DELETE?
             const operationType: SqlOperation = deriveSqlOperation(dynamoRecord.eventName!);
 
@@ -32,9 +38,12 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
             const image: DynamoDbImage = selectImage(operationType, dynamoRecord.dynamodb!);
 
             try {
-                // perform conversion (DynamoDB ---> Aurora)
+                console.info(`DynamoDB ---> Aurora | START (event ID: ${dynamoRecord.eventID})`);
+
                 const upsertResult = await convert(eventSourceArn.table, operationType, image);
                 upsertResults.push(upsertResult);
+
+                console.info(`DynamoDB ---> Aurora | END   (event ID: ${dynamoRecord.eventID})`);
             } catch (err) {
                 console.error("couldn't convert DynamoDB entity to Aurora", err);
                 dumpArguments(event, context);
@@ -58,11 +67,13 @@ const selectImage = (operationType: SqlOperation, streamRecord: StreamRecord): D
             if (!streamRecord.NewImage) {
                 throw new Error("'dynamodb' object missing required field 'NewImage'");
             }
+            console.info(`operation type '${operationType}', selecting image 'NewImage'`);
             return DynamoDbImage.parse(streamRecord.NewImage!);
         case "DELETE":
             if (!streamRecord.OldImage) {
                 throw new Error("'dynamodb' object missing required field 'OldImage'");
             }
+            console.info(`operation type '${operationType}', selecting image 'OldImage'`);
             return DynamoDbImage.parse(streamRecord.OldImage!);
     }
 };

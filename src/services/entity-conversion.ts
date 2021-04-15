@@ -23,15 +23,21 @@ entityConverters.set("test-results", testResultsConverter());
  * @param image DynamoDB document snapshot
  */
 export const convert = async <T> (tableName: string, sqlOperation: SqlOperation, image: DynamoDbImage): Promise<any> => {
+    console.info(`source table name: '${tableName}'`);
+
     const converter = getEntityConverter(tableName);
+
+    console.info("valid converter found");
 
     const entity: T = converter.parseRootImage(image) as T;
 
     switch (sqlOperation) {
         case "INSERT":
         case "UPDATE":
+            console.info(`Upserting entity...`);
             return converter.upsertEntity(entity);
         case "DELETE":
+            console.info(`Deleting entity...`);
             return converter.deleteEntity(entity);
     }
 };
@@ -42,6 +48,9 @@ const getEntityConverter = <T> (tableName: string): EntityConverter<T> => {
     } else if (tableName.includes("test-results")) {
         tableName = "test-results";
     }
+
+    console.info(`converter key:     '${tableName}'`);
+
     const entityConverter: Maybe<EntityConverter<T>> = entityConverters.get(tableName);
 
     if (!entityConverter) {

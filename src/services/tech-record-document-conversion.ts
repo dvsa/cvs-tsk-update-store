@@ -30,6 +30,8 @@ export const techRecordDocumentConverter = (): EntityConverter<TechRecordDocumen
 };
 
 const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promise<TechRecordUpsertResult[]> => {
+    console.info(`upsertTechRecords: START`);
+
     const pool = await getConnectionPool();
 
     let vehicleId;
@@ -38,9 +40,13 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
     try {
         await vehicleConnection.beginTransaction();
 
+        console.info(`upsertTechRecords: Upserting vehicle...`);
+
         vehicleId = await upsertVehicle(vehicleConnection, techRecordDocument);
 
         await vehicleConnection.commit();
+
+        console.info(`upsertTechRecords: Upserted vehicle (ID: ${vehicleId})`);
     } catch (err) {
         console.error(err);
         await vehicleConnection.rollback();
@@ -190,6 +196,8 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
             throw err;
         }
     }
+
+    console.info(`upsertTechRecords: END`);
 
     return upsertResults;
 };
