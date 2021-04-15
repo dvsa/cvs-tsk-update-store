@@ -1,5 +1,4 @@
 import {EventSourceArn, stringToArn} from "../../../src/services/event-source-arn";
-import {DateTime} from "luxon";
 
 describe("stringToArn()", () => {
     it("should parse a valid ARN", () => {
@@ -9,7 +8,7 @@ describe("stringToArn()", () => {
         expect(arn.region).toEqual("us-east-2");
         expect(arn.accountId).toEqual("123456789012");
         expect(arn.table).toEqual("my-table");
-        expect(arn.timestamp).toEqual(DateTime.fromISO("2019-06-10T19:26:16.525").toUTC());
+        expect(arn.timestamp).toEqual("2019-06-10T19:26:16.525");
     });
 
     it("should fail on null ARN", () => {

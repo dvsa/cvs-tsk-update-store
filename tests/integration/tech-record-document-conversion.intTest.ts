@@ -5,7 +5,6 @@ import techRecordDocumentJson from "../resources/dynamodb-image-technical-record
 import {getContainerizedDatabase} from "./cvsbnop-container";
 import {TechRecordUpsertResult} from "../../src/models/upsert-results";
 import {processStreamEvent} from "../../src/functions/process-stream-event";
-import {DynamoDBStreamEvent} from "aws-lambda";
 import {getConnectionPoolOptions} from "../../src/services/connection-pool-options";
 
 useLocalDb();
@@ -39,14 +38,16 @@ describe("convertTechRecordDocument() integration tests", () => {
     });
 
     it("should correctly convert a DynamoDB event into Aurora rows", async () => {
-        const event: DynamoDBStreamEvent = {
+        const event = {
             Records: [
                 {
-                    eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/Technical_Records/stream/2020-01-01T00:00:00.000",
-                    eventName: "INSERT",
-                    dynamodb: {
-                        NewImage: techRecordDocumentJson
-                    }
+                    body: JSON.stringify({
+                        eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
+                        eventName: "INSERT",
+                        dynamodb: {
+                            NewImage: techRecordDocumentJson
+                        }
+                    })
                 }
             ]
         };

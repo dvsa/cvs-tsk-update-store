@@ -11,11 +11,13 @@ describe("processStreamEvent()", () => {
             {
                 Records: [
                     {
-                        eventName: "INSERT",
-                        dynamodb: {
-                            NewImage: {}
-                        },
-                        eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/Technical_Records/stream/2020-01-01T00:00:00.000"
+                        body: JSON.stringify({
+                            eventName: "INSERT",
+                            dynamodb: {
+                                NewImage: {}
+                            },
+                            eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000"
+                        })
                     }
                 ]
             },

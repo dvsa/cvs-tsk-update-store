@@ -1,10 +1,8 @@
-import {DateTime} from "luxon";
-
 export interface EventSourceArn {
     region: string;
     accountId: string;
     table: string;
-    timestamp: DateTime;
+    timestamp: string;
 }
 
 export const stringToArn = (input: string): EventSourceArn => {
@@ -48,7 +46,7 @@ export const stringToArn = (input: string): EventSourceArn => {
         region: parts[3],
         accountId: parts[4],
         table: pathParts[1],
-        timestamp: DateTime.fromISO(pathParts[3]).toUTC(),
+        timestamp: pathParts[3],
     };
 };
 

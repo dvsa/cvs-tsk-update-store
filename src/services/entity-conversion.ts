@@ -12,8 +12,8 @@ export interface EntityConverter<T> {
 
 const entityConverters: Map<string, EntityConverter<any>> = new Map();
 
-entityConverters.set("Technical_Records", techRecordDocumentConverter());
-entityConverters.set("Test_Results", testResultsConverter());
+entityConverters.set("technical-records", techRecordDocumentConverter());
+entityConverters.set("test-results", testResultsConverter());
 
 /**
  * Shared conversion code: convert from DynamoDB document snapshot to Aurora RDS rows
@@ -37,6 +37,11 @@ export const convert = async <T> (tableName: string, sqlOperation: SqlOperation,
 };
 
 const getEntityConverter = <T> (tableName: string): EntityConverter<T> => {
+    if (tableName.includes("technical-records")) {
+        tableName = "technical-records";
+    } else if (tableName.includes("test-results")) {
+        tableName = "test-results";
+    }
     const entityConverter: Maybe<EntityConverter<T>> = entityConverters.get(tableName);
 
     if (!entityConverter) {

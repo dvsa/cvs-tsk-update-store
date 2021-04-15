@@ -24,7 +24,7 @@ describe("convert()", () => {
     });
 
     it("should parse and upsert entities on 'INSERT'", async () => {
-        await expect(convert("Technical_Records", "INSERT", exampleImage()));
+        await expect(convert("technical-records", "INSERT", exampleImage()));
 
         expect(techRecordDocumentConverter().parseRootImage).toHaveBeenCalledTimes(1);
         expect(techRecordDocumentConverter().upsertEntity).toHaveBeenCalledTimes(1);
@@ -32,7 +32,7 @@ describe("convert()", () => {
     });
 
     it("should parse and delete entities on 'DELETE'", async () => {
-        await expect(convert("Technical_Records", "DELETE", exampleImage()));
+        await expect(convert("technical-records", "DELETE", exampleImage()));
 
         expect(techRecordDocumentConverter().parseRootImage).toHaveBeenCalledTimes(1);
         expect(techRecordDocumentConverter().upsertEntity).toHaveBeenCalledTimes(0);

@@ -1,4 +1,4 @@
-import {Context, DynamoDBStreamEvent, Handler, StreamRecord} from "aws-lambda";
+import {Context, DynamoDBStreamEvent, Handler, SQSEvent, StreamRecord} from "aws-lambda";
 import {DynamoDBRecord} from "aws-lambda/trigger/dynamodb-stream";
 import {EventSourceArn, stringToArn} from "../services/event-source-arn";
 import {convert} from "../services/entity-conversion";
@@ -11,36 +11,44 @@ import {destroyConnectionPool} from "../services/connection-pool";
  * @param event - DynamoDB stream event, containing DynamoDB document image
  * @param context - λ context
  */
-export const processStreamEvent: Handler = async (event: DynamoDBStreamEvent, context: Context): Promise<any> => {
-    validateEvent(event);
+export const processStreamEvent: Handler = async (event: SQSEvent, context: Context): Promise<any> => {
+    try {
+        validateEvent(event);
 
-    const upsertResults: any[] = [];
+        const upsertResults: any[] = [];
 
-    for await (const record of event.Records) {
-        validateRecord(record);
+        for await (const record of event.Records) {
+            const dynamoRecord: DynamoDBRecord = JSON.parse(record.body) as DynamoDBRecord;
 
-        // parse source ARN
-        const eventSourceArn: EventSourceArn = stringToArn(record.eventSourceARN!);
+            validateRecord(dynamoRecord);
 
-        // is this an INSERT, UPDATE, or DELETE?
-        const operationType: SqlOperation = deriveSqlOperation(record.eventName!);
+            // parse source ARN
+            const eventSourceArn: EventSourceArn = stringToArn(dynamoRecord.eventSourceARN!);
 
-        // parse native DynamoDB format to usable TS map
-        const image: DynamoDbImage = selectImage(operationType, record.dynamodb!);
+            // is this an INSERT, UPDATE, or DELETE?
+            const operationType: SqlOperation = deriveSqlOperation(dynamoRecord.eventName!);
 
-        try {
-            // perform conversion (DynamoDB ---> Aurora)
-            const upsertResult = await convert(eventSourceArn.table, operationType, image);
-            upsertResults.push(upsertResult);
-        } catch (err) {
-            console.error("couldn't convert DynamoDB entity to Aurora", err);
-            dumpArguments(event, context);
+            // parse native DynamoDB format to usable TS map
+            const image: DynamoDbImage = selectImage(operationType, dynamoRecord.dynamodb!);
+
+            try {
+                // perform conversion (DynamoDB ---> Aurora)
+                const upsertResult = await convert(eventSourceArn.table, operationType, image);
+                upsertResults.push(upsertResult);
+            } catch (err) {
+                console.error("couldn't convert DynamoDB entity to Aurora", err);
+                dumpArguments(event, context);
+            }
         }
+
+        await destroyConnectionPool();
+
+        return upsertResults;
+    } catch (err) {
+        console.error(err);
+        dumpArguments(event, context);
+        throw err;
     }
-
-    await destroyConnectionPool();
-
-    return upsertResults;
 };
 
 const selectImage = (operationType: SqlOperation, streamRecord: StreamRecord): DynamoDbImage => {
