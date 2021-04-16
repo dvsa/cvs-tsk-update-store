@@ -62,9 +62,10 @@ export interface TestResult {
 
 export const parseTestResults = (image?: DynamoDbImage): TestResults => {
     console.info("Parsing test results...");
+    console.info("Expect exactly 2 calls to parseTestResults: root, and recursive call for nested field 'testHistory'");
 
     if (!image) {
-        console.info("image is null or undefined, no test results to process");
+        console.info("image is null or undefined, no test results / test history to process");
         return [] as TestResults;
     }
 

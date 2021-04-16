@@ -13,7 +13,8 @@ import {destroyConnectionPool} from "../services/connection-pool";
  */
 export const processStreamEvent: Handler = async (event: SQSEvent, context: Context): Promise<any> => {
     try {
-        console.info("Received SQS event", event);
+        console.info("Received SQS event: ", event);
+
         validateEvent(event);
 
         const upsertResults: any[] = [];
@@ -21,11 +22,9 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
         console.info(`Received valid SQS event (${event.Records.length} records)`);
 
         for await (const record of event.Records) {
-            console.info("body (unparsed): ", record.body);
-
             const dynamoRecord: DynamoDBRecord = JSON.parse(record.body) as DynamoDBRecord;
 
-            console.info("body (parsed):   ", dynamoRecord);
+            console.info("Original DynamoDB stream event body (parsed): ", dynamoRecord);
 
             validateRecord(dynamoRecord);
 
@@ -52,7 +51,7 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
 
                 console.info(`DynamoDB ---> Aurora | END   (event ID: ${dynamoRecord.eventID})`);
             } catch (err) {
-                console.error("couldn't convert DynamoDB entity to Aurora", err);
+                console.error("Couldn't convert DynamoDB entity to Aurora", err);
                 dumpArguments(event, context);
             }
         }
@@ -61,7 +60,7 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
 
         return upsertResults;
     } catch (err) {
-        console.error(err);
+        console.error("An error unrelated to Dynamo-to-Aurora conversion has occurred", err);
         dumpArguments(event, context);
         throw err;
     }

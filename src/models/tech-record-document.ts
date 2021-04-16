@@ -14,6 +14,8 @@ export interface TechRecordDocument {
 }
 
 export const parseTechRecordDocument = (image: DynamoDbImage): TechRecordDocument => {
+    console.info("Parsing tech records...");
+
     return {
         systemNumber: image.getString("systemNumber"),
         partialVin: image.getString("partialVin"),

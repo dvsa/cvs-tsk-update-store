@@ -41,8 +41,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
 
     const upsertResults: TestResultUpsertResult[] = [];
 
-    console.info(`Found ${testResults.length} test results`);
-    console.info(`Payload: ${JSON.stringify(testResults)}`);
+    console.info(`Upserting ${testResults.length} test results`);
 
     for (const testResult of testResults) {
         validateTestResult(testResult);
@@ -53,13 +52,9 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
         try {
             await vehicleConnection.beginTransaction();
 
-            console.info(`upsertTestResults: Upserting vehicle...`);
-
             vehicleId = await upsertVehicle(vehicleConnection, testResult);
 
             await vehicleConnection.commit();
-
-            console.info(`upsertTestResults: Upserted vehicle (ID: ${vehicleId})`);
         } catch (err) {
             console.error(err);
             await vehicleConnection.rollback();
@@ -82,6 +77,8 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
             for (const testType of testResult.testTypes!) {
                 const fuelEmissionId = await upsertFuelEmission(testResultConnection, testType);
                 const testTypeId = await upsertTestType(testResultConnection, testType);
+
+                console.info(`upsertTestResults: Upserting test result...`);
 
                 const response = await executePartialUpsert(
                     TEST_RESULT_TABLE,
@@ -131,6 +128,8 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
 
                 const testResultId = response.rows.insertId;
 
+                console.info(`upsertTestResults: Upserted test result (ID: ${testResultId})`);
+
                 const defectIds = await upsertDefects(testResultConnection, testResultId, testType);
                 const customDefectIds = await upsertCustomDefects(testResultConnection, testResultId, testType);
 
@@ -168,6 +167,8 @@ const deleteTestResults = async (testResult: TestResults): Promise<void> => {
 };
 
 const upsertVehicle = async (connection: Connection, testResult: TestResult): Promise<number> => {
+    console.info(`upsertTestResults: Upserting vehicle...`);
+
     const response = await executePartialUpsert(
         VEHICLE_TABLE,
         [
@@ -179,6 +180,9 @@ const upsertVehicle = async (connection: Connection, testResult: TestResult): Pr
         ],
         connection
     );
+
+    console.info(`upsertTestResults: Upserted vehicle (ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
@@ -243,6 +247,7 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
     console.info(`upsertTestResults: Upserting vehicle subclasses...`);
 
     if (!testResult.vehicleSubclass) {
+        console.info(`upsertTestResults: no vehicle subclasses present`);
         return [];
     }
 
