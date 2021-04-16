@@ -272,8 +272,8 @@ const upsertFuelEmission = async (connection: Connection, testType: TestType): P
     const response = await executePartialUpsert(
         FUEL_EMISSION_TABLE,
         [
-            testType.modType!.code,
-            testType.modType!.description,
+            testType.modType?.code,
+            testType.modType?.description,
             testType.emissionStandard,
             testType.fuelType,
         ],
