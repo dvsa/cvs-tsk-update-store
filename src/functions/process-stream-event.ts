@@ -13,14 +13,19 @@ import {destroyConnectionPool} from "../services/connection-pool";
  */
 export const processStreamEvent: Handler = async (event: SQSEvent, context: Context): Promise<any> => {
     try {
+        console.info("Received SQS event", event);
         validateEvent(event);
 
         const upsertResults: any[] = [];
 
-        console.log(`Received valid SQS event (${event.Records.length} records)`);
+        console.info(`Received valid SQS event (${event.Records.length} records)`);
 
         for await (const record of event.Records) {
+            console.info("body (unparsed): ", record.body);
+
             const dynamoRecord: DynamoDBRecord = JSON.parse(record.body) as DynamoDBRecord;
+
+            console.info("body (parsed):   ", dynamoRecord);
 
             validateRecord(dynamoRecord);
 
@@ -36,6 +41,8 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
 
             // parse native DynamoDB format to usable TS map
             const image: DynamoDbImage = selectImage(operationType, dynamoRecord.dynamodb!);
+
+            console.info("Dynamo image dump:", image);
 
             try {
                 console.info(`DynamoDB ---> Aurora | START (event ID: ${dynamoRecord.eventID})`);

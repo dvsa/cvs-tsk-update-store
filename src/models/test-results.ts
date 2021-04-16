@@ -61,14 +61,24 @@ export interface TestResult {
 }
 
 export const parseTestResults = (image?: DynamoDbImage): TestResults => {
+    console.info("Parsing test results...");
+
     if (!image) {
+        console.info("image is null or undefined, no test results to process");
         return [] as TestResults;
     }
 
     const testResultsImage = image.getList("testResults");
 
     if (!testResultsImage) {
-        return [] as TestResults;
+        console.info("image.testResults is null or undefined: attempting to parse image as single, unwrapped test result instead");
+
+        if (!image.getString("systemNumber")) {
+            console.info("image missing required field 'systemNumber': this is not a test result, no test results to process");
+            return [] as TestResults;
+        }
+
+        return [ parseTestResult(image) ];
     }
 
     const testResults: TestResults = [];
