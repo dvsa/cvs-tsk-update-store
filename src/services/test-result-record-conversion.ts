@@ -41,6 +41,9 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
 
     const upsertResults: TestResultUpsertResult[] = [];
 
+    console.info(`Found ${testResults.length} test results`);
+    console.info(`Payload: ${JSON.stringify(testResults)}`);
+
     for (const testResult of testResults) {
         validateTestResult(testResult);
 
