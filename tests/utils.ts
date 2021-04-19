@@ -43,7 +43,7 @@ export const exampleContext = (): Context => {
         functionName: "test",
         functionVersion: "0.0.0",
         invokedFunctionArn: "arn:aws:execute-api:eu-west-1:TEST",
-        memoryLimitInMB: "128",
+        memoryLimitInMB: 128,
         awsRequestId: "TEST-AWS-REQUEST-ID",
         logGroupName: "TEST-LOG-GROUP-NAME",
         logStreamName: "TEST-LOG-STREAM-NAME",
