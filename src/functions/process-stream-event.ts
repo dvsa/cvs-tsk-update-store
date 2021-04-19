@@ -1,5 +1,4 @@
-import {Context, DynamoDBStreamEvent, Handler, SQSEvent, StreamRecord} from "aws-lambda";
-import {DynamoDBRecord} from "aws-lambda/trigger/dynamodb-stream";
+import {Context, DynamoDBRecord, DynamoDBStreamEvent, Handler, SQSEvent, StreamRecord} from "aws-lambda";
 import {EventSourceArn, stringToArn} from "../services/event-source-arn";
 import {convert} from "../services/entity-conversion";
 import {DynamoDbImage} from "../services/dynamodb-images";
