@@ -11,6 +11,7 @@ describe("getSecretValue()", () => {
     });
 
     it("should fail on non-existent secret", async () => {
+        mockSecretString("MY-SECRET-KEY", "MY-SECRET-VALUE");
         await expect(getSecretValue("any")).rejects.toThrowError("does not exist");
     });
 
