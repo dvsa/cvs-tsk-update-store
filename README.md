@@ -18,6 +18,14 @@ This Lambda currently supports the following conversions:
 
 See full list of affected Aurora tables in sections below.
 
+### Relation to other services
+`cvs-tsk-update-store` was built as part of the **VOTT** project. See:
+* [Project home](https://wiki.dvsacloud.uk/display/HVT/Vehicle+Operator+Test+Transparency)
+* [Architecture diagram](https://wiki.dvsacloud.uk/pages/viewpage.action?spaceKey=HVT&title=VOTT+Architecture)
+* The following diagram:
+
+![Summary Diagram](summary-diagram.png)
+
 ### Cloning
 This project makes use of [Git submodules][git-submodules] to import [cvs-nop][cvs-nop]. Instead of the regular `git clone`, use:
 
