@@ -22,7 +22,7 @@
     "build:docker": "docker-compose -f docker-compose.yml up -d --build",
     "test": "BRANCH=local AWS_XRAY_CONTEXT_MISSING=LOG_ERROR jest --testMatch=\"**/*.unitTest.ts\" --coverage --collectCoverageFrom=src/!(models)/**/!(*conversion).{js,ts}",
     "test-i": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand",
-    "test-local-i": "USE_CONTAINERIZED_DATABASE=1 BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand",
+    "test-local-i": "jest --testMatch=\"**/*.intTest.ts\" --runInBand --coverage --collectCoverageFrom=src/!(models)/**/*conversion.{js,ts}",
     "tslint": "tslint src/**/*.ts tests/**/*.ts -q",
     "prepush": "npm test && npm run tslint",
     "sonar-scanner": "AWS_XRAY_CONTEXT_MISSING=LOG_ERROR BRANCH=local npm run tslint && AWS_XRAY_CONTEXT_MISSING=LOG_ERROR npm run coverage && sonar-scanner",
