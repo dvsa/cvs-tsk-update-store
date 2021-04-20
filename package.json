@@ -24,6 +24,7 @@
     "test-i": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/*conversion.{js,ts}\"",
     "test-local-i": "jest --testMatch=\"**/*.intTest.ts\" --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/*conversion.{js,ts}\"",
     "tslint": "tslint src/**/*.ts tests/**/*.ts -q",
+    "prettier": "prettier --write ./**/*.{js,ts}",
     "prepush": "npm test && npm run tslint",
     "sonar-scanner": "AWS_XRAY_CONTEXT_MISSING=LOG_ERROR BRANCH=local npm run tslint && AWS_XRAY_CONTEXT_MISSING=LOG_ERROR npm run coverage && sonar-scanner",
     "coverage": "BRANCH=local SLS_DEBUG=* jest --testMatch=\"**/*.*Test.ts\" --coverage --collectCoverageFrom=\"src/!(models)/**/!(*conversion).{js,ts}\"",
@@ -58,10 +59,12 @@
     "aws-lambda": "0.1.2",
     "aws-sdk": "2.562.0",
     "aws-xray-sdk": "2.4.0",
+    "commitlint": "12.1.1",
     "liquibase": "1.0.1",
     "moment": "2.24.0",
     "mysql2": "2.2.5",
     "node-yaml": "3.2.0",
+    "prettier": "2.2.1",
     "reflect-metadata": "0.1.13",
     "request": "2.88.0",
     "request-promise": "4.2.4",
@@ -107,7 +110,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run prepush && npm run security-checks"
+      "pre-commit": "npm run prettier && npm run prepush && npm run security-checks",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   }
 }

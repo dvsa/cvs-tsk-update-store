@@ -1,4 +1,4 @@
 .npmrc
 cvs-nop/
 src/services/secrets-manager.ts
-src/services/secrets-manager.unitTest.ts
+tests/unit/services/secrets-manager.unitTest.ts
