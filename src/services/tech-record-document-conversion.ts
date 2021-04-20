@@ -20,6 +20,7 @@ import {TechRecordUpsertResult} from "../models/upsert-results";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
 import {EntityConverter} from "./entity-conversion";
+import {debugLog} from "./logger";
 
 export const techRecordDocumentConverter = (): EntityConverter<TechRecordDocument> => {
     return {
@@ -30,6 +31,8 @@ export const techRecordDocumentConverter = (): EntityConverter<TechRecordDocumen
 };
 
 const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promise<TechRecordUpsertResult[]> => {
+    debugLog(`upsertTechRecords: START`);
+
     const pool = await getConnectionPool();
 
     let vehicleId;
@@ -55,11 +58,15 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
         return [];
     }
 
+    debugLog(`upsertTechRecords: ${techRecords.length} tech records to upsert`);
+
     for (const techRecord of techRecords) {
         const techRecordConnection = await pool.getConnection();
 
         try {
             await techRecordConnection.beginTransaction();
+
+            debugLog(`upsertTechRecords: Upserting tech record...`);
 
             const makeModelId = await upsertMakeModel(techRecordConnection, techRecord);
             const vehicleClassId = await upsertVehicleClass(techRecordConnection, techRecord);
@@ -161,6 +168,8 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
 
             const techRecordId = response.rows.insertId;
 
+            debugLog(`upsertTechRecords: Upserted tech record (ID: ${techRecordId})`);
+
             const psvBrakesId = await upsertPsvBrakes(techRecordConnection, techRecordId, techRecord);
             const axleSpacingIds = await upsertAxleSpacings(techRecordConnection, techRecordId, techRecord);
             const microfilmId = await upsertMicrofilm(techRecordConnection, techRecordId, techRecord);
@@ -191,6 +200,8 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
         }
     }
 
+    debugLog(`upsertTechRecords: END`);
+
     return upsertResults;
 };
 
@@ -199,6 +210,8 @@ const deleteTechRecords = async (techRecordDocument: TechRecordDocument): Promis
 };
 
 const upsertVehicle = async (connection: Connection, techRecordDocument: TechRecordDocument): Promise<number> => {
+    debugLog(`upsertTechRecords: Upserting vehicle...`);
+
     const response = await executePartialUpsert(
         VEHICLE_TABLE,
         [
@@ -211,10 +224,14 @@ const upsertVehicle = async (connection: Connection, techRecordDocument: TechRec
         connection
     );
 
+    debugLog(`upsertTechRecords: Upserted vehicle (ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertMakeModel = async (connection: Connection, techRecord: TechRecord): Promise<number> => {
+    debugLog(`upsertTechRecords: Upserting make-model...`);
+
     const response = await executePartialUpsert(
         MAKE_MODEL_TABLE,
         [
@@ -233,10 +250,14 @@ const upsertMakeModel = async (connection: Connection, techRecord: TechRecord): 
         connection
     );
 
+    debugLog(`upsertTechRecords: Upserted make-model (ID ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertVehicleClass = async (connection: Connection, techRecord: TechRecord): Promise<number> => {
+    debugLog(`upsertTechRecords: Upserting vehicle class...`);
+
     const response = await executePartialUpsert(
         VEHICLE_CLASS_TABLE,
         [
@@ -250,15 +271,22 @@ const upsertVehicleClass = async (connection: Connection, techRecord: TechRecord
         connection
     );
 
+    debugLog(`upsertTechRecords: Upserted vehicle class (ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: number, techRecord: TechRecord): Promise<number[]> => {
+    debugLog(`upsertTechRecords: Upserting vehicle subclasses...`);
+
     if (!techRecord.vehicleSubclass) {
+        debugLog(`upsertTechRecords: no vehicle subclasses present`);
         return [];
     }
 
     const insertedIds: number[] = [];
+
+    debugLog(`upsertTechRecords: ${techRecord.vehicleSubclass.length} vehicle subclasses to upsert`);
 
     for (const vehicleSubclass of techRecord.vehicleSubclass) {
         const response = await executePartialUpsert(
@@ -269,6 +297,9 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
             ],
             connection
         );
+
+        debugLog(`upsertTechRecords: Upserted vehicle subclass (ID: ${response.rows.insertId}`);
+
         insertedIds.push(response.rows.insertId);
     }
 
@@ -276,6 +307,8 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
 };
 
 const upsertIdentity = async (connection: Connection, id: string, name: string): Promise<number> => {
+    debugLog(`upsertTechRecords: Upserting identity (${id} ---> ${name})...`);
+
     const response = await executePartialUpsert(
         IDENTITY_TABLE,
         [
@@ -284,10 +317,15 @@ const upsertIdentity = async (connection: Connection, id: string, name: string):
         ],
         connection
     );
+
+    debugLog(`upsertTechRecords: Upserted identity  (ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertContactDetails = async (connection: Connection, techRecord: TechRecord): Promise<number> => {
+    debugLog(`upsertTechRecords: Upserting contact details...`);
+
     const response = await executePartialUpsert(
         CONTACT_DETAILS_TABLE,
         [
@@ -304,10 +342,14 @@ const upsertContactDetails = async (connection: Connection, techRecord: TechReco
         connection
     );
 
+    debugLog(`upsertTechRecords: Upserted contact details (ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertPsvBrakes = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<number> => {
+    debugLog(`upsertTechRecords: Upserting PSV brakes (tech-record-id: ${techRecordId})...`);
+
     const response = await executeFullUpsert(
         PSV_BRAKES_TABLE,
         [
@@ -329,15 +371,22 @@ const upsertPsvBrakes = async (connection: Connection, techRecordId: string, tec
         connection
     );
 
+    debugLog(`upsertTechRecords: Upserted PSV brakes (tech-record-id: ${techRecordId}, ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertAxleSpacings = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<number[]> => {
+    debugLog(`upsertTechRecords: Upserting axle spacings (tech-record-id: ${techRecordId})...`);
+
     if (!techRecord.dimensions?.axleSpacing) {
+        debugLog(`upsertTechRecords: no axle spacings present`);
         return [];
     }
 
     const insertedIds: number[] = [];
+
+    debugLog(`upsertTechRecords: ${techRecord.dimensions.axleSpacing.length} axle spacings to upsert`);
 
     for (const axleSpacing of techRecord.dimensions.axleSpacing) {
         const response = await executeFullUpsert(
@@ -349,6 +398,9 @@ const upsertAxleSpacings = async (connection: Connection, techRecordId: string, 
             ],
             connection
         );
+
+        debugLog(`upsertTechRecords: Upserted axle spacing (tech-record-id: ${techRecordId}, ID: ${response.rows.insertId})`);
+
         insertedIds.push(response.rows.insertId);
     }
 
@@ -356,6 +408,8 @@ const upsertAxleSpacings = async (connection: Connection, techRecordId: string, 
 };
 
 const upsertMicrofilm = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<number> => {
+    debugLog(`upsertTechRecords: Upserting microfilm (tech-record-id: ${techRecordId})...`);
+
     const response = await executeFullUpsert(
         MICROFILM_TABLE,
         [
@@ -367,15 +421,22 @@ const upsertMicrofilm = async (connection: Connection, techRecordId: string, tec
         connection
     );
 
+    debugLog(`upsertTechRecords: Upserted microfilm (tech-record-id: ${techRecordId}, ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertPlates = async (connection: Connection, techRecordId: any, techRecord: TechRecord): Promise<number[]> => {
+    debugLog(`upsertTechRecords: Upserting plates (tech-record-id: ${techRecordId})...`);
+
     if (!techRecord.plates) {
+        debugLog(`upsertTechRecords: no plates present`);
         return [];
     }
 
     const insertedIds: number[] = [];
+
+    debugLog(`upsertTechRecords: ${techRecord.plates.length} plates to upsert`);
 
     for (const plate of techRecord.plates) {
         const response = await executeFullUpsert(
@@ -389,6 +450,9 @@ const upsertPlates = async (connection: Connection, techRecordId: any, techRecor
             ],
             connection
         );
+
+        debugLog(`upsertTechRecords: Upserted plate (tech-record-id: ${techRecordId}, ID: ${response.rows.insertId})`);
+
         insertedIds.push(response.rows.insertId);
     }
 
@@ -396,7 +460,10 @@ const upsertPlates = async (connection: Connection, techRecordId: any, techRecor
 };
 
 const upsertAxles = async (connection: Connection, techRecordId: any, techRecord: TechRecord): Promise<number[]> => {
+    debugLog(`upsertTechRecords: Upserting axles (tech-record-id: ${techRecordId})...`);
+
     if (!techRecord.axles) {
+        debugLog(`upsertTechRecords: no axles present`);
         return [];
     }
 
@@ -418,6 +485,8 @@ const upsertAxles = async (connection: Connection, techRecordId: any, techRecord
 
         const tyreId = tyreUpsertResponse.rows.insertId;
 
+        debugLog(`upsertTechRecords: Upserted axle tyre (tech-record-id: ${techRecordId}, ID: ${tyreId})`);
+
         const axleUpsertResponse = await executeFullUpsert(
             AXLES_TABLE,
             [
@@ -436,6 +505,9 @@ const upsertAxles = async (connection: Connection, techRecordId: any, techRecord
             ],
             connection
         );
+
+        debugLog(`upsertTechRecords: Upserted axle (tech-record-id: ${techRecordId}, ID: ${axleUpsertResponse.rows.insertId})`);
+
         insertedIds.push(axleUpsertResponse.rows.insertId);
     }
 

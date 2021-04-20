@@ -18,6 +18,14 @@ This Lambda currently supports the following conversions:
 
 See full list of affected Aurora tables in sections below.
 
+### Relation to other services
+`cvs-tsk-update-store` was built as part of the **VOTT** project. See:
+* [Project home](https://wiki.dvsacloud.uk/display/HVT/Vehicle+Operator+Test+Transparency)
+* [Architecture diagram](https://wiki.dvsacloud.uk/pages/viewpage.action?spaceKey=HVT&title=VOTT+Architecture)
+* The following diagram:
+
+![Summary Diagram](summary-diagram.png)
+
 ### Cloning
 This project makes use of [Git submodules][git-submodules] to import [cvs-nop][cvs-nop]. Instead of the regular `git clone`, use:
 
@@ -38,6 +46,13 @@ cd cvs-nop
 git checkout feature/CVSB-XXXXX
 git pull
 ```
+
+### Debugging
+`cvs-tsk-update-store` is **quiet by default**. It will log almost nothing to CloudWatch unless an error occurs.
+
+To change this, set the environment variable `DEBUG` to any non-null value, e.g. `DEBUG=1`.
+
+This will cause numerous debug logs to fire. Messages will include event information, SQL, template variables, procedure entries and exits and more.
 
 ### Tests
 ```shell

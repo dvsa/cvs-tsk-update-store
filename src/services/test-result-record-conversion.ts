@@ -21,6 +21,7 @@ import {TestResultUpsertResult} from "../models/upsert-results";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
 import {EntityConverter} from "./entity-conversion";
+import {debugLog} from "./logger";
 
 export const testResultsConverter = (): EntityConverter<TestResults> => {
     return {
@@ -31,6 +32,8 @@ export const testResultsConverter = (): EntityConverter<TestResults> => {
 };
 
 const upsertTestResults = async (testResults: TestResults): Promise<TestResultUpsertResult[]> => {
+    debugLog(`upsertTestResults: START`);
+
     if (!testResults) {
         return [];
     }
@@ -38,6 +41,8 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
     const pool = await getConnectionPool();
 
     const upsertResults: TestResultUpsertResult[] = [];
+
+    debugLog(`Upserting ${testResults.length} test results`);
 
     for (const testResult of testResults) {
         validateTestResult(testResult);
@@ -73,6 +78,8 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
             for (const testType of testResult.testTypes!) {
                 const fuelEmissionId = await upsertFuelEmission(testResultConnection, testType);
                 const testTypeId = await upsertTestType(testResultConnection, testType);
+
+                debugLog(`upsertTestResults: Upserting test result...`);
 
                 const response = await executePartialUpsert(
                     TEST_RESULT_TABLE,
@@ -122,6 +129,8 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
 
                 const testResultId = response.rows.insertId;
 
+                debugLog(`upsertTestResults: Upserted test result (ID: ${testResultId})`);
+
                 const defectIds = await upsertDefects(testResultConnection, testResultId, testType);
                 const customDefectIds = await upsertCustomDefects(testResultConnection, testResultId, testType);
 
@@ -144,10 +153,12 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
                 });
             }
         } catch (err) {
-            testResultConnection.rollback();
+            await testResultConnection.rollback();
             throw err;
         }
     }
+
+    debugLog(`upsertTestResults: END`);
 
     return upsertResults;
 };
@@ -157,6 +168,8 @@ const deleteTestResults = async (testResult: TestResults): Promise<void> => {
 };
 
 const upsertVehicle = async (connection: Connection, testResult: TestResult): Promise<number> => {
+    debugLog(`upsertTestResults: Upserting vehicle...`);
+
     const response = await executePartialUpsert(
         VEHICLE_TABLE,
         [
@@ -168,10 +181,15 @@ const upsertVehicle = async (connection: Connection, testResult: TestResult): Pr
         ],
         connection
     );
+
+    debugLog(`upsertTestResults: Upserted vehicle (ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertTestStation = async (connection: Connection, testResult: TestResult): Promise<number> => {
+    debugLog(`upsertTestResults: Upserting test station...`);
+
     const response = await executePartialUpsert(
         TEST_STATION_TABLE,
         [
@@ -181,10 +199,15 @@ const upsertTestStation = async (connection: Connection, testResult: TestResult)
         ],
         connection
     );
+
+    debugLog(`upsertTestResults: Upserted test station (ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertTester = async (connection: Connection, testResult: TestResult): Promise<number> => {
+    debugLog(`upsertTestResults: Upserting tester...`);
+
     const response = await executePartialUpsert(
         TESTER_TABLE,
         [
@@ -194,10 +217,15 @@ const upsertTester = async (connection: Connection, testResult: TestResult): Pro
         ],
         connection
     );
+
+    debugLog(`upsertTestResults: Upserted tester (ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertVehicleClass = async (connection: Connection, testResult: TestResult): Promise<number> => {
+    debugLog(`upsertTestResults: Upserting vehicle class...`);
+
     const response = await executePartialUpsert(
         VEHICLE_CLASS_TABLE,
         [
@@ -210,11 +238,17 @@ const upsertVehicleClass = async (connection: Connection, testResult: TestResult
         ],
         connection
     );
+
+    debugLog(`upsertTestResults: Upserted vehicle class (ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: number, testResult: TestResult): Promise<number[]> => {
+    debugLog(`upsertTestResults: Upserting vehicle subclasses...`);
+
     if (!testResult.vehicleSubclass) {
+        debugLog(`upsertTestResults: no vehicle subclasses present`);
         return [];
     }
 
@@ -229,6 +263,9 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
             ],
             connection
         );
+
+        debugLog(`upsertTestResults: Upserted vehicle subclass (ID: ${response.rows.insertId})`);
+
         insertedIds.push(response.rows.insertId);
     }
 
@@ -236,20 +273,27 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
 };
 
 const upsertFuelEmission = async (connection: Connection, testType: TestType): Promise<number> => {
+    debugLog(`upsertTestResults: Upserting fuel emission...`);
+
     const response = await executePartialUpsert(
         FUEL_EMISSION_TABLE,
         [
-            testType.modType!.code,
-            testType.modType!.description,
+            testType.modType?.code,
+            testType.modType?.description,
             testType.emissionStandard,
             testType.fuelType,
         ],
         connection
     );
+
+    debugLog(`upsertTestResults: Upserted fuel emission (ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertTestType = async (connection: Connection, testType: TestType): Promise<number> => {
+    debugLog(`upsertTestResults: Upserting test type...`);
+
     const response = await executePartialUpsert(
         TEST_TYPE_TABLE,
         [
@@ -258,10 +302,15 @@ const upsertTestType = async (connection: Connection, testType: TestType): Promi
         ],
         connection
     );
+
+    debugLog(`upsertTestResults: Upserted test type (ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertPreparer = async (connection: Connection, testResult: TestResult): Promise<number> => {
+    debugLog(`upsertTestResults: Upserting preparer...`);
+
     const response = await executePartialUpsert(
         PREPARER_TABLE,
         [
@@ -270,10 +319,15 @@ const upsertPreparer = async (connection: Connection, testResult: TestResult): P
         ],
         connection
     );
+
+    debugLog(`upsertTestResults: Upserted preparer (ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
 const upsertIdentity = async (connection: Connection, id: string, name: string): Promise<number> => {
+    debugLog(`upsertTestResults: Upserting identity (${id} ---> ${name})...`);
+
     const response = await executePartialUpsert(
         IDENTITY_TABLE,
         [
@@ -282,6 +336,9 @@ const upsertIdentity = async (connection: Connection, id: string, name: string):
         ],
         connection
     );
+
+    debugLog(`upsertTestResults: Upserted identity (ID: ${response.rows.insertId})`);
+
     return response.rows.insertId;
 };
 
@@ -293,6 +350,8 @@ const upsertDefects = async (connection: Connection, testResultId: number, testT
     const insertedIds: number[] = [];
 
     for (const defect of testType.defects) {
+        debugLog(`upsertTestResults: Upserting defect...`);
+
         const insertDefectResponse = await executePartialUpsert(
             DEFECTS_TABLE,
             [
@@ -311,6 +370,9 @@ const upsertDefects = async (connection: Connection, testResultId: number, testT
         );
 
         const defectId = insertDefectResponse.rows.insertId;
+
+        debugLog(`upsertTestResults: Upserted defect (defect ID: ${defectId})`);
+
         insertedIds.push(defectId);
 
         const insertLocationResponse = await executePartialUpsert(
@@ -329,6 +391,8 @@ const upsertDefects = async (connection: Connection, testResultId: number, testT
 
         const locationId = insertLocationResponse.rows.insertId;
 
+        debugLog(`upsertTestResults: Upserted defect location (location ID: ${locationId})`);
+
         await executePartialUpsert(
             TEST_DEFECT_TABLE,
             [
@@ -341,6 +405,8 @@ const upsertDefects = async (connection: Connection, testResultId: number, testT
             ],
             connection
         );
+
+        debugLog(`upsertTestResults: Upserted defect test-defect mapping`);
     }
 
     return insertedIds;
@@ -354,6 +420,8 @@ const upsertCustomDefects = async (connection: Connection, testResultId: number,
     const insertedIds: number[] = [];
 
     for (const customDefect of testType.customDefects) {
+        debugLog(`upsertTestResults: Upserting custom defect...`);
+
         const response = await executePartialUpsert(
             CUSTOM_DEFECT_TABLE,
             [
@@ -364,6 +432,9 @@ const upsertCustomDefects = async (connection: Connection, testResultId: number,
             ],
             connection
         );
+
+        debugLog(`upsertTestResults: Upserted custom defect (ID: ${response.rows.insertId})`);
+
         insertedIds.push(response.rows.insertId);
     }
 

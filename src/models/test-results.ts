@@ -2,6 +2,7 @@ import {parseVehicleClass, VehicleClass} from "./vehicle-class";
 import {parseTestTypes, TestTypes} from "./test-types";
 import {EuVehicleCategory, VehicleConfiguration, VehicleSize, VehicleType} from "./shared-enums";
 import {DynamoDbImage, parseStringArray} from "../services/dynamodb-images";
+import {debugLog} from "../services/logger";
 
 export type TestVersion = "current" | "archived";
 
@@ -61,14 +62,25 @@ export interface TestResult {
 }
 
 export const parseTestResults = (image?: DynamoDbImage): TestResults => {
+    debugLog("Parsing test results...");
+    debugLog("Expect exactly 2 calls to parseTestResults: root, and recursive call for nested field 'testHistory'");
+
     if (!image) {
+        debugLog("image is null or undefined, no test results / test history to process");
         return [] as TestResults;
     }
 
     const testResultsImage = image.getList("testResults");
 
     if (!testResultsImage) {
-        return [] as TestResults;
+        debugLog("image.testResults is null or undefined: attempting to parse image as single, unwrapped test result instead");
+
+        if (!image.getString("systemNumber")) {
+            debugLog("image missing required field 'systemNumber': this is not a test result, no test results to process");
+            return [] as TestResults;
+        }
+
+        return [ parseTestResult(image) ];
     }
 
     const testResults: TestResults = [];
