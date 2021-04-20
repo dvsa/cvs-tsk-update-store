@@ -110,8 +110,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run prettier && npm run prepush && npm run security-checks",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+      "pre-commit": "npm run prettier && npm run prepush && npm run security-checks"
     }
   }
 }
