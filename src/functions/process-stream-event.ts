@@ -4,6 +4,7 @@ import {convert} from "../services/entity-conversion";
 import {DynamoDbImage} from "../services/dynamodb-images";
 import {deriveSqlOperation, SqlOperation} from "../services/sql-operations";
 import {destroyConnectionPool} from "../services/connection-pool";
+import {debugLog} from "../services/logger";
 
 /**
  * λ function: convert a DynamoDB document to Aurora RDS rows
@@ -12,27 +13,27 @@ import {destroyConnectionPool} from "../services/connection-pool";
  */
 export const processStreamEvent: Handler = async (event: SQSEvent, context: Context): Promise<any> => {
     try {
-        console.info("Received SQS event: ", event);
+        debugLog("Received SQS event: ", event);
 
         validateEvent(event);
 
         const upsertResults: any[] = [];
 
-        console.info(`Received valid SQS event (${event.Records.length} records)`);
+        debugLog(`Received valid SQS event (${event.Records.length} records)`);
 
         for await (const record of event.Records) {
             const dynamoRecord: DynamoDBRecord = JSON.parse(record.body) as DynamoDBRecord;
 
-            console.info("Original DynamoDB stream event body (parsed): ", dynamoRecord);
+            debugLog("Original DynamoDB stream event body (parsed): ", dynamoRecord);
 
             validateRecord(dynamoRecord);
 
             // parse source ARN
             const eventSourceArn: EventSourceArn = stringToArn(dynamoRecord.eventSourceARN!);
 
-            console.info(`source ARN region:     '${eventSourceArn.region}'`);
-            console.info(`source ARN account ID: '${eventSourceArn.accountId}'`);
-            console.info(`source ARN timestamp:  '${eventSourceArn.timestamp}'`);
+            debugLog(`source ARN region:     '${eventSourceArn.region}'`);
+            debugLog(`source ARN account ID: '${eventSourceArn.accountId}'`);
+            debugLog(`source ARN timestamp:  '${eventSourceArn.timestamp}'`);
 
             // is this an INSERT, UPDATE, or DELETE?
             const operationType: SqlOperation = deriveSqlOperation(dynamoRecord.eventName!);
@@ -40,15 +41,15 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
             // parse native DynamoDB format to usable TS map
             const image: DynamoDbImage = selectImage(operationType, dynamoRecord.dynamodb!);
 
-            console.info("Dynamo image dump:", image);
+            debugLog("Dynamo image dump:", image);
 
             try {
-                console.info(`DynamoDB ---> Aurora | START (event ID: ${dynamoRecord.eventID})`);
+                debugLog(`DynamoDB ---> Aurora | START (event ID: ${dynamoRecord.eventID})`);
 
                 const upsertResult = await convert(eventSourceArn.table, operationType, image);
                 upsertResults.push(upsertResult);
 
-                console.info(`DynamoDB ---> Aurora | END   (event ID: ${dynamoRecord.eventID})`);
+                debugLog(`DynamoDB ---> Aurora | END   (event ID: ${dynamoRecord.eventID})`);
             } catch (err) {
                 console.error("Couldn't convert DynamoDB entity to Aurora", err);
                 dumpArguments(event, context);
@@ -72,13 +73,13 @@ const selectImage = (operationType: SqlOperation, streamRecord: StreamRecord): D
             if (!streamRecord.NewImage) {
                 throw new Error("'dynamodb' object missing required field 'NewImage'");
             }
-            console.info(`operation type '${operationType}', selecting image 'NewImage'`);
+            debugLog(`operation type '${operationType}', selecting image 'NewImage'`);
             return DynamoDbImage.parse(streamRecord.NewImage!);
         case "DELETE":
             if (!streamRecord.OldImage) {
                 throw new Error("'dynamodb' object missing required field 'OldImage'");
             }
-            console.info(`operation type '${operationType}', selecting image 'OldImage'`);
+            debugLog(`operation type '${operationType}', selecting image 'OldImage'`);
             return DynamoDbImage.parse(streamRecord.OldImage!);
     }
 };

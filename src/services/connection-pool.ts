@@ -2,6 +2,7 @@ import * as mysql2 from "mysql2/promise";
 import {Connection, FieldPacket, Pool} from "mysql2/promise";
 import {Maybe} from "../models/optionals";
 import {getConnectionPoolOptions} from "./connection-pool-options";
+import {debugLog} from "./logger";
 
 export interface QueryResponse {
     rows?: any;
@@ -13,27 +14,27 @@ let pool: Maybe<Pool>;
 
 export const getConnectionPool = async (): Promise<Pool> => {
     if (!pool) {
-        console.info("getConnectionPool: Creating connection pool...");
+        debugLog("getConnectionPool: Creating connection pool...");
 
         const config = await getConnectionPoolOptions();
 
-        console.info(`getConnectionPool: Destination DB ${config.database}`);
+        debugLog(`getConnectionPool: Destination DB ${config.database}`);
 
         pool = mysql2.createPool(config);
 
-        console.info("getConnectionPool: Connection pool created");
+        debugLog("getConnectionPool: Connection pool created");
     }
     return pool;
 };
 
 export const destroyConnectionPool = async (): Promise<void> => {
-    console.info("destroyConnectionPool: Destroying connection pool...");
+    debugLog("destroyConnectionPool: Destroying connection pool...");
     if (pool) {
         await pool.end();
         pool = undefined;
-        console.info(`destroyConnectionPool: connection pool destroyed`);
+        debugLog(`destroyConnectionPool: connection pool destroyed`);
     } else {
-        console.info(`destroyConnectionPool: nothing to do`);
+        debugLog(`destroyConnectionPool: nothing to do`);
     }
 };
 
@@ -42,8 +43,8 @@ export const executeSql = async (sql: string, templateVariables?: any[], connect
         templateVariables = undefinedToNull(templateVariables);
     }
 
-    console.info(`Executing SQL: ${sql}`);
-    console.info(`Template vars: ${templateVariables === undefined ? "[]" : templateVariables}`);
+    debugLog(`Executing SQL: ${sql}`);
+    debugLog(`Template vars: ${templateVariables === undefined ? "[]" : templateVariables}`);
 
     if (connection) {
         const [rows, fields] = await connection.execute(sql, templateVariables);

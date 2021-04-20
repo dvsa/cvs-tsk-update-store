@@ -3,6 +3,7 @@ import {techRecordDocumentConverter} from "./tech-record-document-conversion";
 import {testResultsConverter} from "./test-result-record-conversion";
 import {SqlOperation} from "./sql-operations";
 import {Maybe} from "../models/optionals";
+import {debugLog} from "./logger";
 
 export interface EntityConverter<T> {
     parseRootImage: (image: DynamoDbImage) => T;
@@ -23,21 +24,21 @@ entityConverters.set("test-results", testResultsConverter());
  * @param image DynamoDB document snapshot
  */
 export const convert = async <T> (tableName: string, sqlOperation: SqlOperation, image: DynamoDbImage): Promise<any> => {
-    console.info(`source table name: '${tableName}'`);
+    debugLog(`source table name: '${tableName}'`);
 
     const converter = getEntityConverter(tableName);
 
-    console.info("valid converter found");
+    debugLog("valid converter found");
 
     const entity: T = converter.parseRootImage(image) as T;
 
     switch (sqlOperation) {
         case "INSERT":
         case "UPDATE":
-            console.info(`Upserting entity...`);
+            debugLog(`Upserting entity...`);
             return converter.upsertEntity(entity);
         case "DELETE":
-            console.info(`Deleting entity...`);
+            debugLog(`Deleting entity...`);
             return converter.deleteEntity(entity);
     }
 };
@@ -49,7 +50,7 @@ const getEntityConverter = <T> (tableName: string): EntityConverter<T> => {
         tableName = "test-results";
     }
 
-    console.info(`converter key:     '${tableName}'`);
+    debugLog(`converter key:     '${tableName}'`);
 
     const entityConverter: Maybe<EntityConverter<T>> = entityConverters.get(tableName);
 

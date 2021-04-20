@@ -1,4 +1,5 @@
 import {SecretsManager} from "aws-sdk";
+import {debugLog} from "./logger";
 
 export const getSecretValue = async (secretName: string): Promise<string> => {
     // This constructor is inside the function for testability (Jest hoisting is a pain).
@@ -6,7 +7,7 @@ export const getSecretValue = async (secretName: string): Promise<string> => {
     // Please refactor if the above is ever not the case :)
     const secretsManager: SecretsManager = new SecretsManager();
 
-    console.info(`Fetching secret '${secretName}' from AWS Secrets Manager`);
+    debugLog(`Fetching secret '${secretName}' from AWS Secrets Manager`);
 
     const secretValue = await secretsManager.getSecretValue({ SecretId: secretName }).promise();
 

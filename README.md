@@ -47,6 +47,13 @@ git checkout feature/CVSB-XXXXX
 git pull
 ```
 
+### Debugging
+`cvs-tsk-update-store` is **quiet by default**. It will log almost nothing to CloudWatch unless an error occurs.
+
+To change this, set the environment variable `DEBUG` to any non-null value, e.g. `DEBUG=1`.
+
+This will cause numerous debug logs to fire. Messages will include event information, SQL, template variables, procedure entries and exits and more.
+
 ### Tests
 ```shell
 npm run test
