@@ -1,0 +1,38 @@
+{
+  "ParentMapField": {
+    "M": {
+      "ListField": {
+        "L": [
+          {
+            "S": "Hello"
+          },
+          {
+            "M": {
+              "StringField": {
+                "S": "Hello"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ParentListField": {
+    "L": [
+      {
+        "M": {
+          "StringField": {
+            "S": "Hello"
+          },
+          "ListField": {
+            "L": [
+              {
+                "S": "Hello"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,351 @@
+{
+  "testResults": {
+    "L": [
+      {
+        "M": {
+          "systemNumber": {
+            "S": "SYSTEM-NUMBER"
+          },
+          "vrm": {
+            "S": "VRM"
+          },
+          "trailerId": {
+            "S": "88888888"
+          },
+          "vin": {
+            "S": "VIN"
+          },
+          "vehicleId": {
+            "S": "VEHICLE-ID"
+          },
+          "testHistory": {
+            "L": []
+          },
+          "testVersion": {
+            "S": "TEST-VERSION"
+          },
+          "reasonForCreation": {
+            "S": "REASON-FOR-CREATION"
+          },
+          "createdAt": {
+            "S": "2020-01-01T00:00:00.000"
+          },
+          "createdByName": {
+            "S": "CREATED-BY-NAME"
+          },
+          "createdById": {
+            "S": "CREATED-BY-ID"
+          },
+          "lastUpdatedAt": {
+            "S": "2020-01-01T00:00:00.000"
+          },
+          "lastUpdatedByName": {
+            "S": "LAST-UPDATED-BY-NAME"
+          },
+          "lastUpdatedById": {
+            "S": "LAST-UPDATED-BY-ID"
+          },
+          "shouldEmailCertificate": {
+            "S": "SHOULD-EMAIL-CERTIFICATE"
+          },
+          "testStationName": {
+            "S": "TEST-STATION-NAME"
+          },
+          "testStationPNumber": {
+            "S": "P-NUMBER"
+          },
+          "testStationType": {
+            "S": "atf"
+          },
+          "testerName": {
+            "S": "TESTER-NAME"
+          },
+          "testerStaffId": {
+            "S": "999999999"
+          },
+          "testResultId": {
+            "S": "TEST-RESULT-ID"
+          },
+          "testerEmailAddress": {
+            "S": "TESTER-EMAIL-ADDRESS"
+          },
+          "testStartTimestamp": {
+            "S": "2020-01-01T00:00:00.000"
+          },
+          "testEndTimestamp": {
+            "S": "2020-01-01T00:00:00.000"
+          },
+          "testStatus": {
+            "S": "submitted"
+          },
+          "reasonForCancellation": {
+            "S": "REASON-FOR-CANCELLATION"
+          },
+          "vehicleClass": {
+            "M": {
+              "code": {
+                "S": "2"
+              },
+              "description": {
+                "S": "motorbikes over 200cc or with a sidecar"
+              }
+            }
+          },
+          "vehicleSubclass": {
+            "L": [
+              {
+                "S": "1"
+              }
+            ]
+          },
+          "vehicleType": {
+            "S": "psv"
+          },
+          "numberOfSeats": {
+            "N": "1"
+          },
+          "vehicleConfiguration": {
+            "S": "rigid"
+          },
+          "odometerReading": {
+            "N": "1"
+          },
+          "odometerReadingUnits": {
+            "S": "KILOMETRES"
+          },
+          "preparerId": {
+            "S": "999999999"
+          },
+          "preparerName": {
+            "S": "PREPARER-NAME"
+          },
+          "numberOfWheelsDriven": {
+            "N": "1"
+          },
+          "euVehicleCategory": {
+            "S": "m1"
+          },
+          "countryOfRegistration": {
+            "S": "COUNTRY-OF-REGISTRATION"
+          },
+          "vehicleSize": {
+            "S": "large"
+          },
+          "noOfAxles": {
+            "N": "1"
+          },
+          "regnDate": {
+            "S": "2020-01-01"
+          },
+          "firstUseDate": {
+            "S": "2020-01-01"
+          },
+          "testTypes": {
+            "L": [
+              {
+                "M": {
+                  "createdAt": {
+                    "S": "2020-01-01T00:00:00.000"
+                  },
+                  "lastUpdatedAt": {
+                    "S": "2020-01-01T00:00:00.000"
+                  },
+                  "deletionFlag": {
+                    "BOOL": true
+                  },
+                  "testCode": {
+                    "S": "333"
+                  },
+                  "testTypeClassification": {
+                    "S": "2323232323232323232323"
+                  },
+                  "testTypeName": {
+                    "S": "TEST-TYPE-NAME"
+                  },
+                  "name": {
+                    "S": "NAME"
+                  },
+                  "testTypeId": {
+                    "S": "TEST-TYPE-ID"
+                  },
+                  "testNumber": {
+                    "S": "TEST-NUMBER"
+                  },
+                  "certificateNumber": {
+                    "S": "999999999"
+                  },
+                  "secondaryCertificateNumber": {
+                    "S": "999999999"
+                  },
+                  "certificateLink": {
+                    "S": "CERTIFICATE-LINK"
+                  },
+                  "testExpiryDate": {
+                    "S": "2020-01-01T00:00:00.000"
+                  },
+                  "testAnniversaryDate": {
+                    "S": "2020-01-01T00:00:00.000"
+                  },
+                  "testTypeStartTimestamp": {
+                    "S": "2020-01-01T00:00:00.000"
+                  },
+                  "testTypeEndTimestamp": {
+                    "S": "2020-01-01T00:00:00.000"
+                  },
+                  "statusUpdatedFlag": {
+                    "BOOL": true
+                  },
+                  "numberOfSeatbeltsFitted": {
+                    "N": "1"
+                  },
+                  "lastSeatbeltInstallationCheckDate": {
+                    "S": "2020-01-01"
+                  },
+                  "seatbeltInstallationCheckDate": {
+                    "BOOL": true
+                  },
+                  "testResult": {
+                    "S": "fail"
+                  },
+                  "prohibitionIssued": {
+                    "BOOL": true
+                  },
+                  "reasonForAbandoning": {
+                    "S": "REASON-FOR-ABANDONING"
+                  },
+                  "additionalNotesRecorded": {
+                    "S": "ADDITIONAL-NOTES-RECORDED"
+                  },
+                  "additionalCommentsForAbandon": {
+                    "S": "ADDITIONAL-COMMENTS-FOR-ABANDON"
+                  },
+                  "modType": {
+                    "M": {
+                      "code": {
+                        "S": "p"
+                      },
+                      "description": {
+                        "S": "particulate trap"
+                      }
+                    }
+                  },
+                  "emissionStandard": {
+                    "S": "0.10 g/kWh Euro 3 PM"
+                  },
+                  "fuelType": {
+                    "S": "diesel"
+                  },
+                  "particulateTrapFitted": {
+                    "S": "PARTICULATE-TRAP-FITTED"
+                  },
+                  "particulateTrapSerialNumber": {
+                    "S": "PARTICULATE-TRAP-SERIAL-NUMBER"
+                  },
+                  "modificationTypeUsed": {
+                    "S": "MODIFICATION-TYPE-USED"
+                  },
+                  "smokeTestKLimitApplied": {
+                    "S": "SMOKE-TEST-K-LIMIT-APPLIED"
+                  },
+                  "defects": {
+                    "L": [
+                      {
+                        "M": {
+                          "imNumber": {
+                            "N": "1"
+                          },
+                          "imDescription": {
+                            "S": "IM-DESCRIPTION"
+                          },
+                          "additionalInformation": {
+                            "M": {
+                              "location": {
+                                "M": {
+                                  "vertical": {
+                                    "S": "upper"
+                                  },
+                                  "horizontal": {
+                                    "S": "inner"
+                                  },
+                                  "lateral": {
+                                    "S": "nearside"
+                                  },
+                                  "longitudinal": {
+                                    "S": "front"
+                                  },
+                                  "rowNumber": {
+                                    "N": "1"
+                                  },
+                                  "seatNumber": {
+                                    "N": "1"
+                                  },
+                                  "axleNumber": {
+                                    "N": "1"
+                                  }
+                                }
+                              },
+                              "notes": {
+                                "S": "NOTES"
+                              }
+                            }
+                          },
+                          "itemNumber": {
+                            "N": "1"
+                          },
+                          "itemDescription": {
+                            "S": "ITEM-DESCRIPTION"
+                          },
+                          "deficiencyRef": {
+                            "S": "DEFICIENCY-REF"
+                          },
+                          "deficiencyId": {
+                            "S": "a"
+                          },
+                          "deficiencySubId": {
+                            "S": "mdclxvi"
+                          },
+                          "deficiencyCategory": {
+                            "S": "advisory"
+                          },
+                          "deficiencyText": {
+                            "S": "DEFICIENCY-TEXT"
+                          },
+                          "stdForProhibition": {
+                            "BOOL": true
+                          },
+                          "prs": {
+                            "BOOL": true
+                          },
+                          "prohibitionIssued": {
+                            "BOOL": true
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "customDefects": {
+                    "L": [
+                      {
+                        "M": {
+                          "referenceNumber": {
+                            "S": "1010101010"
+                          },
+                          "defectName": {
+                            "S": "DEFECT-NAME"
+                          },
+                          "defectNotes": {
+                            "S": "DEFECT-NOTES"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
