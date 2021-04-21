@@ -2,3 +2,4 @@
 cvs-nop/
 src/services/secrets-manager.ts
 tests/unit/services/secrets-manager.unitTest.ts
+tests/resources/mysql-connector-java-8.0.23.jar
