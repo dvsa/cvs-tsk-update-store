@@ -70,7 +70,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         const vehicleResultSet = await executeSql(
             `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`
              FROM \`vehicle\`
-             WHERE \`vehicle\`.\`id\` = ${upsertResult.vehicleId}`
+             WHERE \`vehicle\`.\`vrm_trm\` = "999999999"`
         );
         expect(vehicleResultSet.rows.length).toEqual(1);
         expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER");
