@@ -68,7 +68,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         const vehicleResultSet = await executeSql(
             `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`
              FROM \`vehicle\`
-             WHERE \`vehicle\`.\`vrm_trm\` = "999999999"`
+             WHERE \`vehicle\`.\`id\` = ${upsertResult.vehicleId}`
         );
         expect(vehicleResultSet.rows.length).toEqual(1);
         expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-1");
@@ -254,7 +254,7 @@ describe("convertTechRecordDocument() integration tests", () => {
              WHERE \`technical_record\`.\`id\` = ${upsertResult.techRecordId}`
         );
         // check a few fields of different types here
-        expect((techRecordResultSet.rows[0].vehicle_id)).toEqual(1);
+        expect((techRecordResultSet.rows[0].vehicle_id)).toEqual(upsertResult.vehicleId);
         expect((techRecordResultSet.rows[0].recordCompleteness)).toEqual("88888888");
         expect((techRecordResultSet.rows[0].createdAt as Date).toUTCString()).toEqual("Wed, 01 Jan 2020 00:00:00 GMT");
         expect((techRecordResultSet.rows[0].lastUpdatedAt as Date).toUTCString()).toEqual("Wed, 01 Jan 2020 00:00:00 GMT");

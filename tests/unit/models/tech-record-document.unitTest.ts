@@ -10,7 +10,7 @@ describe("parseTechRecordDocument()", () => {
         const techRecordDocument: TechRecordDocument = parseTechRecordDocument(image);
 
         // check only first property of each root, for now
-        expect(techRecordDocument.systemNumber).toEqual("SYSTEM-NUMBER");
+        expect(techRecordDocument.systemNumber).toEqual("SYSTEM-NUMBER-1");
         expect(techRecordDocument.techRecord![0].recordCompleteness).toEqual("88888888");
         expect(techRecordDocument.techRecord![0].authIntoService?.cocIssueDate).toEqual("2020-01-01");
         expect(techRecordDocument.techRecord![0].lettersOfAuth?.letterType).toEqual("Trailer authorization");
