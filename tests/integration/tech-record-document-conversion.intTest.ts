@@ -6,7 +6,6 @@ import {getContainerizedDatabase} from "./cvsbnop-container";
 import {TechRecordUpsertResult} from "../../src/models/upsert-results";
 import {processStreamEvent} from "../../src/functions/process-stream-event";
 import {getConnectionPoolOptions} from "../../src/services/connection-pool-options";
-// import { databaseTearDown } from "./database-teardown";
 
 useLocalDb();
 
@@ -17,7 +16,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         jest.setTimeout(60_000);
 
         // see README for why this environment variable exists
-        if (process.env.USE_CONTAINERIZED_DATABASE) {
+        if (process.env.USE_CONTAINERIZED_DATABASE === "1") {
             container = await getContainerizedDatabase();
         } else {
             (getConnectionPoolOptions as jest.Mock) = jest.fn().mockResolvedValue({
@@ -32,10 +31,9 @@ describe("convertTechRecordDocument() integration tests", () => {
 
     afterAll(async () => {
         await destroyConnectionPool();
-        if (process.env.USE_CONTAINERIZED_DATABASE) {
+        if (process.env.USE_CONTAINERIZED_DATABASE === "1") {
             await container.stop();
         }
-        // await databaseTearDown();
     });
 
     it("should correctly convert a DynamoDB event into Aurora rows", async () => {
@@ -73,7 +71,7 @@ describe("convertTechRecordDocument() integration tests", () => {
              WHERE \`vehicle\`.\`vrm_trm\` = "999999999"`
         );
         expect(vehicleResultSet.rows.length).toEqual(1);
-        expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER");
+        expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-1");
         expect(vehicleResultSet.rows[0].vin).toEqual("VIN");
         expect(vehicleResultSet.rows[0].vrm_trm).toEqual("999999999");
         expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
