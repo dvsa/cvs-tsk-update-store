@@ -16,7 +16,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         jest.setTimeout(60_000);
 
         // see README for why this environment variable exists
-        if (process.env.USE_CONTAINERIZED_DATABASE) {
+        if (process.env.USE_CONTAINERIZED_DATABASE === "1") {
             container = await getContainerizedDatabase();
         } else {
             (getConnectionPoolOptions as jest.Mock) = jest.fn().mockResolvedValue({
@@ -31,7 +31,7 @@ describe("convertTechRecordDocument() integration tests", () => {
 
     afterAll(async () => {
         await destroyConnectionPool();
-        if (process.env.USE_CONTAINERIZED_DATABASE) {
+        if (process.env.USE_CONTAINERIZED_DATABASE === "1") {
             await container.stop();
         }
     });
@@ -71,7 +71,7 @@ describe("convertTechRecordDocument() integration tests", () => {
              WHERE \`vehicle\`.\`id\` = ${upsertResult.vehicleId}`
         );
         expect(vehicleResultSet.rows.length).toEqual(1);
-        expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER");
+        expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-1");
         expect(vehicleResultSet.rows[0].vin).toEqual("VIN");
         expect(vehicleResultSet.rows[0].vrm_trm).toEqual("999999999");
         expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
@@ -254,7 +254,7 @@ describe("convertTechRecordDocument() integration tests", () => {
              WHERE \`technical_record\`.\`id\` = ${upsertResult.techRecordId}`
         );
         // check a few fields of different types here
-        expect((techRecordResultSet.rows[0].vehicle_id)).toEqual(1);
+        expect((techRecordResultSet.rows[0].vehicle_id)).toEqual(upsertResult.vehicleId);
         expect((techRecordResultSet.rows[0].recordCompleteness)).toEqual("88888888");
         expect((techRecordResultSet.rows[0].createdAt as Date).toUTCString()).toEqual("Wed, 01 Jan 2020 00:00:00 GMT");
         expect((techRecordResultSet.rows[0].lastUpdatedAt as Date).toUTCString()).toEqual("Wed, 01 Jan 2020 00:00:00 GMT");
@@ -267,7 +267,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect((techRecordResultSet.rows[0].emissionsLimit)).toEqual("1");
         expect((techRecordResultSet.rows[0].departmentalVehicleMarker)).toEqual(1);
         expect((techRecordResultSet.rows[0].alterationMarker)).toEqual(1);
-        expect((techRecordResultSet.rows[0].vehicle_class_id)).toEqual(1);
+        expect((techRecordResultSet.rows[0].vehicle_class_id)).toEqual(upsertResult.vehicleClassId);
         expect((techRecordResultSet.rows[0].variantVersionNumber)).toEqual("1");
         expect((techRecordResultSet.rows[0].grossEecWeight)).toEqual(1);
         expect((techRecordResultSet.rows[0].trainEecWeight)).toEqual(1);
