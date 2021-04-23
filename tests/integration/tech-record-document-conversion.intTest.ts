@@ -267,7 +267,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect((techRecordResultSet.rows[0].emissionsLimit)).toEqual("1");
         expect((techRecordResultSet.rows[0].departmentalVehicleMarker)).toEqual(1);
         expect((techRecordResultSet.rows[0].alterationMarker)).toEqual(1);
-        expect((techRecordResultSet.rows[0].vehicle_class_id)).toEqual(1);
+        expect((techRecordResultSet.rows[0].vehicle_class_id)).toEqual(upsertResult.vehicleClassId);
         expect((techRecordResultSet.rows[0].variantVersionNumber)).toEqual("1");
         expect((techRecordResultSet.rows[0].grossEecWeight)).toEqual(1);
         expect((techRecordResultSet.rows[0].trainEecWeight)).toEqual(1);
