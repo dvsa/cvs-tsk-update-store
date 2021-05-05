@@ -1,5 +1,5 @@
 import {AttributeValue} from "aws-sdk/clients/dynamodbstreams";
-import { format, parse } from "date-fns";
+import { format, parse, parseISO } from "date-fns";
 import {Maybe} from "../models/optionals";
 
 export type DynamoDbItemType = "NULL" | "BOOL" | "S" | "N" | "B" | "M" | "L";
@@ -87,9 +87,16 @@ export class DynamoDbImage {
             key,
             "S",
             ((v: any) => {
-                const parsedDate = parse("yyyy-MM-DDThh:mm:ss.SSSSSS", v, new Date());
+                const parsedDate = parseISO(v);
+                const year = parsedDate.getUTCFullYear();
+                const month = padToTwo(parsedDate.getUTCMonth() + 1);
+                const date = padToTwo(parsedDate.getUTCDate());
+                const hours = padToTwo(parsedDate.getUTCHours());
+                const minutes = padToTwo(parsedDate.getUTCMinutes());
+                const seconds = padToTwo(parsedDate.getUTCSeconds());
+                const ms = parsedDate.getUTCMilliseconds();
 
-                return format(parsedDate, "yyyy-MM-DD hh:mm:ss.SSSSSS");
+                return `${year}-${month}-${date} ${hours}:${minutes}:${seconds}.${ms}`;
             }));
     }
 
@@ -214,6 +221,10 @@ export class DynamoDbImage {
         }
     }
 }
+
+const padToTwo = (digit: number): string => {
+    return digit > 9 ? digit.toString() : "0" + digit;
+  };
 
 const verifyType = (expectedType: DynamoDbType, field: DynamoDbField) => {
     if (expectedType !== field.type) {
