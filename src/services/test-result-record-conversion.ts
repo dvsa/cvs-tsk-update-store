@@ -60,6 +60,8 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
             console.error(err);
             await vehicleConnection.rollback();
             throw err;
+        } finally {
+            vehicleConnection.release();
         }
 
         const testResultConnection = await pool.getConnection();
@@ -155,6 +157,8 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
         } catch (err) {
             await testResultConnection.rollback();
             throw err;
+        } finally {
+            testResultConnection.release();
         }
     }
 
