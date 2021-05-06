@@ -1,5 +1,5 @@
 import {AttributeValue} from "aws-sdk/clients/dynamodbstreams";
-import { format, parse, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 import {Maybe} from "../models/optionals";
 
 export type DynamoDbItemType = "NULL" | "BOOL" | "S" | "N" | "B" | "M" | "L";
