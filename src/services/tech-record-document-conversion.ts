@@ -48,6 +48,8 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
         console.error(err);
         await vehicleConnection.rollback();
         throw err;
+    } finally {
+        vehicleConnection.release();
     }
 
     const techRecords = techRecordDocument.techRecord;
@@ -197,6 +199,8 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
             console.error(err);
             await techRecordConnection.rollback();
             throw err;
+        } finally {
+            techRecordConnection.release();
         }
     }
 
