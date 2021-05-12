@@ -30,7 +30,7 @@ export const parsePlates = (platesImage?: DynamoDbImage): Plates => {
 
         plates.push({
             plateSerialNumber: plateImage.getString("plateSerialNumber"),
-            plateIssueDate: plateImage.getString("plateIssueDate"),
+            plateIssueDate: plateImage.getDate("plateIssueDate"),
             plateReasonForIssue: plateImage.getString("plateReasonForIssue") as PlateReasonForIssue,
             plateIssuer: plateImage.getString("plateIssuer"),
             toEmailAddress: plateImage.getString("toEmailAddress")
