@@ -20,18 +20,24 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
 
         const upsertResults: any[] = [];
         const region = process.env.AWS_REGION;
+        const branch = process.env.branch;
 
         if (!region) {
             console.error("AWS_REGION envvar not available");
             return;
         }
 
+        if (!branch) {
+            console.error("BRANCH envvar not available");
+            return;
+        }
+
         debugLog(`Received valid SQS event (${event.Records.length} records)`);
         const sqsService = new SqsService({
             region,
-            queueName: "config.sqs.remote.queueName[0]",
-            s3EndpointUrl: "config.s3.remote.params.endpoint",
-            s3Bucket: "BUCKET_NAME",
+            queueName: `cvs-edh-test-results-${branch}-queue`,
+            s3EndpointUrl: `https://s3.${region}.amazonaws.com`,
+            s3Bucket: `cvs-sqs-queues-${branch}`,
           });
 
         for await (const record of event.Records) {
