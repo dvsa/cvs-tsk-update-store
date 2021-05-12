@@ -24,6 +24,16 @@ export const generateFullUpsertSql = (tableDetails: TableDetails): string => {
     );
 };
 
+/**
+ * Generate select SQL.
+ *
+ * @param tableDetails the table to generate select(md5) SQL for
+ */
+export const generateSelectSql = (tableDetails: TableDetails): string => {
+    const query = `SELECT id insertId FROM \`${tableDetails.tableName}\` WHERE fingerprint = MD5(CONCAT_WS('|', ${(nCopies(tableDetails.columnNames.length, "IFNULL(?, '')").join(", "))}))`;
+    return query;
+};
+
 const generateUpsertSql = (tableDetails: TableDetails, updatePlaceholders: string[]): string => {
     return `INSERT INTO \`${tableDetails.tableName}\` (${tableDetails.columnNames.map((c) => `\`${c}\``).join(", ")})`
         + ` VALUES (${(nCopies(tableDetails.columnNames.length, "?").join(", "))})`

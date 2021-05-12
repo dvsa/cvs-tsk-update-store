@@ -16,7 +16,7 @@ import {
     VEHICLE_SUBCLASS_TABLE,
     VEHICLE_TABLE
 } from "./table-details";
-import {executePartialUpsert} from "./sql-execution";
+import {executePartialUpsert, executePartialUpsertIfNotExists} from "./sql-execution";
 import {TestResultUpsertResult} from "../models/upsert-results";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
@@ -194,7 +194,7 @@ const upsertVehicle = async (connection: Connection, testResult: TestResult): Pr
 const upsertTestStation = async (connection: Connection, testResult: TestResult): Promise<number> => {
     debugLog(`upsertTestResults: Upserting test station...`);
 
-    const response = await executePartialUpsert(
+    const response = await executePartialUpsertIfNotExists(
         TEST_STATION_TABLE,
         [
             testResult.testStationPNumber,
@@ -212,7 +212,7 @@ const upsertTestStation = async (connection: Connection, testResult: TestResult)
 const upsertTester = async (connection: Connection, testResult: TestResult): Promise<number> => {
     debugLog(`upsertTestResults: Upserting tester...`);
 
-    const response = await executePartialUpsert(
+    const response = await executePartialUpsertIfNotExists(
         TESTER_TABLE,
         [
             testResult.testerStaffId,
@@ -230,7 +230,7 @@ const upsertTester = async (connection: Connection, testResult: TestResult): Pro
 const upsertVehicleClass = async (connection: Connection, testResult: TestResult): Promise<number> => {
     debugLog(`upsertTestResults: Upserting vehicle class...`);
 
-    const response = await executePartialUpsert(
+    const response = await executePartialUpsertIfNotExists(
         VEHICLE_CLASS_TABLE,
         [
             testResult.vehicleClass?.code,
@@ -315,7 +315,7 @@ const upsertTestType = async (connection: Connection, testType: TestType): Promi
 const upsertPreparer = async (connection: Connection, testResult: TestResult): Promise<number> => {
     debugLog(`upsertTestResults: Upserting preparer...`);
 
-    const response = await executePartialUpsert(
+    const response = await executePartialUpsertIfNotExists(
         PREPARER_TABLE,
         [
             testResult.preparerId,
@@ -332,7 +332,7 @@ const upsertPreparer = async (connection: Connection, testResult: TestResult): P
 const upsertIdentity = async (connection: Connection, id: string, name: string): Promise<number> => {
     debugLog(`upsertTestResults: Upserting identity (${id} ---> ${name})...`);
 
-    const response = await executePartialUpsert(
+    const response = await executePartialUpsertIfNotExists(
         IDENTITY_TABLE,
         [
             id,
@@ -356,7 +356,7 @@ const upsertDefects = async (connection: Connection, testResultId: number, testT
     for (const defect of testType.defects) {
         debugLog(`upsertTestResults: Upserting defect...`);
 
-        const insertDefectResponse = await executePartialUpsert(
+        const insertDefectResponse = await executePartialUpsertIfNotExists(
             DEFECTS_TABLE,
             [
                 defect.imNumber,
@@ -379,7 +379,7 @@ const upsertDefects = async (connection: Connection, testResultId: number, testT
 
         insertedIds.push(defectId);
 
-        const insertLocationResponse = await executePartialUpsert(
+        const insertLocationResponse = await executePartialUpsertIfNotExists(
             LOCATION_TABLE,
             [
                 defect.additionalInformation?.location?.vertical,
