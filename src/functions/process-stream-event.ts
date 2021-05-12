@@ -5,6 +5,7 @@ import {DynamoDbImage} from "../services/dynamodb-images";
 import {deriveSqlOperation, SqlOperation} from "../services/sql-operations";
 import {destroyConnectionPool} from "../services/connection-pool";
 import {debugLog} from "../services/logger";
+import {SqsService} from "../services/sqs-huge-msg";
 
 /**
  * λ function: convert a DynamoDB document to Aurora RDS rows
@@ -18,11 +19,25 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
         validateEvent(event);
 
         const upsertResults: any[] = [];
+        const region = process.env.AWS_REGION;
+
+        if (!region) {
+            console.error("AWS_REGION envvar not available");
+            return;
+        }
 
         debugLog(`Received valid SQS event (${event.Records.length} records)`);
+        const sqsService = new SqsService({
+            region,
+            queueName: "config.sqs.remote.queueName[0]",
+            s3EndpointUrl: "config.s3.remote.params.endpoint",
+            s3Bucket: "BUCKET_NAME",
+          });
 
         for await (const record of event.Records) {
-            const dynamoRecord: DynamoDBRecord = JSON.parse(record.body) as DynamoDBRecord;
+            const dynamoRecord: DynamoDBRecord = JSON.parse(
+                await sqsService.getMessageContent(record.body),
+                ) as DynamoDBRecord;
 
             debugLog("Original DynamoDB stream event body (parsed): ", dynamoRecord);
 
