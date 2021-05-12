@@ -26,7 +26,7 @@
     "tslint": "tslint src/**/*.ts tests/**/*.ts -q",
     "prettier": "prettier --write ./**/*.{js,ts}",
     "prepush": "npm test && npm run tslint",
-    "sonar-scanner": "cross-env AWS_XRAY_CONTEXT_MISSING=LOG_ERROR BRANCH=local npm run tslint && cross-env AWS_XRAY_CONTEXT_MISSING=LOG_ERROR npm run coverage && sonar-scanner",
+    "sonar-scanner": "cross-env AWS_XRAY_CONTEXT_MISSING=LOG_ERROR BRANCH=local npm run tslint && cross-env AWS_XRAY_CONTEXT_MISSING=LOG_ERROR BRANCH=local AWS_REGION=local npm run coverage && sonar-scanner",
     "coverage": "cross-env AWS_REGION=local BRANCH=local SLS_DEBUG=* jest --testMatch=\"**/*.*Test.ts\" --coverage --collectCoverageFrom=\"src/!(models)/**/!(*conversion).{js,ts}\"",
     "audit-dep": "npm audit --json | node_modules/.bin/audit-filter --nsp-config=.nsprc --audit=-",
     "package": "mkdir -p ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME}/ && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
