@@ -1,7 +1,7 @@
-import * as AWS from 'aws-sdk';
-import { MessageBodyAttributeMap } from 'aws-sdk/clients/sqs';
-import { PromiseResult } from 'aws-sdk/lib/request';
-import { v4 as uuid } from 'uuid';
+import * as AWS from "aws-sdk";
+import { MessageBodyAttributeMap } from "aws-sdk/clients/sqs";
+import { PromiseResult } from "aws-sdk/lib/request";
+import { v4 as uuid } from "uuid";
 
 export interface SqsServiceOptions {
   endpoint?: string;
@@ -15,6 +15,9 @@ export interface SqsServiceOptions {
 export enum SqsServiceMessage {
   MAX_SQS_MESSAGE_SIZE = 256 * 1024
 }
+/**
+ * Allow SQS to handle messages over 256k in size, by storing large messages in S3
+ */
 export class SqsService {
   private endpoint?: string;
 
@@ -37,6 +40,11 @@ export class SqsService {
     this.s3Bucket = options.s3Bucket;
   }
 
+  /**
+   * Get SQS instance
+   *
+   * @returns AWS.SQS
+   */
   private getInstance(): AWS.SQS {
     const sqsConfig = {
       region: this.region,
@@ -48,16 +56,28 @@ export class SqsService {
     return new AWS.SQS(sqsConfig);
   }
 
+  /**
+   * Get S3 instance
+   *
+   * @returns AWS.S3
+   */
   private getInstanceS3(): AWS.S3 {
     const s3Config = {
       s3ForcePathStyle: true,
-      signatureVersion: 'v2',
+      signatureVersion: "v2",
       region: this.region,
       endpoint: this.s3EndpointUrl,
     };
     return new AWS.S3(s3Config);
   }
 
+  /**
+   * Delete a message from the queue
+   *
+   * @param queueName string
+   * @param message any
+   * @returns Promise<void>
+   */
   private async deleteMessage(queueName: string, message: any): Promise<void> {
     const queueUrl = await this.getQueueUrl(queueName);
 
@@ -72,6 +92,12 @@ export class SqsService {
       }).promise();
   }
 
+  /**
+   * Get the URL of an SQS queue, based on the queuename
+   *
+   * @param queueName string
+   * @returns Promise<string|undefined>
+   */
   public async getQueueUrl(queueName: string): Promise<string|undefined> {
     const { QueueUrl } = await this.getInstance()
       .getQueueUrl({
@@ -81,8 +107,16 @@ export class SqsService {
     return QueueUrl;
   }
 
+  /**
+   * Send a message on SQS, passing the body to S3 if required
+   *
+   * @param queueName string
+   * @param body string
+   * @param messageAttributes MessageBodyAttributeMap
+   * @returns Promise<void|PromiseResult<AWS.SQS.SendMessageResult, AWS.AWSError>>
+   */
   public async sendMessage(queueName: string, body: string, messageAttributes?: MessageBodyAttributeMap): Promise<void|PromiseResult<AWS.SQS.SendMessageResult, AWS.AWSError>> {
-    const msgSize = Buffer.byteLength(body, 'utf-8');
+    const msgSize = Buffer.byteLength(body, "utf-8");
     const queueUrl = await this.getQueueUrl(queueName);
 
     if (queueUrl === undefined) {
@@ -90,7 +124,7 @@ export class SqsService {
     }
 
     if (msgSize < this.maxMessageSize) {
-      const messageConfig = {
+      const smallMessageConfig = {
         QueueUrl: queueUrl,
         MessageBody: JSON.stringify({
           message: body,
@@ -98,10 +132,10 @@ export class SqsService {
         messageAttributes,
       };
 
-      return this.getInstance().sendMessage(messageConfig).promise();
+      return this.getInstance().sendMessage(smallMessageConfig).promise();
     }
 
-    const keyId:string = uuid();
+    const keyId: string = uuid();
     const payloadId = `${keyId}.json`;
 
     const responseBucket = await this.getInstanceS3().upload({
@@ -127,6 +161,12 @@ export class SqsService {
     return this.getInstance().sendMessage(messageConfig).promise();
   }
 
+  /**
+   * Get a message from SQS, including getting the body from S3 if required
+   *
+   * @param queueName string
+   * @returns Promise<PromiseResult<AWS.SQS.ReceiveMessageResult, AWS.AWSError>|void>
+   */
   public async getMessage(queueName: string): Promise<PromiseResult<AWS.SQS.ReceiveMessageResult, AWS.AWSError>|void> {
     const queueUrl = await this.getQueueUrl(queueName);
 
@@ -153,7 +193,13 @@ export class SqsService {
     return message;
   }
 
-  public async getMessageContent(body:string):Promise<string> {
+  /**
+   * Get the content of an SQS message either directly or from S3
+   *
+   * @param body string
+   * @returns Promise<string>
+   */
+  public async getMessageContent(body: string): Promise<string> {
     const parsedBody = JSON.parse(body) as MessageBody;
     if (parsedBody.S3Payload) {
       const s3Object = await this.getInstanceS3()
@@ -164,7 +210,7 @@ export class SqsService {
         .promise();
 
       if (s3Object.Body === undefined) {
-        throw new Error('Body missing from S3 object');
+        throw new Error("Body missing from S3 object");
       }
 
       return s3Object.Body.toString();
@@ -175,9 +221,9 @@ export class SqsService {
 }
 
 interface MessageBody {
-  S3Payload?: S3Payload
+  S3Payload?: S3Payload;
 }
 
 interface S3Payload {
-  Key: string
+  Key: string;
 }
