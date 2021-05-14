@@ -135,13 +135,13 @@ export class SqsService {
     }
 
     if (msgSize < this.maxMessageSize) {
-      const messageConfig = {
+      const smallMessageConfig = {
         QueueUrl: queueUrl,
         MessageBody: body,
         MessageAttributes: messageAttributes,
       };
 
-      return this.getInstance().sendMessage(messageConfig).promise();
+      return this.getInstance().sendMessage(smallMessageConfig).promise();
     }
 
     const keyId: string = uuid();
