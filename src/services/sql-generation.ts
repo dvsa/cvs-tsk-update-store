@@ -25,9 +25,9 @@ export const generateFullUpsertSql = (tableDetails: TableDetails): string => {
 };
 
 /**
- * Generate select SQL.
+ * Generate select SQL statement. See sql-execution.ts for a definition of partial upsert if record already exists.
  *
- * @param tableDetails the table to generate select(md5) SQL for
+ * @param tableDetails the table to generate select statement for
  */
 export const generateSelectSql = (tableDetails: TableDetails): string => {
     const query = `SELECT id insertId FROM \`${tableDetails.tableName}\` WHERE fingerprint = MD5(CONCAT_WS('|', ${(nCopies(tableDetails.columnNames.length, "IFNULL(?, '')").join(", "))}))`;

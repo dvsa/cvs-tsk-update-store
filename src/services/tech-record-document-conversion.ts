@@ -39,6 +39,7 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
     const vehicleConnection = await pool.getConnection();
 
     try {
+        await vehicleConnection.execute('SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED');
         await vehicleConnection.beginTransaction();
 
         vehicleId = await upsertVehicle(vehicleConnection, techRecordDocument);
@@ -66,16 +67,18 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
         const techRecordConnection = await pool.getConnection();
 
         try {
-            await techRecordConnection.beginTransaction();
-
+            await vehicleConnection.execute('SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED');
+            
             debugLog(`upsertTechRecords: Upserting tech record...`);
-
+            
             const makeModelId = await upsertMakeModel(techRecordConnection, techRecord);
             const vehicleClassId = await upsertVehicleClass(techRecordConnection, techRecord);
             const vehicleSubclassIds = await upsertVehicleSubclasses(techRecordConnection, vehicleClassId, techRecord);
             const createdById = await upsertIdentity(techRecordConnection, techRecord.createdById!, techRecord.createdByName!);
             const lastUpdatedById = await upsertIdentity(techRecordConnection, techRecord.lastUpdatedById!, techRecord.lastUpdatedByName!);
             const contactDetailsId = await upsertContactDetails(techRecordConnection, techRecord);
+            
+            await techRecordConnection.beginTransaction();
 
             const response = await executeFullUpsert(
                 TECHNICAL_RECORD_TABLE,
@@ -293,7 +296,7 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
     debugLog(`upsertTechRecords: ${techRecord.vehicleSubclass.length} vehicle subclasses to upsert`);
 
     for (const vehicleSubclass of techRecord.vehicleSubclass) {
-        const response = await executePartialUpsert(
+        const response = await executePartialUpsertIfNotExists(
             VEHICLE_SUBCLASS_TABLE,
             [
                 vehicleClassId,

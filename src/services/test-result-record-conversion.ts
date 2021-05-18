@@ -51,6 +51,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
 
         let vehicleId;
         try {
+            await vehicleConnection.execute('SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED');
             await vehicleConnection.beginTransaction();
 
             vehicleId = await upsertVehicle(vehicleConnection, testResult);
@@ -67,8 +68,8 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
         const testResultConnection = await pool.getConnection();
 
         try {
-            await testResultConnection.beginTransaction();
-
+            await testResultConnection.execute('SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED');
+            
             const testStationId = await upsertTestStation(testResultConnection, testResult);
             const testerId = await upsertTester(testResultConnection, testResult);
             const vehicleClassId = await upsertVehicleClass(testResultConnection, testResult);
@@ -76,7 +77,9 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
             const preparerId = await upsertPreparer(testResultConnection, testResult);
             const createdById = await upsertIdentity(testResultConnection, testResult.createdById!, testResult.createdByName!);
             const lastUpdatedById = await upsertIdentity(testResultConnection, testResult.lastUpdatedById!, testResult.lastUpdatedByName!);
-
+            
+            await testResultConnection.beginTransaction();
+            
             for (const testType of testResult.testTypes!) {
                 const fuelEmissionId = await upsertFuelEmission(testResultConnection, testType);
                 const testTypeId = await upsertTestType(testResultConnection, testType);
@@ -259,7 +262,7 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
     const insertedIds: number[] = [];
 
     for (const vehicleSubclass of testResult.vehicleSubclass) {
-        const response = await executePartialUpsert(
+        const response = await executePartialUpsertIfNotExists(
             VEHICLE_SUBCLASS_TABLE,
             [
                 vehicleClassId,
@@ -279,7 +282,7 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
 const upsertFuelEmission = async (connection: Connection, testType: TestType): Promise<number> => {
     debugLog(`upsertTestResults: Upserting fuel emission...`);
 
-    const response = await executePartialUpsert(
+    const response = await executePartialUpsertIfNotExists(
         FUEL_EMISSION_TABLE,
         [
             testType.modType?.code,
@@ -298,7 +301,7 @@ const upsertFuelEmission = async (connection: Connection, testType: TestType): P
 const upsertTestType = async (connection: Connection, testType: TestType): Promise<number> => {
     debugLog(`upsertTestResults: Upserting test type...`);
 
-    const response = await executePartialUpsert(
+    const response = await executePartialUpsertIfNotExists(
         TEST_TYPE_TABLE,
         [
             testType.testTypeClassification,
