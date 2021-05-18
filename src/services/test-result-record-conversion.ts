@@ -51,7 +51,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
 
         let vehicleId;
         try {
-            await vehicleConnection.execute('SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED');
+            await vehicleConnection.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
             await vehicleConnection.beginTransaction();
 
             vehicleId = await upsertVehicle(vehicleConnection, testResult);
@@ -68,8 +68,8 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
         const testResultConnection = await pool.getConnection();
 
         try {
-            await testResultConnection.execute('SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED');
-            
+            await testResultConnection.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
+
             const testStationId = await upsertTestStation(testResultConnection, testResult);
             const testerId = await upsertTester(testResultConnection, testResult);
             const vehicleClassId = await upsertVehicleClass(testResultConnection, testResult);
@@ -77,9 +77,9 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
             const preparerId = await upsertPreparer(testResultConnection, testResult);
             const createdById = await upsertIdentity(testResultConnection, testResult.createdById!, testResult.createdByName!);
             const lastUpdatedById = await upsertIdentity(testResultConnection, testResult.lastUpdatedById!, testResult.lastUpdatedByName!);
-            
+
             await testResultConnection.beginTransaction();
-            
+
             for (const testType of testResult.testTypes!) {
                 const fuelEmissionId = await upsertFuelEmission(testResultConnection, testType);
                 const testTypeId = await upsertTestType(testResultConnection, testType);
