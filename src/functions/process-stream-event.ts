@@ -20,7 +20,7 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
 
         const upsertResults: any[] = [];
         const region = process.env.AWS_REGION;
-        const branch = process.env.branch;
+        const branch = process.env.BRANCH;
 
         if (!region) {
             console.error("AWS_REGION envvar not available");
