@@ -195,7 +195,6 @@ describe("convertTestResults() integration tests", () => {
              FROM \`test_defect\`
              WHERE \`test_defect\`.\`test_result_id\` = ${upsertResult.testResultId}`
         );
-
         const lastIndex = testDefectResultSet.rows.length - 1;
         expect(testDefectResultSet.rows[lastIndex].test_result_id).toEqual(upsertResult.testResultId);
         expect(testDefectResultSet.rows[lastIndex].defect_id).toEqual(upsertResult.defectIds[0]);
