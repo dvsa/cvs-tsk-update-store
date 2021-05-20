@@ -195,7 +195,6 @@ describe("convertTestResults() integration tests", () => {
              FROM \`test_defect\`
              WHERE \`test_defect\`.\`test_result_id\` = ${upsertResult.testResultId}`
         );
-<<<<<<< HEAD
         // expect(testDefectResultSet.rows.length).toEqual(1);
         const lastIndex = testDefectResultSet.rows.length - 1;
         expect(testDefectResultSet.rows[lastIndex].test_result_id).toEqual(upsertResult.testResultId);
@@ -204,15 +203,13 @@ describe("convertTestResults() integration tests", () => {
         expect(testDefectResultSet.rows[lastIndex].notes).toEqual("NOTES");
         expect(testDefectResultSet.rows[lastIndex].prs).toEqual(1);
         expect(testDefectResultSet.rows[lastIndex].prohibitionIssued).toEqual(1);
-=======
-        expect(testDefectResultSet.rows.length).toEqual(1);
-        expect(testDefectResultSet.rows[0].test_result_id).toEqual(upsertResult.testResultId);
-        expect(testDefectResultSet.rows[0].defect_id).toEqual(upsertResult.defectIds[0]);
-        expect(testDefectResultSet.rows[0].location_id).toEqual(1);
-        expect(testDefectResultSet.rows[0].notes).toEqual("NOTES");
-        expect(testDefectResultSet.rows[0].prs).toEqual(1);
-        expect(testDefectResultSet.rows[0].prohibitionIssued).toEqual(1);
->>>>>>> Feature/CVSB-19224 (#1)
+        // expect(testDefectResultSet.rows.length).toEqual(1);
+        // expect(testDefectResultSet.rows[0].test_result_id).toEqual(upsertResult.testResultId);
+        // expect(testDefectResultSet.rows[0].defect_id).toEqual(upsertResult.defectIds[0]);
+        // expect(testDefectResultSet.rows[0].location_id).toEqual(1);
+        // expect(testDefectResultSet.rows[0].notes).toEqual("NOTES");
+        // expect(testDefectResultSet.rows[0].prs).toEqual(1);
+        // expect(testDefectResultSet.rows[0].prohibitionIssued).toEqual(1);
 
         expect(upsertResult.customDefectIds.length).toEqual(1);
 
