@@ -6,6 +6,8 @@ import {deriveSqlOperation, SqlOperation} from "../services/sql-operations";
 import {destroyConnectionPool} from "../services/connection-pool";
 import {debugLog} from "../services/logger";
 import {SqsService} from "../services/sqs-huge-msg";
+import AWSXRay from "aws-xray-sdk";
+import { SQS, S3 } from "aws-sdk";
 
 /**
  * λ function: convert a DynamoDB document to Aurora RDS rows
@@ -20,11 +22,17 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
 
         const upsertResults: any[] = [];
         const region = process.env.AWS_REGION;
+        const bucket = process.env.SQS_BUCKET;
         const branch = process.env.BRANCH;
 
         if (!region) {
             console.error("AWS_REGION envvar not available");
             return;
+        }
+
+        if (!bucket) {
+          console.error("SQS_BUCKET envvar not available");
+          return;
         }
 
         if (!branch) {
@@ -33,11 +41,19 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
         }
 
         debugLog(`Received valid SQS event (${event.Records.length} records)`);
-        const sqsService = new SqsService({
+        const s3 = AWSXRay.captureAWSClient(new S3({
+            s3ForcePathStyle: true,
+            signatureVersion: "v2",
             region,
+            endpoint: `https://s3.${region}.amazonaws.com`,
+          })) as S3;
+        const sqs = AWSXRay.captureAWSClient(new SQS({ region })) as SQS;
+        const sqsService = new SqsService({
+            s3,
+            sqs,
             queueName: `cvs-edh-test-results-${branch}-queue`,
-            s3EndpointUrl: `https://s3.${region}.amazonaws.com`,
-            s3Bucket: `cvs-sqs-queues-${branch}`,
+            s3Bucket: bucket,
+            itemPrefix: branch,
           });
 
         for await (const record of event.Records) {

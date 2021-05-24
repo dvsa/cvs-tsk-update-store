@@ -1,16 +1,15 @@
 import * as AWS from "aws-sdk";
 import { PromiseResult } from "aws-sdk/lib/request";
 import { v4 as uuid } from "uuid";
-import AWSXRay from "aws-xray-sdk";
 import { MessageBodyAttributeMap } from "aws-sdk/clients/sqs";
 
 export interface SqsServiceOptions {
-  endpoint?: string;
-  region: string;
+  s3: AWS.S3;
+  sqs: AWS.SQS;
   queueName: string;
   maxMessageSize?: number;
-  s3EndpointUrl: string;
   s3Bucket: string;
+  itemPrefix?: string;
 }
 
 export enum SqsServiceMessage {
@@ -21,65 +20,25 @@ export enum SqsServiceMessage {
  * Handles sending and receiving SQS messages including those over 256KB
  */
 export class SqsService {
-  private endpoint?: string;
+  private s3: AWS.S3;
 
-  private region: string;
+  private sqs: AWS.SQS;
 
   private queueName: string;
 
   private maxMessageSize: number;
 
-  private s3EndpointUrl: string;
-
   private s3Bucket: string;
 
-  private sqsInstance: AWS.SQS|undefined;
+  private itemPrefix?: string;
 
   constructor(options: SqsServiceOptions) {
-    this.endpoint = options.endpoint;
-    this.region = options.region;
+    this.s3 = options.s3;
+    this.sqs = options.sqs;
     this.queueName = options.queueName;
     this.maxMessageSize = options.maxMessageSize || SqsServiceMessage.MAX_SQS_MESSAGE_SIZE;
-    this.s3EndpointUrl = options.s3EndpointUrl;
     this.s3Bucket = options.s3Bucket;
-  }
-
-  /**
-   * Get SQS instance
-   *
-   * @returns AWS.SQS
-   */
-  private getInstance(): AWS.SQS {
-    if (this.sqsInstance) {
-      return this.sqsInstance;
-    }
-
-    const sqsConfig = {
-      region: this.region,
-      endpoint: this.endpoint,
-    };
-    if (!this.endpoint) {
-      delete sqsConfig.endpoint;
-    }
-
-    this.sqsInstance = AWSXRay.captureAWSClient(new AWS.SQS(sqsConfig)) as AWS.SQS;
-
-    return this.sqsInstance;
-  }
-
-  /**
-   * Get S3 instance
-   *
-   * @returns AWS.S3
-   */
-  private getInstanceS3(): AWS.S3 {
-    const s3Config = {
-      s3ForcePathStyle: true,
-      signatureVersion: "v2",
-      region: this.region,
-      endpoint: this.s3EndpointUrl,
-    };
-    return new AWS.S3(s3Config);
+    this.itemPrefix = options.itemPrefix;
   }
 
   /**
@@ -96,7 +55,7 @@ export class SqsService {
       return;
     }
 
-    await this.getInstance()
+    await this.sqs
       .deleteMessage({
         QueueUrl: queueUrl,
         ReceiptHandle: message.Messages[0].ReceiptHandle,
@@ -110,7 +69,7 @@ export class SqsService {
    * @returns Promise<string|undefined>
    */
   public async getQueueUrl(queueName: string): Promise<string|undefined> {
-    const { QueueUrl } = await this.getInstance()
+    const { QueueUrl } = await this.sqs
       .getQueueUrl({
         QueueName: queueName || this.queueName,
       }).promise();
@@ -131,7 +90,7 @@ export class SqsService {
     const queueUrl = await this.getQueueUrl(queueName);
 
     if (queueUrl === undefined) {
-      return Promise.resolve();
+      throw new Error("Queue URL not found");
     }
 
     if (msgSize < this.maxMessageSize) {
@@ -141,13 +100,13 @@ export class SqsService {
         MessageAttributes: messageAttributes,
       };
 
-      return this.getInstance().sendMessage(smallMessageConfig).promise();
+      return this.sqs.sendMessage(smallMessageConfig).promise();
     }
 
     const keyId: string = uuid();
-    const payloadId = `${keyId}.json`;
+    const payloadId = this.itemPrefix !== undefined ? `${this.itemPrefix}/${keyId}.json` : `${keyId}.json`;
 
-    const responseBucket = await this.getInstanceS3().upload({
+    const responseBucket = await this.s3.upload({
       Bucket: this.s3Bucket,
       Body: body,
       Key: payloadId,
@@ -165,7 +124,7 @@ export class SqsService {
       MessageAttributes: messageAttributes,
     };
 
-    return this.getInstance().sendMessage(messageConfig).promise();
+    return this.sqs.sendMessage(messageConfig).promise();
   }
 
   /**
@@ -174,20 +133,20 @@ export class SqsService {
    * @param queueName string
    * @returns Promise<PromiseResult<AWS.SQS.ReceiveMessageResult, AWS.AWSError>|void>
    */
-  public async getMessage(queueName: string): Promise<PromiseResult<AWS.SQS.ReceiveMessageResult, AWS.AWSError>|void> {
+  public async getMessage(queueName: string): Promise<PromiseResult<AWS.SQS.ReceiveMessageResult, AWS.AWSError>> {
     const queueUrl = await this.getQueueUrl(queueName);
 
     if (queueUrl === undefined) {
-      return Promise.resolve();
+      throw new Error("Queue URL not found");
     }
 
-    const message = await this.getInstance()
+    const message = await this.sqs
       .receiveMessage({ QueueUrl: queueUrl }).promise();
 
     const messages = message.Messages;
 
     if (!messages || messages.length === 0) {
-      return Promise.resolve();
+      throw new Error("No messages found");
     }
 
     const { Body } = messages[0];
@@ -209,7 +168,7 @@ export class SqsService {
   public async getMessageContent(body: string): Promise<string> {
     const parsedBody = JSON.parse(body) as MessageBody;
     if (parsedBody.S3Payload) {
-      const s3Object = await this.getInstanceS3()
+      const s3Object = await this.s3
         .getObject({
           Bucket: this.s3Bucket,
           Key: parsedBody.S3Payload.Key,
