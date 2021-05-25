@@ -15,7 +15,7 @@ import {
     VEHICLE_SUBCLASS_TABLE,
     VEHICLE_TABLE
 } from "./table-details";
-import {executeFullUpsert, executePartialUpsert} from "./sql-execution";
+import {executeFullUpsert, executePartialUpsert, executePartialUpsertIfNotExists} from "./sql-execution";
 import {TechRecordUpsertResult} from "../models/upsert-results";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
@@ -39,6 +39,7 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
     const vehicleConnection = await pool.getConnection();
 
     try {
+        await vehicleConnection.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
         await vehicleConnection.beginTransaction();
 
         vehicleId = await upsertVehicle(vehicleConnection, techRecordDocument);
@@ -66,7 +67,7 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
         const techRecordConnection = await pool.getConnection();
 
         try {
-            await techRecordConnection.beginTransaction();
+            await vehicleConnection.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
 
             debugLog(`upsertTechRecords: Upserting tech record...`);
 
@@ -76,6 +77,8 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
             const createdById = await upsertIdentity(techRecordConnection, techRecord.createdById!, techRecord.createdByName!);
             const lastUpdatedById = await upsertIdentity(techRecordConnection, techRecord.lastUpdatedById!, techRecord.lastUpdatedByName!);
             const contactDetailsId = await upsertContactDetails(techRecordConnection, techRecord);
+
+            await techRecordConnection.beginTransaction();
 
             const response = await executeFullUpsert(
                 TECHNICAL_RECORD_TABLE,
@@ -236,7 +239,7 @@ const upsertVehicle = async (connection: Connection, techRecordDocument: TechRec
 const upsertMakeModel = async (connection: Connection, techRecord: TechRecord): Promise<number> => {
     debugLog(`upsertTechRecords: Upserting make-model...`);
 
-    const response = await executePartialUpsert(
+    const response = await executePartialUpsertIfNotExists(
         MAKE_MODEL_TABLE,
         [
             techRecord.make,
@@ -262,7 +265,7 @@ const upsertMakeModel = async (connection: Connection, techRecord: TechRecord): 
 const upsertVehicleClass = async (connection: Connection, techRecord: TechRecord): Promise<number> => {
     debugLog(`upsertTechRecords: Upserting vehicle class...`);
 
-    const response = await executePartialUpsert(
+    const response = await executePartialUpsertIfNotExists(
         VEHICLE_CLASS_TABLE,
         [
             techRecord.vehicleClass?.code,
@@ -293,7 +296,7 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
     debugLog(`upsertTechRecords: ${techRecord.vehicleSubclass.length} vehicle subclasses to upsert`);
 
     for (const vehicleSubclass of techRecord.vehicleSubclass) {
-        const response = await executePartialUpsert(
+        const response = await executePartialUpsertIfNotExists(
             VEHICLE_SUBCLASS_TABLE,
             [
                 vehicleClassId,
@@ -313,7 +316,7 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
 const upsertIdentity = async (connection: Connection, id: string, name: string): Promise<number> => {
     debugLog(`upsertTechRecords: Upserting identity (${id} ---> ${name})...`);
 
-    const response = await executePartialUpsert(
+    const response = await executePartialUpsertIfNotExists(
         IDENTITY_TABLE,
         [
             id,
@@ -330,7 +333,7 @@ const upsertIdentity = async (connection: Connection, id: string, name: string):
 const upsertContactDetails = async (connection: Connection, techRecord: TechRecord): Promise<number> => {
     debugLog(`upsertTechRecords: Upserting contact details...`);
 
-    const response = await executePartialUpsert(
+    const response = await executePartialUpsertIfNotExists(
         CONTACT_DETAILS_TABLE,
         [
             techRecord.applicantDetails?.name,
