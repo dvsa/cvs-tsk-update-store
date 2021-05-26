@@ -57,7 +57,7 @@
   "dependencies": {
     "@types/lambda-tester": "3.6.0",
     "aws-lambda": "0.1.2",
-    "aws-sdk": "2.562.0",
+    "aws-sdk": "2.900.0",
     "aws-xray-sdk": "2.4.0",
     "commitlint": "12.1.1",
     "date-fns": "2.21.2",
