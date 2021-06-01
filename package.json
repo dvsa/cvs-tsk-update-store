@@ -68,7 +68,7 @@
     "prettier": "2.2.1",
     "reflect-metadata": "0.1.13",
     "request": "2.88.0",
-    "request-promise": "4.2.4",
+    "request-promise": "4.2.6",
     "testcontainers": "7.6.2",
     "ts-node-register": "1.0.0",
     "uuid": "8.3.2"
