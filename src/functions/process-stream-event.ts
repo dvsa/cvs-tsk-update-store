@@ -22,44 +22,17 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
 
         const upsertResults: any[] = [];
         const region = process.env.AWS_REGION;
-        const bucket = process.env.SQS_BUCKET;
-        const branch = process.env.BRANCH;
 
         if (!region) {
             console.error("AWS_REGION envvar not available");
             return;
         }
 
-        if (!bucket) {
-          console.error("SQS_BUCKET envvar not available");
-          return;
-        }
-
-        if (!branch) {
-            console.error("BRANCH envvar not available");
-            return;
-        }
-
         debugLog(`Received valid SQS event (${event.Records.length} records)`);
-        const s3 = AWSXRay.captureAWSClient(new S3({
-            s3ForcePathStyle: true,
-            signatureVersion: "v2",
-            region,
-            endpoint: `https://s3.${region}.amazonaws.com`,
-          })) as S3;
-        const sqs = AWSXRay.captureAWSClient(new SQS({ region })) as SQS;
-        const sqsService = new SqsService({
-            s3,
-            sqs,
-            queueName: `cvs-edh-test-results-${branch}-queue`,
-            s3Bucket: bucket,
-            itemPrefix: branch,
-          });
+
 
         for await (const record of event.Records) {
-            const dynamoRecord: DynamoDBRecord = JSON.parse(
-                await sqsService.getMessageContent(record.body),
-                ) as DynamoDBRecord;
+            const dynamoRecord: DynamoDBRecord = JSON.parse(record.body) as DynamoDBRecord;
 
             debugLog("Original DynamoDB stream event body (parsed): ", dynamoRecord);
 
