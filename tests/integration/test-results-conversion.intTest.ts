@@ -196,13 +196,13 @@ describe("convertTestResults() integration tests", () => {
              WHERE \`test_defect\`.\`test_result_id\` = ${upsertResult.testResultId}`
         );
         const lastIndex = testDefectResultSet.rows.length - 1;
+
         expect(testDefectResultSet.rows[lastIndex].test_result_id).toEqual(upsertResult.testResultId);
         expect(testDefectResultSet.rows[lastIndex].defect_id).toEqual(upsertResult.defectIds[0]);
         expect(testDefectResultSet.rows[lastIndex].location_id).toEqual(1);
         expect(testDefectResultSet.rows[lastIndex].notes).toEqual("NOTES");
         expect(testDefectResultSet.rows[lastIndex].prs).toEqual(1);
         expect(testDefectResultSet.rows[lastIndex].prohibitionIssued).toEqual(1);
-
         expect(upsertResult.customDefectIds.length).toEqual(1);
 
         const customDefectResultSet = await executeSql(
