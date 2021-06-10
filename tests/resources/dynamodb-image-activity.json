@@ -1,0 +1,51 @@
+{
+	"id": {
+		"S": "c2b83364-7cef-44b0-a110-e999c871170c"
+	},
+	"testStationType": {
+		"S": "gvts"
+	},
+	"startTime": {
+		"S": "2020-12-03T10:04:47.746Z"
+	},
+	"testerStaffId": {
+		"S": "918a7700-f9fe-4165-ac8b-b189d965dcf5"
+	},
+	"testerName": {
+		"S": "CVS _UAT"
+	},
+	"activityType": {
+		"S": "visit"
+	},
+	"testerEmail": {
+		"S": "CVS_UAT@DVSA.GOV.UK"
+	},
+	"endTime": {
+		"S": "2020-12-03T10:07:39.448Z"
+	},
+	"testStationName": {
+		"S": "Abshire-Kub"
+	},
+	"activityDay": {
+		"S": "2020-12-03"
+	},
+	"testStationPNumber": {
+		"S": "09-4129632"
+	},
+	"testStationEmail": {
+		"S": "cvs.test2@dvsagov.onmicrosoft.com"
+	},
+    "parentId": {
+		"S": "6c910323-0a80-420e-89be-fd41fba1b203"
+	},
+    "notes": {
+		"S": "Note 1"
+	},
+    "waitReason": {
+        "L":[
+            {
+                "S": "reason 1"
+            }
+        ]
+    }
+}

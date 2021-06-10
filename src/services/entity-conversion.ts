@@ -48,7 +48,10 @@ const getEntityConverter = <T> (tableName: string): EntityConverter<T> => {
         tableName = "technical-records";
     } else if (tableName.includes("test-results")) {
         tableName = "test-results";
+    } else if (tableName.includes("activities")) {
+        tableName = "activities";
     }
+
 
     debugLog(`converter key:     '${tableName}'`);
 

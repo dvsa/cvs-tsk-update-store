@@ -385,6 +385,11 @@ export const TEST_RESULT_TABLE: TableDetails = {
     ]
 };
 
+export const ACTIVITIES_TABLE: TableDetails = {
+    tableName: "activities",
+    columnNames: []
+};
+
 export const allTables = (): TableDetails[] => {
     return [
         VEHICLE_TABLE,
@@ -410,5 +415,6 @@ export const allTables = (): TableDetails[] => {
         TEST_DEFECT_TABLE,
         CUSTOM_DEFECT_TABLE,
         TEST_RESULT_TABLE,
+        ACTIVITIES_TABLE,
     ];
 };
