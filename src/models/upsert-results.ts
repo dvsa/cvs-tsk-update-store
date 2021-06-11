@@ -32,4 +32,7 @@ export interface TestResultUpsertResult {
 
 export interface ActivitiesUpsertResult {
     activityId: number;
+    testStationId: number;
+    testerId: number;
+    waitReasonIds: number[];
 }

@@ -385,9 +385,27 @@ export const TEST_RESULT_TABLE: TableDetails = {
     ]
 };
 
-export const ACTIVITIES_TABLE: TableDetails = {
-    tableName: "activities",
-    columnNames: []
+export const ACTIVITY_TABLE: TableDetails = {
+    tableName: "activity",
+    columnNames: [
+        "test_station_id",
+        "tester_id",
+        "activityId",
+        "parentId",
+        "activityType",
+        "startTime",
+        "activityDay",
+        "endTime",
+        "notes"
+    ]
+};
+
+export const WAIT_REASON_TABLE: TableDetails = {
+    tableName: "wait_reason",
+    columnNames: [
+        "activity_id",
+        "note"
+    ]
 };
 
 export const allTables = (): TableDetails[] => {
@@ -415,6 +433,6 @@ export const allTables = (): TableDetails[] => {
         TEST_DEFECT_TABLE,
         CUSTOM_DEFECT_TABLE,
         TEST_RESULT_TABLE,
-        ACTIVITIES_TABLE,
+        ACTIVITY_TABLE,
     ];
 };

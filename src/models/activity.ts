@@ -1,8 +1,6 @@
 import {DynamoDbImage, parseStringArray} from "../services/dynamodb-images";
 import {debugLog} from "../services/logger";
 
-// https://wiki.dvsacloud.uk/pages/viewpage.action?spaceKey=HVT&title=Technical+API+Changelog
-// API_Vehicle_Tech_Records_v32.yaml
 export interface Activity {
     id?: string;
     activityType?: string;
@@ -22,7 +20,7 @@ export interface Activity {
 }
 
 export const parseActivity = (image: DynamoDbImage): Activity => {
-    debugLog("Parsing tech records...");
+    debugLog("Parsing activity...");
 
     return {
         id: image.getString("id"),
