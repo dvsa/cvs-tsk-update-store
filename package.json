@@ -25,12 +25,12 @@
     "test-local-i": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local USE_CONTAINERIZED_DATABASE=1 jest --testMatch=\"**/*.intTest.ts\" --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/*conversion.{js,ts}\"",
     "tslint": "tslint src/**/*.ts tests/**/*.ts -q",
     "prettier": "prettier --write ./**/*.{js,ts}",
-    "prepush": "npm test && npm run tslint",
+    "prepush": "npm test && npm run build",
     "sonar-scanner": "cross-env SQS_BUCKET=local AWS_XRAY_CONTEXT_MISSING=LOG_ERROR BRANCH=local npm run tslint && cross-env AWS_XRAY_CONTEXT_MISSING=LOG_ERROR BRANCH=local AWS_REGION=local npm run coverage && sonar-scanner",
     "coverage": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local SLS_DEBUG=* jest --testMatch=\"**/*.*Test.ts\" --coverage --collectCoverageFrom=\"src/!(models)/**/!(*conversion).{js,ts}\"",
     "audit-dep": "npm audit --json | node_modules/.bin/audit-filter --nsp-config=.nsprc --audit=-",
     "package": "mkdir -p ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME}/ && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
-    "security-checks": "npm audit --audit-level=critical && git secrets --register-aws && git secrets --scan && git log -p | scanrepo",
+    "security-checks": "git secrets --register-aws && git secrets --scan && git log -p | scanrepo",
     "tools-setup": "liquibase --changeLogFile cvs-nop/changelog-master.xml --username root --password 12345 --url jdbc:mysql://localhost:3306/CVSBNOP --classpath tests/resources/mysql-connector-java-8.0.23.jar update"
   },
   "nyc": {
@@ -90,7 +90,7 @@
     "jest-plugin-context": "2.9.0",
     "jest-sonar-reporter": "2.0.0",
     "lambda-tester": "3.5.0",
-    "serverless": "2.24.0",
+    "serverless": "2.45.2",
     "serverless-dependency-invoke": "0.0.9",
     "serverless-offline": "6.9.0",
     "serverless-plugin-tracing": "2.0.0",
@@ -114,7 +114,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run prettier && npm run prepush && npm run security-checks"
+      "pre-commit": "npm run security-checks && npm audit && npm run tslint && npm run prettier",
+      "pre-push": "npm run prepush"
     }
   }
 }
