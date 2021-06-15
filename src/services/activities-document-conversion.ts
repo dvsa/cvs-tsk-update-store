@@ -10,12 +10,12 @@ import {Connection} from "mysql2/promise";
 export const activitiesDocumentConverter = (): EntityConverter<Activity> => {
     return {
         parseRootImage: parseActivity,
-        upsertEntity: upsertActivities,
-        deleteEntity: deleteActivities
+        upsertEntity: upsertActivity,
+        deleteEntity: deleteActivity
     };
 };
 
-const upsertActivities = async (activity: Activity): Promise<ActivitiesUpsertResult[]> => {
+const upsertActivity = async (activity: Activity): Promise<ActivitiesUpsertResult[]> => {
     debugLog(`upsertTechRecords: START`);
 
     const pool = await getConnectionPool();
@@ -62,7 +62,7 @@ const upsertActivities = async (activity: Activity): Promise<ActivitiesUpsertRes
     return upsertResults;
 };
 
-const deleteActivities = async (activity: Activity): Promise<void> => {
+const deleteActivity = async (activity: Activity): Promise<void> => {
     throw new Error("deleting tech record documents is not implemented yet");
 };
 
