@@ -4,6 +4,7 @@ import {testResultsConverter} from "./test-result-record-conversion";
 import {SqlOperation} from "./sql-operations";
 import {Maybe} from "../models/optionals";
 import {debugLog} from "./logger";
+import { activitiesDocumentConverter } from "./activities-document-conversion";
 
 export interface EntityConverter<T> {
     parseRootImage: (image: DynamoDbImage) => T;
@@ -15,6 +16,7 @@ const entityConverters: Map<string, EntityConverter<any>> = new Map();
 
 entityConverters.set("technical-records", techRecordDocumentConverter());
 entityConverters.set("test-results", testResultsConverter());
+entityConverters.set("activities", activitiesDocumentConverter());
 
 /**
  * Shared conversion code: convert from DynamoDB document snapshot to Aurora RDS rows
