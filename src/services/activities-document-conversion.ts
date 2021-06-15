@@ -50,6 +50,8 @@ const upsertActivity = async (activity: Activity): Promise<ActivitiesUpsertResul
         const activityId = response.rows.insertId;
         const waitReasonIds = await upsertWaitReasons(activityConnection, activityId, activity);
 
+        await activityConnection.commit();
+
         upsertResults.push({activityId, testStationId, testerId, waitReasonIds});
     } catch (err) {
         console.error(err);
