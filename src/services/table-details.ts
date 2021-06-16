@@ -404,7 +404,7 @@ export const WAIT_REASON_TABLE: TableDetails = {
     tableName: "wait_reason",
     columnNames: [
         "activity_id",
-        "note"
+        "reason"
     ]
 };
 
