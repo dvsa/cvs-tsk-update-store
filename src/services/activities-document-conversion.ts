@@ -16,7 +16,7 @@ export const activitiesDocumentConverter = (): EntityConverter<Activity> => {
 };
 
 const upsertActivity = async (activity: Activity): Promise<ActivitiesUpsertResult[]> => {
-    debugLog(`upsertTechRecords: START`);
+    debugLog(`upsertActivity: START`);
 
     const pool = await getConnectionPool();
     const upsertResults: ActivitiesUpsertResult[] = [];
@@ -28,7 +28,7 @@ const upsertActivity = async (activity: Activity): Promise<ActivitiesUpsertResul
         const testStationId = await upsertTestStation(activityConnection, activity);
         const testerId = await upsertTester(activityConnection, activity);
 
-        debugLog(`upsertTechRecords: Upserting tech record..`);
+        debugLog(`upsertActivity: Upserting activity..`);
         await activityConnection.beginTransaction();
 
         const response = await executeFullUpsert(
@@ -65,11 +65,11 @@ const upsertActivity = async (activity: Activity): Promise<ActivitiesUpsertResul
 };
 
 const deleteActivity = async (activity: Activity): Promise<void> => {
-    throw new Error("deleting tech record documents is not implemented yet");
+    throw new Error("deleting activities is not implemented yet");
 };
 
 const upsertTestStation = async (connection: Connection, activity: Activity): Promise<number> => {
-    debugLog(`upsertTestResults: Upserting test station...`);
+    debugLog(`upsertTestStation: Upserting test station...`);
 
     const response = await executePartialUpsertIfNotExists(
         TEST_STATION_TABLE,
@@ -81,13 +81,13 @@ const upsertTestStation = async (connection: Connection, activity: Activity): Pr
         connection
     );
 
-    debugLog(`upsertTestResults: Upserted test station (ID: ${response.rows.insertId})`);
+    debugLog(`upsertTestStation: Upserted test station (ID: ${response.rows.insertId})`);
 
     return response.rows.insertId;
 };
 
 const upsertTester = async (connection: Connection, activity: Activity): Promise<number> => {
-    debugLog(`upsertTestResults: Upserting tester...`);
+    debugLog(`upsertTester: Upserting tester...`);
 
     const response = await executePartialUpsertIfNotExists(
         TESTER_TABLE,
@@ -99,22 +99,22 @@ const upsertTester = async (connection: Connection, activity: Activity): Promise
         connection
     );
 
-    debugLog(`upsertTestResults: Upserted tester (ID: ${response.rows.insertId})`);
+    debugLog(`upsertTester: Upserted tester (ID: ${response.rows.insertId})`);
 
     return response.rows.insertId;
 };
 
 const upsertWaitReasons = async (connection: Connection, activityId: string, activity: Activity): Promise<number[]> => {
-    debugLog(`upsertTechRecords: Upserting axle spacings (activity-id: ${activityId})...`);
+    debugLog(`upsertWaitReasons: Upserting wait reason (activity-id: ${activityId})...`);
 
     if (!activity.waitReason) {
-        debugLog(`upsertTechRecords: no wait reasons present`);
+        debugLog(`upsertWaitReasons: no wait reasons present`);
         return [];
     }
 
     const insertedIds: number[] = [];
 
-    debugLog(`upsertTechRecords: ${activity.waitReason.length} wait reasons to upsert`);
+    debugLog(`upsertWaitReasons: ${activity.waitReason.length} wait reasons to upsert`);
 
     for (const reason of activity.waitReason) {
         const response = await executeFullUpsert(
@@ -126,7 +126,7 @@ const upsertWaitReasons = async (connection: Connection, activityId: string, act
             connection
         );
 
-        debugLog(`upsertTechRecords: Upserted wait reason (activity-id: ${activityId}, ID: ${response.rows.insertId})`);
+        debugLog(`upsertWaitReasons: Upserted wait reason (activity-id: ${activityId}, ID: ${response.rows.insertId})`);
 
         insertedIds.push(response.rows.insertId);
     }
