@@ -434,5 +434,6 @@ export const allTables = (): TableDetails[] => {
         CUSTOM_DEFECT_TABLE,
         TEST_RESULT_TABLE,
         ACTIVITY_TABLE,
+        WAIT_REASON_TABLE
     ];
 };
