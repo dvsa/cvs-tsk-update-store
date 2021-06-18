@@ -394,7 +394,6 @@ export const ACTIVITY_TABLE: TableDetails = {
         "parentId",
         "activityType",
         "startTime",
-        "activityDay",
         "endTime",
         "notes"
     ]

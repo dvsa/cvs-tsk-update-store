@@ -57,7 +57,6 @@ describe("Activities document conversion", () => {
             activity = {
                 id: "1234",
                 activityType: "visit",
-                activityDay: "2021-06-15",
                 startTime: "2021-06-15 15:36:20.234",
                 endTime: "2021-06-15 16:15:25.954",
                 testerStaffId: "123",

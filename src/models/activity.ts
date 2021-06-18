@@ -4,7 +4,6 @@ import {debugLog} from "../services/logger";
 export interface Activity {
     id?: string;
     activityType?: string;
-    activityDay?: string;
     startTime?: string;
     endTime?: string;
     testerStaffId?: string;
@@ -25,7 +24,6 @@ export const parseActivity = (image: DynamoDbImage): Activity => {
     return {
         id: image.getString("id"),
         activityType: image.getString("activityType"),
-        activityDay: image.getString("activityDay"),
         startTime: image.getDateTime("startTime"),
         endTime: image.getDateTime("endTime"),
         testerStaffId: image.getString("testerStaffId"),

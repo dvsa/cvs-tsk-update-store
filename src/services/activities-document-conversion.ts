@@ -40,7 +40,6 @@ const upsertActivity = async (activity: Activity): Promise<ActivitiesUpsertResul
                 activity.parentId,
                 activity.activityType,
                 activity.startTime,
-                activity.activityDay,
                 activity.endTime,
                 activity.notes
             ],

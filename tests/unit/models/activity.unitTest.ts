@@ -19,7 +19,6 @@ describe("parseTechRecordDocument()", () => {
         expect(activity.testerEmail).toEqual("CVS_UAT@DVSA.GOV.UK");
         expect(activity.endTime).toEqual("2020-12-03 10:07:39.448");
         expect(activity.testStationName).toEqual("Abshire-Kub");
-        expect(activity.activityDay).toEqual("2020-12-03");
         expect(activity.testStationPNumber).toEqual("09-4129632");
         expect(activity.testStationEmail).toEqual("cvs.test2@dvsagov.onmicrosoft.com");
         expect(activity.parentId).toEqual("6c910323-0a80-420e-89be-fd41fba1b203");
