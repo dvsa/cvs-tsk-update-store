@@ -12,9 +12,7 @@
     "url": "https://github.com/dvsa/cvs-tsk-update-store.git"
   },
   "scripts": {
-    "start": "npm run kill:offline && npm run start:offline && serverless invoke local -f main --path tests/resources/queue-event.json",
-    "start:offline": "node_modules/gulp/bin/gulp.js start-serverless",
-    "kill:offline": "node_modules/gulp/bin/gulp.js kill-serverless",
+    "start": "serverless invoke local -f main --path tests/resources/queue-event.json",
     "start:docker": "docker-compose -f docker-compose.yml up -d",
     "build": "node_modules/typescript/bin/tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy",
     "build:dev": "node_modules/typescript/bin/tsc && npm run build:copy",
@@ -86,7 +84,6 @@
     "audit-filter": "0.5.0",
     "aws-lambda-mock-context": "3.2.1",
     "cross-env": "7.0.3",
-    "gulp": "4.0.2",
     "husky": "3.0.9",
     "jest": "26.0.0",
     "jest-plugin-context": "2.9.0",
