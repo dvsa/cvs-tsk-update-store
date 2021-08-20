@@ -4,7 +4,7 @@
   "description": "Update Store Microservice",
   "main": "handler.js",
   "engines": {
-    "node": "10.18.1",
+    "node": "14.*",
     "npm": "5.6.0"
   },
   "repository": {
@@ -12,9 +12,7 @@
     "url": "https://github.com/dvsa/cvs-tsk-update-store.git"
   },
   "scripts": {
-    "start": "npm run kill:offline && npm run start:offline && serverless invoke local -f main --path tests/resources/queue-event.json",
-    "start:offline": "node_modules/gulp/bin/gulp.js start-serverless",
-    "kill:offline": "node_modules/gulp/bin/gulp.js kill-serverless",
+    "start": "serverless invoke local -f main --path tests/resources/queue-event.json",
     "start:docker": "docker-compose -f docker-compose.yml up -d",
     "build": "node_modules/typescript/bin/tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy",
     "build:dev": "node_modules/typescript/bin/tsc && npm run build:copy",
@@ -23,15 +21,14 @@
     "test": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local AWS_XRAY_CONTEXT_MISSING=LOG_ERROR jest --testMatch=\"**/*.unitTest.ts\" --coverage --collectCoverageFrom=\"src/!(models)/**/!(*conversion).{js,ts}\"",
     "test-i": "cross-env SQS_BUCKET=local AWS_REGION=local USE_CONTAINERIZED_DATABASE=0 BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/*conversion.{js,ts}\"",
     "test-local-i": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local USE_CONTAINERIZED_DATABASE=1 jest --testMatch=\"**/*.intTest.ts\" --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/*conversion.{js,ts}\"",
-    "tslint": "tslint src/**/*.ts tests/**/*.ts -q",
+    "lint": "tslint src/**/*.ts tests/**/*.ts -q",
     "prettier": "prettier --write ./**/*.{js,ts}",
-    "prepush": "npm test && npm run build",
-    "sonar-scanner": "cross-env SQS_BUCKET=local AWS_XRAY_CONTEXT_MISSING=LOG_ERROR BRANCH=local npm run tslint && cross-env AWS_XRAY_CONTEXT_MISSING=LOG_ERROR BRANCH=local AWS_REGION=local npm run coverage && sonar-scanner",
-    "coverage": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local SLS_DEBUG=* jest --testMatch=\"**/*.*Test.ts\" --coverage --collectCoverageFrom=\"src/!(models)/**/!(*conversion).{js,ts}\"",
-    "audit-dep": "npm audit --json | node_modules/.bin/audit-filter --nsp-config=.nsprc --audit=-",
+    "prepush": "npm test && npm run build && npm run test-local-i",
+    "sonar-scanner": "sonar-scanner",
+    "audit": "npm audit",
     "package": "mkdir -p ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME}/ && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
     "security-checks": "git secrets --register-aws && git secrets --scan && git log -p | scanrepo",
-    "tools-setup": "liquibase --changeLogFile cvs-nop/changelog-master.xml --username root --password 12345 --url jdbc:mysql://localhost:3306/CVSBNOP --classpath tests/resources/mysql-connector-java-8.0.23.jar update"
+    "tools-setup": "liquibase --changeLogFile ../cvs-nop/changelog-master.xml --username root --password 12345 --url jdbc:mysql://127.0.0.1:3306/CVSBNOP?createDatabaseIfNotExist=true --classpath /liquibase/lib/mysql.jar update"
   },
   "nyc": {
     "include": [
@@ -74,6 +71,8 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "12.1.4",
+    "@commitlint/config-conventional": "12.1.4",
     "@types/aws-lambda": "8.10.34",
     "@types/jest": "26.0.0",
     "@types/jest-plugin-context": "2.9.2",
@@ -84,7 +83,6 @@
     "audit-filter": "0.5.0",
     "aws-lambda-mock-context": "3.2.1",
     "cross-env": "7.0.3",
-    "gulp": "4.0.2",
     "husky": "3.0.9",
     "jest": "26.0.0",
     "jest-plugin-context": "2.9.0",
@@ -114,7 +112,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run security-checks && npm audit && npm run tslint && npm run prettier",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "npm run security-checks && npm run audit && npm run lint && npm run prettier",
       "pre-push": "npm run prepush"
     }
   }
