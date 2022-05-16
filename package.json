@@ -59,7 +59,7 @@
     "commitlint": "12.1.1",
     "date-fns": "2.21.2",
     "liquibase": "1.0.1",
-    "moment": "2.24.0",
+    "moment": "2.29.2",
     "mysql2": "2.2.5",
     "node-yaml": "3.2.0",
     "prettier": "2.2.1",
