@@ -44,7 +44,7 @@ export const convert = async <T> (tableName: string, sqlOperation: SqlOperation,
 };
 
 const getEntityConverter = <T> (tableName: string): EntityConverter<T> => {
-    if (tableName.includes("technical-records")) {
+    if (tableName.includes("technical-records") || tableName.includes('flat-tech-records')) {
         tableName = "technical-records";
     } else if (tableName.includes("test-results")) {
         tableName = "test-results";
