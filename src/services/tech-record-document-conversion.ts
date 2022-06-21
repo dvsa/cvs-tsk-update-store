@@ -219,7 +219,7 @@ const deleteTechRecords = async (techRecordDocument: TechRecordDocument): Promis
 const upsertVehicle = async (connection: Connection, techRecordDocument: TechRecordDocument): Promise<number> => {
     debugLog(`upsertTechRecords: Upserting vehicle...`);
 
-    const response = await executePartialUpsert(
+    const response = await executeFullUpsert(
         VEHICLE_TABLE,
         [
             techRecordDocument.systemNumber,
