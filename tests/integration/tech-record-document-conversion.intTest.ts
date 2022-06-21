@@ -446,4 +446,101 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect(axlesResultSet.rows[0].leverLength).toEqual(1);
         expect(axlesResultSet.rows[0].springBrakeParking).toEqual(1);
     });
+    describe("hen adding a new vehicle and changing VRM to a new value, VRM should change on existing vehicle.", () => {
+        it("A new vehicle is present", async () => {
+
+            // arrange - create a record so we can later query for it and assert for is existence
+            const techRecordDocumentJsonNew = techRecordDocumentJson;
+            techRecordDocumentJsonNew.systemNumber = {S : "SYSTEM-NUMBER-2"};
+            techRecordDocumentJsonNew.vin =  {S : "VIN-2"};
+            techRecordDocumentJsonNew.primaryVrm =  {S : "VRM7777"};
+
+            const event = {
+                Records: [
+                    {
+                        body: JSON.stringify({
+                            eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
+                            eventName: "INSERT",
+                            dynamodb: {
+                                NewImage: techRecordDocumentJson
+                            }
+                        })
+                    }
+                ]
+            };
+            // array of arrays: event contains array of records, each with array of tech record entities
+            const upsertResults: TechRecordUpsertResult[][] = await processStreamEvent(
+                event,
+                exampleContext(),
+                () => {
+                    return;
+                }
+            );
+            // Assert
+            expect(upsertResults.length).toEqual(1);
+            expect(upsertResults[0].length).toEqual(1);
+            const upsertResult = upsertResults[0][0];
+            const vehicleResultSet = await executeSql(
+                `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`
+                 FROM \`vehicle\`
+                 WHERE \`vehicle\`.\`id\` = ${upsertResult.vehicleId}`
+            );
+
+            expect(vehicleResultSet.rows.length).toEqual(1);
+            expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-2");
+            expect(vehicleResultSet.rows[0].vin).toEqual("VIN-2");
+            expect(vehicleResultSet.rows[0].vrm_trm).toEqual("VRM7777");
+            expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
+            expect((vehicleResultSet.rows[0].createdAt as Date).toUTCString()).not.toBeNull(); // todo This returns null
+            });
+
+        it("VRM has changed", async () => {
+
+            // arrange - create a record with existing pair of (SystemNumber, VIN) and new VRM so we can later query for it and assert its value
+            const techRecordDocumentJsonNew = techRecordDocumentJson;
+            techRecordDocumentJsonNew.systemNumber = {S : "SYSTEM-NUMBER-2"};
+            techRecordDocumentJsonNew.vin =  {S : "VIN-2"};
+            techRecordDocumentJsonNew.primaryVrm =  {S : "VRM888NEW"};
+
+            const event = {
+                Records: [
+                    {
+                        body: JSON.stringify({
+                            eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
+                            eventName: "INSERT",
+                            dynamodb: {
+                                NewImage: techRecordDocumentJson
+                            }
+                        })
+                    }
+                ]
+            };
+            // array of arrays: event contains array of records, each with array of tech record entities
+            const upsertResults: TechRecordUpsertResult[][] = await processStreamEvent(
+                event,
+                exampleContext(),
+                () => {
+                    return;
+                }
+            );
+
+            // Assert
+            expect(upsertResults.length).toEqual(1);
+            expect(upsertResults[0].length).toEqual(1);
+            const upsertResult = upsertResults[0][0];
+            const vehicleResultSet = await executeSql(
+                `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`
+                 FROM \`vehicle\`
+                 WHERE \`vehicle\`.\`id\` = ${upsertResult.vehicleId}`
+            );
+
+            expect(vehicleResultSet.rows.length).toEqual(1);
+            expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-2");
+            expect(vehicleResultSet.rows[0].vin).toEqual("VIN-2");
+            expect(vehicleResultSet.rows[0].vrm_trm).toEqual("VRM888NEW");
+            expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
+            expect((vehicleResultSet.rows[0].createdAt as Date).toUTCString()).not.toBeNull(); // todo This returns null
+
+        });
+    });
 });
