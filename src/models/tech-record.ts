@@ -156,8 +156,8 @@ export const parseTechRecords = (image?: DynamoDbImage): TechRecords => {
 const parseTechRecord = (image: DynamoDbImage): TechRecord => {
     return {
         recordCompleteness: image.getString("recordCompleteness"),
-        createdAt: image.getDate("createdAt"),
-        lastUpdatedAt: image.getDate("lastUpdatedAt"),
+        createdAt: image.getDateTime("createdAt"),
+        lastUpdatedAt: image.getDateTime("lastUpdatedAt"),
         make: image.getString("make"),
         model: image.getString("model"),
         functionCode: image.getString("functionCode"),

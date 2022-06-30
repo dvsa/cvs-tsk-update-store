@@ -82,7 +82,7 @@ export class DynamoDbImage {
      * Parse the {@code S} field under {@code key} as a {@code string}.
      * @param key
      */
-    public getDate(key: string): Maybe<string> {
+    public getDateTime(key: string): Maybe<string> {
         return this.parseItem(
             key,
             "S",

@@ -29,3 +29,10 @@ export interface TestResultUpsertResult {
     defectIds: number[];
     customDefectIds: number[];
 }
+
+export interface ActivitiesUpsertResult {
+    activityId: number;
+    testStationId: number;
+    testerId: number;
+    waitReasonIds: number[];
+}

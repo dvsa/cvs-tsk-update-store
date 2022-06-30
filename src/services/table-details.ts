@@ -385,6 +385,28 @@ export const TEST_RESULT_TABLE: TableDetails = {
     ]
 };
 
+export const ACTIVITY_TABLE: TableDetails = {
+    tableName: "activity",
+    columnNames: [
+        "test_station_id",
+        "tester_id",
+        "activityId",
+        "parentId",
+        "activityType",
+        "startTime",
+        "endTime",
+        "notes"
+    ]
+};
+
+export const WAIT_REASON_TABLE: TableDetails = {
+    tableName: "wait_reason",
+    columnNames: [
+        "activity_id",
+        "reason"
+    ]
+};
+
 export const allTables = (): TableDetails[] => {
     return [
         VEHICLE_TABLE,
@@ -410,5 +432,7 @@ export const allTables = (): TableDetails[] => {
         TEST_DEFECT_TABLE,
         CUSTOM_DEFECT_TABLE,
         TEST_RESULT_TABLE,
+        ACTIVITY_TABLE,
+        WAIT_REASON_TABLE
     ];
 };
