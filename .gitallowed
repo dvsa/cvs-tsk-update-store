@@ -1,0 +1,6 @@
+# RegEx patterns that caused git secrets --scan to raise violations
+ON DUPLICATE KEY
+MY-SECRET-VALUE
+MY-SECRET-KEY
+process.env.SECRET
+TEST_SECRET
