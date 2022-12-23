@@ -1,13 +1,10 @@
 import {Context, DynamoDBRecord, DynamoDBStreamEvent, Handler, SQSEvent, StreamRecord} from "aws-lambda";
-import {EventSourceArn, stringToArn} from "../services/event-source-arn";
 import {convert} from "../services/entity-conversion";
 import {DynamoDbImage} from "../services/dynamodb-images";
 import {deriveSqlOperation, SqlOperation} from "../services/sql-operations";
 import {destroyConnectionPool} from "../services/connection-pool";
 import {debugLog} from "../services/logger";
-import {SqsService} from "../services/sqs-huge-msg";
-import AWSXRay from "aws-xray-sdk";
-import { SQS, S3 } from "aws-sdk";
+import { BatchItemFailuresResponse } from "../models/batch-item-failure-response"
 
 /**
  * λ function: convert a DynamoDB document to Aurora RDS rows
@@ -15,12 +12,15 @@ import { SQS, S3 } from "aws-sdk";
  * @param context - λ context
  */
 export const processStreamEvent: Handler = async (event: SQSEvent, context: Context): Promise<any> => {
+    const res: BatchItemFailuresResponse = {
+        batchItemFailures: [],
+    };
+
     try {
         debugLog("Received SQS event: ", event);
 
         validateEvent(event);
 
-        const upsertResults: any[] = [];
         const region = process.env.AWS_REGION;
 
         if (!region) {
@@ -30,8 +30,8 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
 
         debugLog(`Received valid SQS event (${event.Records.length} records)`);
 
-
         for await (const record of event.Records) {
+            const id = record.messageId;
             const dynamoRecord: DynamoDBRecord = JSON.parse(record.body) as DynamoDBRecord;
 
             debugLog("Original DynamoDB stream event body (parsed): ", dynamoRecord);
@@ -39,11 +39,7 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
             validateRecord(dynamoRecord);
 
             // parse source ARN
-            const eventSourceArn: EventSourceArn = stringToArn(dynamoRecord.eventSourceARN!);
-
-            debugLog(`source ARN region:     '${eventSourceArn.region}'`);
-            debugLog(`source ARN account ID: '${eventSourceArn.accountId}'`);
-            debugLog(`source ARN timestamp:  '${eventSourceArn.timestamp}'`);
+            const tableName: string = getTableNameFromArn(dynamoRecord.eventSourceARN!);
 
             // is this an INSERT, UPDATE, or DELETE?
             const operationType: SqlOperation = deriveSqlOperation(dynamoRecord.eventName!);
@@ -56,25 +52,28 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
             try {
                 debugLog(`DynamoDB ---> Aurora | START (event ID: ${dynamoRecord.eventID})`);
 
-                const upsertResult = await convert(eventSourceArn.table, operationType, image);
-                upsertResults.push(upsertResult);
+                await convert(tableName, operationType, image);
 
                 debugLog(`DynamoDB ---> Aurora | END   (event ID: ${dynamoRecord.eventID})`);
             } catch (err) {
-                console.error("Couldn't convert DynamoDB entity to Aurora", err);
+                console.error("Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry", err);
+                res.batchItemFailures.push({ itemIdentifier: id });
                 dumpArguments(event, context);
             }
         }
 
         await destroyConnectionPool();
-
-        return upsertResults;
     } catch (err) {
-        console.error("An error unrelated to Dynamo-to-Aurora conversion has occurred", err);
+        console.error("An error unrelated to Dynamo-to-Aurora conversion has occurred, event will not be retried", err);
         dumpArguments(event, context);
-        throw err;
+    } finally {
+        return res;
     }
 };
+
+export const getTableNameFromArn = (eventSourceArn: string): string => {
+    return eventSourceArn.split(':')[5].split('/')[1];
+}
 
 const selectImage = (operationType: SqlOperation, streamRecord: StreamRecord): DynamoDbImage => {
     switch (operationType) {
