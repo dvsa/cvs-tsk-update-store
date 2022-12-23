@@ -4,7 +4,7 @@ import {DynamoDbImage} from "../services/dynamodb-images";
 import {deriveSqlOperation, SqlOperation} from "../services/sql-operations";
 import {destroyConnectionPool} from "../services/connection-pool";
 import {debugLog} from "../services/logger";
-import { BatchItemFailuresResponse } from "../models/batch-item-failure-response"
+import { BatchItemFailuresResponse } from "../models/batch-item-failure-response";
 
 /**
  * λ function: convert a DynamoDB document to Aurora RDS rows
@@ -66,14 +66,13 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
     } catch (err) {
         console.error("An error unrelated to Dynamo-to-Aurora conversion has occurred, event will not be retried", err);
         dumpArguments(event, context);
-    } finally {
-        return res;
     }
+    return res;
 };
 
 export const getTableNameFromArn = (eventSourceArn: string): string => {
-    return eventSourceArn.split(':')[5].split('/')[1];
-}
+    return eventSourceArn.split(":")[5].split("/")[1];
+};
 
 const selectImage = (operationType: SqlOperation, streamRecord: StreamRecord): DynamoDbImage => {
     switch (operationType) {

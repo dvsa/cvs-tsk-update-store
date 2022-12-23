@@ -84,7 +84,7 @@ describe("convertTestResults() integration tests", () => {
 
         expect(testResultSet.rows.length).toEqual(1);
 
-        const { test_station_id, tester_id, vehicle_class_id, preparer_id, createdBy_Id, lastUpdatedBy_Id, fuel_emission_id, test_type_id, id } = testResultSet.rows[0]
+        const { test_station_id, tester_id, vehicle_class_id, preparer_id, createdBy_Id, lastUpdatedBy_Id, fuel_emission_id, test_type_id, id } = testResultSet.rows[0];
 
         const testStationResultSet = await executeSql(
             `SELECT \`pNumber\`, \`name\`, \`type\`
@@ -175,7 +175,7 @@ describe("convertTestResults() integration tests", () => {
             `SELECT \`test_result_id\`, \`defect_id\`, \`location_id\`, \`notes\`, \`prs\`, \`prohibitionIssued\`
              FROM \`test_defect\`
              WHERE \`test_defect\`.\`test_result_id\` = ${id}`
-        );        
+        );
 
         expect(testDefectResultSet.rows[0].test_result_id).toEqual(id);
         expect(testDefectResultSet.rows[0].defect_id).toEqual(1);
