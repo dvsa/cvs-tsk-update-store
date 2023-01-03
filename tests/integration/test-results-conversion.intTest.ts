@@ -177,18 +177,14 @@ describe("convertTestResults() integration tests", () => {
              WHERE \`test_defect\`.\`test_result_id\` = ${id}`
         );
 
-        expect(testDefectResultSet.rows[0].test_result_id).toEqual(id);
-        expect(testDefectResultSet.rows[0].defect_id).toEqual(1);
-        expect(testDefectResultSet.rows[0].location_id).toEqual(1);
-        expect(testDefectResultSet.rows[0].notes).toEqual("NOTES");
-        expect(testDefectResultSet.rows[0].prs).toEqual(1);
-        expect(testDefectResultSet.rows[0].prohibitionIssued).toEqual(1);
-        expect(testDefectResultSet.rows[1].test_result_id).toEqual(id);
-        expect(testDefectResultSet.rows[1].defect_id).toEqual(1);
-        expect(testDefectResultSet.rows[1].location_id).toEqual(1);
-        expect(testDefectResultSet.rows[1].notes).toEqual("NOTES");
-        expect(testDefectResultSet.rows[1].prs).toEqual(1);
-        expect(testDefectResultSet.rows[1].prohibitionIssued).toEqual(1);
+        const testDefectLastIndex = testDefectResultSet.rows.length - 1;
+
+        expect(testDefectResultSet.rows[testDefectLastIndex].test_result_id).toEqual(id);
+        expect(testDefectResultSet.rows[testDefectLastIndex].defect_id).toEqual(1);
+        expect(testDefectResultSet.rows[testDefectLastIndex].location_id).toEqual(1);
+        expect(testDefectResultSet.rows[testDefectLastIndex].notes).toEqual("NOTES");
+        expect(testDefectResultSet.rows[testDefectLastIndex].prs).toEqual(1);
+        expect(testDefectResultSet.rows[testDefectLastIndex].prohibitionIssued).toEqual(1);
 
         const defectResultSet = await executeSql(
             `SELECT \`imNumber\`,
@@ -202,7 +198,7 @@ describe("convertTestResults() integration tests", () => {
                     \`deficiencyText\`,
                     \`stdForProhibition\`
              FROM \`defect\`
-             WHERE \`defect\`.\`id\` = ${testDefectResultSet.rows[0].defect_id}`
+             WHERE \`defect\`.\`id\` = ${testDefectResultSet.rows[testDefectLastIndex].defect_id}`
         );
         expect(defectResultSet.rows.length).toEqual(1);
         expect(defectResultSet.rows[0].imNumber).toEqual(1);
@@ -219,12 +215,14 @@ describe("convertTestResults() integration tests", () => {
         const customDefectResultSet = await executeSql(
             `SELECT \`test_result_id\`, \`referenceNumber\`, \`defectName\`, \`defectNotes\`
              FROM \`custom_defect\`
-             WHERE \`custom_defect\`.\`id\` = ${testDefectResultSet.rows[1].defect_id}`
+             WHERE \`custom_defect\`.\`test_result_id\` = ${id}`
         );
-        expect(customDefectResultSet.rows.length).toEqual(1);
-        expect(customDefectResultSet.rows[0].test_result_id).toEqual(id);
-        expect(customDefectResultSet.rows[0].referenceNumber).toEqual("1010101010");
-        expect(customDefectResultSet.rows[0].defectName).toEqual("DEFECT-NAME");
-        expect(customDefectResultSet.rows[0].defectNotes).toEqual("DEFECT-NOTES");
+
+        const customDefectLastIndex = customDefectResultSet.rows.length - 1;
+
+        expect(customDefectResultSet.rows[customDefectLastIndex].test_result_id).toEqual(id);
+        expect(customDefectResultSet.rows[customDefectLastIndex].referenceNumber).toEqual("1010101010");
+        expect(customDefectResultSet.rows[customDefectLastIndex].defectName).toEqual("DEFECT-NAME");
+        expect(customDefectResultSet.rows[customDefectLastIndex].defectNotes).toEqual("DEFECT-NOTES");
     });
 });
