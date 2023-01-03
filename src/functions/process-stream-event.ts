@@ -5,9 +5,6 @@ import {DynamoDbImage} from "../services/dynamodb-images";
 import {deriveSqlOperation, SqlOperation} from "../services/sql-operations";
 import {destroyConnectionPool} from "../services/connection-pool";
 import {debugLog} from "../services/logger";
-import {SqsService} from "../services/sqs-huge-msg";
-import AWSXRay from "aws-xray-sdk";
-import { SQS, S3 } from "aws-sdk";
 
 /**
  * λ function: convert a DynamoDB document to Aurora RDS rows
@@ -66,12 +63,11 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
             }
         }
 
-        await destroyConnectionPool();
-
         return upsertResults;
     } catch (err) {
         console.error("An error unrelated to Dynamo-to-Aurora conversion has occurred", err);
         dumpArguments(event, context);
+        await destroyConnectionPool();
         throw err;
     }
 };
