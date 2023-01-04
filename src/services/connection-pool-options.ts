@@ -10,7 +10,7 @@ export const getConnectionPoolOptions = async (): Promise<PoolOptions> => {
         user: config.username,
         password: config.password,
         database: process.env.SCHEMA_NAME,
-        connectionLimit: 1000,
+        connectionLimit: 50,
     };
 };
 
