@@ -61,11 +61,10 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
                 dumpArguments(event, context);
             }
         }
-
-        await destroyConnectionPool();
     } catch (err) {
         console.error("An error unrelated to Dynamo-to-Aurora conversion has occurred, event will not be retried", err);
         dumpArguments(event, context);
+        await destroyConnectionPool();
     }
     return res;
 };

@@ -13,17 +13,19 @@ export interface QueryResponse {
 let pool: Maybe<Pool>;
 
 export const getConnectionPool = async (): Promise<Pool> => {
-    if (!pool) {
-        debugLog("getConnectionPool: Creating connection pool...");
-
-        const config = await getConnectionPoolOptions();
-
-        debugLog(`getConnectionPool: Destination DB ${config.database}`);
-
-        pool = mysql2.createPool(config);
-
-        debugLog("getConnectionPool: Connection pool created");
+    if (pool) {
+        debugLog("getConnectionPool: Returning existing connection pool");
+        return pool;
     }
+    debugLog("getConnectionPool: Creating connection pool...");
+
+    const config = await getConnectionPoolOptions();
+
+    debugLog(`getConnectionPool: Destination DB ${config.database}`);
+
+    pool = mysql2.createPool(config);
+
+    debugLog("getConnectionPool: Connection pool created");
     return pool;
 };
 
