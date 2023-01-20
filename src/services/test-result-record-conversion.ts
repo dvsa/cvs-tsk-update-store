@@ -78,9 +78,9 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
             const createdById = await upsertIdentity(testResultConnection, testResult.createdById!, testResult.createdByName!);
             const lastUpdatedById = await upsertIdentity(testResultConnection, testResult.lastUpdatedById!, testResult.lastUpdatedByName!);
 
-            await testResultConnection.beginTransaction();
-
             for (const testType of testResult.testTypes!) {
+                await testResultConnection.beginTransaction();
+
                 const fuelEmissionId = await upsertFuelEmission(testResultConnection, testType);
                 const testTypeId = await upsertTestType(testResultConnection, testType);
 
