@@ -3,7 +3,6 @@ import {destroyConnectionPool, executeSql} from "../../src/services/connection-p
 import {exampleContext, useLocalDb} from "../utils";
 import testResultsJson from "../resources/dynamodb-image-test-results.json";
 import {getContainerizedDatabase} from "./cvsbnop-container";
-import {TestResultUpsertResult} from "../../src/models/upsert-results";
 import {processStreamEvent} from "../../src/functions/process-stream-event";
 import {getConnectionPoolOptions} from "../../src/services/connection-pool-options";
 
@@ -52,7 +51,7 @@ describe("convertTestResults() integration tests", () => {
         };
 
         // array of arrays: event contains array of records, each with array of test result entities
-        const upsertResults: TestResultUpsertResult[][] = await processStreamEvent(
+        await processStreamEvent(
             event,
             exampleContext(),
             () => {
@@ -60,16 +59,16 @@ describe("convertTestResults() integration tests", () => {
             }
         );
 
-        expect(upsertResults.length).toEqual(1);
-        expect(upsertResults[0].length).toEqual(1);
-
-        const upsertResult = upsertResults[0][0];
-
         const vehicleResultSet = await executeSql(
-            `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`
+            `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`, \`id\`
              FROM \`vehicle\`
-             WHERE \`vehicle\`.\`id\` = ${upsertResult.vehicleId}`
+             WHERE \`vehicle\`.\`id\` IN (
+                SELECT \`id\`
+                FROM \`vehicle\`
+                WHERE \`vehicle\`.\`system_number\` = "SYSTEM-NUMBER"
+             )`
         );
+
         expect(vehicleResultSet.rows.length).toEqual(1);
         expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER");
         expect(vehicleResultSet.rows[0].vin).toEqual("VIN");
@@ -77,10 +76,20 @@ describe("convertTestResults() integration tests", () => {
         expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
         expect((vehicleResultSet.rows[0].createdAt as Date).toUTCString()).not.toBeNull();
 
+        const testResultSet = await executeSql(
+            `SELECT \`test_station_id\`, \`tester_id\`, \`vehicle_class_id\`, \`preparer_id\`, \`createdBy_Id\`, \`lastUpdatedBy_Id\`, \`fuel_emission_id\`, \`test_type_id\`, \`id\`
+             FROM \`test_result\`
+             WHERE \`test_result\`.\`vehicle_id\` = ${vehicleResultSet.rows[0].id}`
+        );
+
+        expect(testResultSet.rows.length).toEqual(1);
+
+        const { test_station_id, tester_id, vehicle_class_id, preparer_id, createdBy_Id, lastUpdatedBy_Id, fuel_emission_id, test_type_id, id } = testResultSet.rows[0];
+
         const testStationResultSet = await executeSql(
             `SELECT \`pNumber\`, \`name\`, \`type\`
              FROM \`test_station\`
-             WHERE \`test_station\`.\`id\` = ${upsertResult.testStationId}`
+             WHERE \`test_station\`.\`id\` = ${test_station_id}`
         );
         expect(testStationResultSet.rows.length).toEqual(1);
         expect(testStationResultSet.rows[0].pNumber).toEqual("P-NUMBER");
@@ -90,7 +99,7 @@ describe("convertTestResults() integration tests", () => {
         const testerResultSet = await executeSql(
             `SELECT \`staffId\`, \`name\`, \`email_address\`
              FROM \`tester\`
-             WHERE \`tester\`.\`id\` = ${upsertResult.testerId}`
+             WHERE \`tester\`.\`id\` = ${tester_id}`
         );
         expect(testerResultSet.rows.length).toEqual(1);
         expect(testerResultSet.rows[0].staffId).toEqual("999999999");
@@ -105,7 +114,7 @@ describe("convertTestResults() integration tests", () => {
                     \`vehicleConfiguration\`,
                     \`euVehicleCategory\`
              FROM \`vehicle_class\`
-             WHERE \`vehicle_class\`.\`id\` = ${upsertResult.vehicleClassId}`
+             WHERE \`vehicle_class\`.\`id\` = ${vehicle_class_id}`
         );
         expect(vehicleClassResultSet.rows.length).toEqual(1);
         expect(vehicleClassResultSet.rows[0].code).toEqual("2");
@@ -118,7 +127,7 @@ describe("convertTestResults() integration tests", () => {
         const preparerResultSet = await executeSql(
             `SELECT \`preparerId\`, \`name\`
              FROM \`preparer\`
-             WHERE \`preparer\`.\`id\` = ${upsertResult.preparerId}`
+             WHERE \`preparer\`.\`id\` = ${preparer_id}`
         );
         expect(preparerResultSet.rows.length).toEqual(1);
         expect(preparerResultSet.rows[0].preparerId).toEqual("999999999");
@@ -127,7 +136,7 @@ describe("convertTestResults() integration tests", () => {
         const createdByResultSet = await executeSql(
             `SELECT \`identityId\`, \`name\`
              FROM \`identity\`
-             WHERE \`identity\`.\`id\` = ${upsertResult.createdById}`
+             WHERE \`identity\`.\`id\` = ${createdBy_Id}`
         );
         expect(createdByResultSet.rows.length).toEqual(1);
         expect(createdByResultSet.rows[0].identityId).toEqual("CREATED-BY-ID");
@@ -136,7 +145,7 @@ describe("convertTestResults() integration tests", () => {
         const lastUpdatedByResultSet = await executeSql(
             `SELECT \`identityId\`, \`name\`
              FROM \`identity\`
-             WHERE \`identity\`.\`id\` = ${upsertResult.lastUpdatedById}`
+             WHERE \`identity\`.\`id\` = ${lastUpdatedBy_Id}`
         );
         expect(lastUpdatedByResultSet.rows.length).toEqual(1);
         expect(lastUpdatedByResultSet.rows[0].identityId).toEqual("LAST-UPDATED-BY-ID");
@@ -145,7 +154,7 @@ describe("convertTestResults() integration tests", () => {
         const fuelEmissionResultSet = await executeSql(
             `SELECT \`modTypeCode\`, \`description\`, \`emissionStandard\`, \`fuelType\`
              FROM \`fuel_emission\`
-             WHERE \`fuel_emission\`.\`id\` = ${upsertResult.fuelEmissionId}`
+             WHERE \`fuel_emission\`.\`id\` = ${fuel_emission_id}`
         );
         expect(fuelEmissionResultSet.rows.length).toEqual(1);
         expect(fuelEmissionResultSet.rows[0].modTypeCode).toEqual("p");
@@ -156,13 +165,26 @@ describe("convertTestResults() integration tests", () => {
         const testTypeResultSet = await executeSql(
             `SELECT \`testTypeClassification\`, \`testTypeName\`
              FROM \`test_type\`
-             WHERE \`test_type\`.\`id\` = ${upsertResult.testTypeId}`
+             WHERE \`test_type\`.\`id\` = ${test_type_id}`
         );
         expect(testTypeResultSet.rows.length).toEqual(1);
         expect(testTypeResultSet.rows[0].testTypeClassification).toEqual("2323232323232323232323");
         expect(testTypeResultSet.rows[0].testTypeName).toEqual("TEST-TYPE-NAME");
 
-        expect(upsertResult.defectIds.length).toEqual(1);
+        const testDefectResultSet = await executeSql(
+            `SELECT \`test_result_id\`, \`defect_id\`, \`location_id\`, \`notes\`, \`prs\`, \`prohibitionIssued\`
+             FROM \`test_defect\`
+             WHERE \`test_defect\`.\`test_result_id\` = ${id}`
+        );
+
+        const testDefectLastIndex = testDefectResultSet.rows.length - 1;
+
+        expect(testDefectResultSet.rows[testDefectLastIndex].test_result_id).toEqual(id);
+        expect(testDefectResultSet.rows[testDefectLastIndex].defect_id).toEqual(1);
+        expect(testDefectResultSet.rows[testDefectLastIndex].location_id).toEqual(1);
+        expect(testDefectResultSet.rows[testDefectLastIndex].notes).toEqual("NOTES");
+        expect(testDefectResultSet.rows[testDefectLastIndex].prs).toEqual(1);
+        expect(testDefectResultSet.rows[testDefectLastIndex].prohibitionIssued).toEqual(1);
 
         const defectResultSet = await executeSql(
             `SELECT \`imNumber\`,
@@ -176,7 +198,7 @@ describe("convertTestResults() integration tests", () => {
                     \`deficiencyText\`,
                     \`stdForProhibition\`
              FROM \`defect\`
-             WHERE \`defect\`.\`id\` = ${upsertResult.defectIds[0]}`
+             WHERE \`defect\`.\`id\` = ${testDefectResultSet.rows[testDefectLastIndex].defect_id}`
         );
         expect(defectResultSet.rows.length).toEqual(1);
         expect(defectResultSet.rows[0].imNumber).toEqual(1);
@@ -190,30 +212,17 @@ describe("convertTestResults() integration tests", () => {
         expect(defectResultSet.rows[0].deficiencyText).toEqual("DEFICIENCY-TEXT");
         expect(defectResultSet.rows[0].itemNumber).toEqual(1);
 
-        const testDefectResultSet = await executeSql(
-            `SELECT \`test_result_id\`, \`defect_id\`, \`location_id\`, \`notes\`, \`prs\`, \`prohibitionIssued\`
-             FROM \`test_defect\`
-             WHERE \`test_defect\`.\`test_result_id\` = ${upsertResult.testResultId}`
-        );
-        const lastIndex = testDefectResultSet.rows.length - 1;
-
-        expect(testDefectResultSet.rows[lastIndex].test_result_id).toEqual(upsertResult.testResultId);
-        expect(testDefectResultSet.rows[lastIndex].defect_id).toEqual(upsertResult.defectIds[0]);
-        expect(testDefectResultSet.rows[lastIndex].location_id).toEqual(1);
-        expect(testDefectResultSet.rows[lastIndex].notes).toEqual("NOTES");
-        expect(testDefectResultSet.rows[lastIndex].prs).toEqual(1);
-        expect(testDefectResultSet.rows[lastIndex].prohibitionIssued).toEqual(1);
-        expect(upsertResult.customDefectIds.length).toEqual(1);
-
         const customDefectResultSet = await executeSql(
             `SELECT \`test_result_id\`, \`referenceNumber\`, \`defectName\`, \`defectNotes\`
              FROM \`custom_defect\`
-             WHERE \`custom_defect\`.\`id\` = ${upsertResult.customDefectIds[0]}`
+             WHERE \`custom_defect\`.\`test_result_id\` = ${id}`
         );
-        expect(customDefectResultSet.rows.length).toEqual(1);
-        expect(customDefectResultSet.rows[0].test_result_id).toEqual(upsertResult.testResultId);
-        expect(customDefectResultSet.rows[0].referenceNumber).toEqual("1010101010");
-        expect(customDefectResultSet.rows[0].defectName).toEqual("DEFECT-NAME");
-        expect(customDefectResultSet.rows[0].defectNotes).toEqual("DEFECT-NOTES");
+
+        const customDefectLastIndex = customDefectResultSet.rows.length - 1;
+
+        expect(customDefectResultSet.rows[customDefectLastIndex].test_result_id).toEqual(id);
+        expect(customDefectResultSet.rows[customDefectLastIndex].referenceNumber).toEqual("1010101010");
+        expect(customDefectResultSet.rows[customDefectLastIndex].defectName).toEqual("DEFECT-NAME");
+        expect(customDefectResultSet.rows[customDefectLastIndex].defectNotes).toEqual("DEFECT-NOTES");
     });
 });

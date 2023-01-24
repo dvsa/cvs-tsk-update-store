@@ -3,7 +3,6 @@ import {destroyConnectionPool, executeSql} from "../../src/services/connection-p
 import {exampleContext, useLocalDb} from "../utils";
 import techRecordDocumentJson from "../resources/dynamodb-image-technical-record.json";
 import {getContainerizedDatabase} from "./cvsbnop-container";
-import {TechRecordUpsertResult} from "../../src/models/upsert-results";
 import {processStreamEvent} from "../../src/functions/process-stream-event";
 import {getConnectionPoolOptions} from "../../src/services/connection-pool-options";
 
@@ -52,7 +51,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         };
 
         // array of arrays: event contains array of records, each with array of tech record entities
-        const upsertResults: TechRecordUpsertResult[][] = await processStreamEvent(
+        await processStreamEvent(
             event,
             exampleContext(),
             () => {
@@ -60,15 +59,14 @@ describe("convertTechRecordDocument() integration tests", () => {
             }
         );
 
-        expect(upsertResults.length).toEqual(1);
-        expect(upsertResults[0].length).toEqual(1);
-
-        const upsertResult = upsertResults[0][0];
-
         const vehicleResultSet = await executeSql(
-            `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`
+            `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`, \`id\`
              FROM \`vehicle\`
-             WHERE \`vehicle\`.\`id\` = ${upsertResult.vehicleId}`
+             WHERE \`vehicle\`.\`id\` IN (
+                SELECT \`id\`
+                FROM \`vehicle\`
+                WHERE \`vehicle\`.\`system_number\` = "SYSTEM-NUMBER-1"
+             )`
         );
         expect(vehicleResultSet.rows.length).toEqual(1);
         expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-1");
@@ -76,6 +74,19 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect(vehicleResultSet.rows[0].vrm_trm).toEqual("999999999");
         expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
         expect((vehicleResultSet.rows[0].createdAt as Date).toUTCString()).not.toBeNull(); // todo This returns null
+
+        const vehicleId = vehicleResultSet.rows[0].id;
+        const technicalRecordSet = await executeSql(
+            `SELECT \`make_model_id\`, \`vehicle_class_id\`, \`createdBy_Id\`, \`lastUpdatedBy_Id\`, \`applicant_detail_id\`, \`purchaser_detail_id\`, \`manufacturer_detail_id\`, \`id\`
+            FROM \`technical_record\`
+            WHERE \`technical_record\`.\`vehicle_id\` = ${vehicleId}`
+        );
+
+        expect(technicalRecordSet.rows.length).toEqual(1);
+
+        const { make_model_id, vehicle_class_id, createdBy_Id, lastUpdatedBy_Id, applicant_detail_id, purchaser_detail_id, manufacturer_detail_id } = technicalRecordSet.rows[0];
+
+        const technicalRecordId = technicalRecordSet.rows[0].id;
 
         const makeModelResultSet = await executeSql(
             `SELECT \`make\`,
@@ -90,7 +101,7 @@ describe("convertTechRecordDocument() integration tests", () => {
                     \`fuelPropulsionSystem\`,
                     \`dtpCode\`
              FROM \`make_model\`
-             WHERE \`make_model\`.\`id\` = ${upsertResult.makeModelId}`
+             WHERE \`make_model\`.\`id\` = ${make_model_id}`
         );
         expect(makeModelResultSet.rows.length).toEqual(1);
         expect(makeModelResultSet.rows[0].make).toEqual("MAKE");
@@ -113,7 +124,7 @@ describe("convertTechRecordDocument() integration tests", () => {
                     \`vehicleConfiguration\`,
                     \`euVehicleCategory\`
              FROM \`vehicle_class\`
-             WHERE \`vehicle_class\`.\`id\` = ${upsertResult.vehicleClassId}`
+             WHERE \`vehicle_class\`.\`id\` = ${vehicle_class_id}`
         );
         expect(vehicleClassResultSet.rows.length).toEqual(1);
         expect(vehicleClassResultSet.rows[0].code).toEqual("2");
@@ -126,7 +137,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         const createdByResultSet = await executeSql(
             `SELECT \`identityId\`, \`name\`
              FROM \`identity\`
-             WHERE \`identity\`.\`id\` = ${upsertResult.createdById}`
+             WHERE \`identity\`.\`id\` = ${createdBy_Id}`
         );
         expect(createdByResultSet.rows.length).toEqual(1);
         expect(createdByResultSet.rows[0].identityId).toEqual("CREATED-BY-ID");
@@ -135,7 +146,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         const lastUpdatedByResultSet = await executeSql(
             `SELECT \`identityId\`, \`name\`
              FROM \`identity\`
-             WHERE \`identity\`.\`id\` = ${upsertResult.lastUpdatedById}`
+             WHERE \`identity\`.\`id\` = ${lastUpdatedBy_Id}`
         );
         expect(lastUpdatedByResultSet.rows.length).toEqual(1);
         expect(lastUpdatedByResultSet.rows[0].identityId).toEqual("LAST-UPDATED-BY-ID");
@@ -152,8 +163,12 @@ describe("convertTechRecordDocument() integration tests", () => {
                     \`telephoneNumber\`,
                     \`faxNumber\`
              FROM \`contact_details\`
-             WHERE \`contact_details\`.\`id\` = ${upsertResult.contactDetailsId}`
+             WHERE \`contact_details\`.\`id\` = ${applicant_detail_id}`
         );
+
+        const contactIds = [applicant_detail_id, manufacturer_detail_id, purchaser_detail_id];
+        expect(contactIds.every((id) => contactIds[0] === id)).toBe(true);
+
         expect(contactDetailsResultSet.rows.length).toEqual(1);
         expect(contactDetailsResultSet.rows[0].name).toEqual("NAME");
         expect(contactDetailsResultSet.rows[0].address1).toEqual("ADDRESS-1");
@@ -251,10 +266,10 @@ describe("convertTechRecordDocument() integration tests", () => {
                     \`numberOfSeatbelts\`,
                     \`seatbeltInstallationApprovalDate\`
              FROM \`technical_record\`
-             WHERE \`technical_record\`.\`id\` = ${upsertResult.techRecordId}`
+             WHERE \`technical_record\`.\`id\` = ${technicalRecordId}`
         );
         // check a few fields of different types here
-        expect((techRecordResultSet.rows[0].vehicle_id)).toEqual(upsertResult.vehicleId);
+        expect((techRecordResultSet.rows[0].vehicle_id)).toEqual(vehicleId);
         expect((techRecordResultSet.rows[0].recordCompleteness)).toEqual("88888888");
         expect((techRecordResultSet.rows[0].createdAt as Date).toUTCString()).toEqual("Wed, 01 Jan 2020 00:00:00 GMT");
         expect((techRecordResultSet.rows[0].lastUpdatedAt as Date).toUTCString()).toEqual("Wed, 01 Jan 2020 00:00:00 GMT");
@@ -267,7 +282,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect((techRecordResultSet.rows[0].emissionsLimit)).toEqual("1");
         expect((techRecordResultSet.rows[0].departmentalVehicleMarker)).toEqual(1);
         expect((techRecordResultSet.rows[0].alterationMarker)).toEqual(1);
-        expect((techRecordResultSet.rows[0].vehicle_class_id)).toEqual(upsertResult.vehicleClassId);
+        expect((techRecordResultSet.rows[0].vehicle_class_id)).toEqual(vehicle_class_id);
         expect((techRecordResultSet.rows[0].variantVersionNumber)).toEqual("1");
         expect((techRecordResultSet.rows[0].grossEecWeight)).toEqual(1);
         expect((techRecordResultSet.rows[0].trainEecWeight)).toEqual(1);
@@ -355,10 +370,10 @@ describe("convertTechRecordDocument() integration tests", () => {
                     \`secondaryBrakeForceB\`,
                     \`parkingBrakeForceB\`
              FROM \`psv_brakes\`
-             WHERE \`psv_brakes\`.\`id\` = ${upsertResult.psvBrakesId}`
+             WHERE \`psv_brakes\`.\`technical_record_id\` = ${technicalRecordId}`
         );
         expect(brakesResultSet.rows.length).toEqual(1);
-        expect(brakesResultSet.rows[0].technical_record_id).toEqual(upsertResult.techRecordId);
+        expect(brakesResultSet.rows[0].technical_record_id).toEqual(technicalRecordId);
         expect(brakesResultSet.rows[0].brakeCodeOriginal).toEqual("333");
         expect(brakesResultSet.rows[0].brakeCode).toEqual("666666");
         expect(brakesResultSet.rows[0].dataTrBrakeOne).toEqual("DATA-TR-BRAKE-ONE");
@@ -373,30 +388,30 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect(brakesResultSet.rows[0].secondaryBrakeForceB).toEqual(1);
         expect(brakesResultSet.rows[0].parkingBrakeForceB).toEqual(1);
 
-        expect(upsertResult.axleSpacingIds.length).toEqual(1);
-
         const axleSpacingResultSet = await executeSql(
             `SELECT \`technical_record_id\`, \`axles\`, \`value\`
              FROM \`axle_spacing\`
-             WHERE \`axle_spacing\`.\`id\` = ${upsertResult.axleSpacingIds[0]}`
+             WHERE \`axle_spacing\`.\`id\` IN (
+                SELECT \`id\`
+                FROM \`axle_spacing\`
+                WHERE \`axle_spacing\`.\`technical_record_id\` = ${technicalRecordId}
+             )`
         );
         expect(axleSpacingResultSet.rows.length).toEqual(1);
-        expect(axleSpacingResultSet.rows[0].technical_record_id).toEqual(upsertResult.techRecordId);
+        expect(axleSpacingResultSet.rows[0].technical_record_id).toEqual(technicalRecordId);
         expect(axleSpacingResultSet.rows[0].axles).toEqual("1-2");
         expect(axleSpacingResultSet.rows[0].value).toEqual(1);
 
         const microfilmResultSet = await executeSql(
             `SELECT \`technical_record_id\`, \`microfilmDocumentType\`, \`microfilmRollNumber\`, \`microfilmSerialNumber\`
              FROM \`microfilm\`
-             WHERE \`microfilm\`.\`id\` = ${upsertResult.microfilmId}`
+             WHERE \`microfilm\`.\`technical_record_id\` = ${technicalRecordId}`
         );
         expect(microfilmResultSet.rows.length).toEqual(1);
-        expect(microfilmResultSet.rows[0].technical_record_id).toEqual(upsertResult.techRecordId);
+        expect(microfilmResultSet.rows[0].technical_record_id).toEqual(technicalRecordId);
         expect(microfilmResultSet.rows[0].microfilmDocumentType).toEqual("PSV Miscellaneous");
         expect(microfilmResultSet.rows[0].microfilmRollNumber).toEqual("1");
         expect(microfilmResultSet.rows[0].microfilmSerialNumber).toEqual("1");
-
-        expect(upsertResult.plateIds.length).toEqual(1);
 
         const platesResultSet = await executeSql(
             `SELECT \`technical_record_id\`,
@@ -405,16 +420,18 @@ describe("convertTechRecordDocument() integration tests", () => {
                     \`plateReasonForIssue\`,
                     \`plateIssuer\`
              FROM \`plate\`
-             WHERE \`plate\`.\`id\` = ${upsertResult.plateIds[0]}`
+             WHERE \`plate\`.\`id\` IN (
+                SELECT \`id\`
+                FROM \`plate\`
+                WHERE \`plate\`.\`technical_record_id\` = ${technicalRecordId}
+             )`
         );
         expect(platesResultSet.rows.length).toEqual(1);
-        expect(platesResultSet.rows[0].technical_record_id).toEqual(upsertResult.techRecordId);
+        expect(platesResultSet.rows[0].technical_record_id).toEqual(technicalRecordId);
         expect(platesResultSet.rows[0].plateSerialNumber).toEqual("1");
         expect((platesResultSet.rows[0].plateIssueDate as Date).toUTCString()).toEqual("Wed, 01 Jan 2020 00:00:00 GMT");
         expect(platesResultSet.rows[0].plateReasonForIssue).toEqual("Free replacement");
         expect(platesResultSet.rows[0].plateIssuer).toEqual("PLATE-ISSUER");
-
-        expect(upsertResult.axleIds.length).toEqual(1);
 
         const axlesResultSet = await executeSql(
             `SELECT \`technical_record_id\`,
@@ -430,11 +447,15 @@ describe("convertTechRecordDocument() integration tests", () => {
                     \`leverLength\`,
                     \`springBrakeParking\`
              FROM \`axles\`
-             WHERE \`axles\`.\`id\` = ${upsertResult.axleIds[0]}`
+             WHERE \`axles\`.\`id\` IN (
+                SELECT \`id\`
+                FROM \`axles\`
+                WHERE \`axles\`.\`technical_record_id\` = ${technicalRecordId}
+             )`
         );
         expect(axlesResultSet.rows.length).toEqual(1);
-        expect(axlesResultSet.rows[0].technical_record_id).toEqual(upsertResult.techRecordId);
-        expect(axlesResultSet.rows[0].tyre_id).toEqual(upsertResult.techRecordId);
+        expect(axlesResultSet.rows[0].technical_record_id).toEqual(technicalRecordId);
+        expect(axlesResultSet.rows[0].tyre_id).toEqual(technicalRecordId);
         expect(axlesResultSet.rows[0].axleNumber).toEqual(1);
         expect(axlesResultSet.rows[0].parkingBrakeMrk).toEqual(1);
         expect(axlesResultSet.rows[0].kerbWeight).toEqual(1);
@@ -446,7 +467,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect(axlesResultSet.rows[0].leverLength).toEqual(1);
         expect(axlesResultSet.rows[0].springBrakeParking).toEqual(1);
     });
-    describe("hen adding a new vehicle and changing VRM to a new value, VRM should change on existing vehicle.", () => {
+    describe("when adding a new vehicle and changing VRM to a new value, VRM should change on existing vehicle.", () => {
         it("A new vehicle is present", async () => {
 
             // arrange - create a record so we can later query for it and assert for is existence
@@ -469,21 +490,22 @@ describe("convertTechRecordDocument() integration tests", () => {
                 ]
             };
             // array of arrays: event contains array of records, each with array of tech record entities
-            const upsertResults: TechRecordUpsertResult[][] = await processStreamEvent(
+            await processStreamEvent(
                 event,
                 exampleContext(),
                 () => {
                     return;
                 }
             );
-            // Assert
-            expect(upsertResults.length).toEqual(1);
-            expect(upsertResults[0].length).toEqual(1);
-            const upsertResult = upsertResults[0][0];
+
             const vehicleResultSet = await executeSql(
                 `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`
                  FROM \`vehicle\`
-                 WHERE \`vehicle\`.\`id\` = ${upsertResult.vehicleId}`
+                 WHERE \`vehicle\`.\`id\` IN (
+                    SELECT \`id\`
+                    FROM \`vehicle\`
+                    WHERE \`system_number\` = "SYSTEM-NUMBER-2"
+                 )`
             );
 
             expect(vehicleResultSet.rows.length).toEqual(1);
@@ -492,7 +514,7 @@ describe("convertTechRecordDocument() integration tests", () => {
             expect(vehicleResultSet.rows[0].vrm_trm).toEqual("VRM7777");
             expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
             expect((vehicleResultSet.rows[0].createdAt as Date).toUTCString()).not.toBeNull(); // todo This returns null
-            });
+        });
 
         it("VRM has changed", async () => {
 
@@ -516,7 +538,7 @@ describe("convertTechRecordDocument() integration tests", () => {
                 ]
             };
             // array of arrays: event contains array of records, each with array of tech record entities
-            const upsertResults: TechRecordUpsertResult[][] = await processStreamEvent(
+            await processStreamEvent(
                 event,
                 exampleContext(),
                 () => {
@@ -524,14 +546,14 @@ describe("convertTechRecordDocument() integration tests", () => {
                 }
             );
 
-            // Assert
-            expect(upsertResults.length).toEqual(1);
-            expect(upsertResults[0].length).toEqual(1);
-            const upsertResult = upsertResults[0][0];
             const vehicleResultSet = await executeSql(
                 `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`
                  FROM \`vehicle\`
-                 WHERE \`vehicle\`.\`id\` = ${upsertResult.vehicleId}`
+                 WHERE \`vehicle\`.\`id\` IN (
+                    SELECT \`id\`
+                    FROM \`vehicle\`
+                    WHERE \`system_number\` = "SYSTEM-NUMBER-2"
+                 )`
             );
 
             expect(vehicleResultSet.rows.length).toEqual(1);
