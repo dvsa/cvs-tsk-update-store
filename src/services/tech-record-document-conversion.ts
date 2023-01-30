@@ -67,7 +67,7 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
         const techRecordConnection = await pool.getConnection();
 
         try {
-            await vehicleConnection.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
+            await techRecordConnection.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
 
             debugLog(`upsertTechRecords: Upserting tech record...`);
 
