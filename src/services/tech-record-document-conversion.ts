@@ -477,7 +477,7 @@ const upsertAxles = async (connection: Connection, techRecordId: any, techRecord
     const insertedIds: number[] = [];
 
     for (const axle of techRecord.axles) {
-        const tyreUpsertResponse = await executePartialUpsert(
+        const tyreUpsertResponse = await executePartialUpsertIfNotExists(
             TYRE_TABLE,
             [
                 axle.tyres?.tyreSize,
