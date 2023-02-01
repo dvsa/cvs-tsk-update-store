@@ -16,7 +16,7 @@ import {
     VEHICLE_SUBCLASS_TABLE,
     VEHICLE_TABLE
 } from "./table-details";
-import {executePartialUpsert, executePartialUpsertIfNotExists} from "./sql-execution";
+import {executeFullUpsert, executePartialUpsert, executePartialUpsertIfNotExists} from "./sql-execution";
 import {TestResultUpsertResult} from "../models/upsert-results";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
@@ -96,6 +96,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
                         preparerId,
                         vehicleClassId,
                         testTypeId,
+                        testResult.testResultId,
                         testResult.testStatus,
                         testResult.reasonForCancellation,
                         testResult.numberOfSeats,
@@ -127,23 +128,23 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
                         testType.modificationTypeUsed,
                         testType.smokeTestKLimitApplied,
                         createdById,
-                        lastUpdatedById
+                        lastUpdatedById,
                     ],
                     testResultConnection
                 );
 
-                const testResultId = response.rows.insertId;
+                const testResultRecordId = response.rows.insertId;
 
-                debugLog(`upsertTestResults: Upserted test result (ID: ${testResultId})`);
+                debugLog(`upsertTestResults: Upserted test result (ID: ${testResultRecordId})`);
 
-                const defectIds = await upsertDefects(testResultConnection, testResultId, testType);
-                const customDefectIds = await upsertCustomDefects(testResultConnection, testResultId, testType);
+                const defectIds = await upsertDefects(testResultConnection, testResultRecordId, testType);
+                const customDefectIds = await upsertCustomDefects(testResultConnection, testResultRecordId, testType);
 
                 await testResultConnection.commit();
 
                 upsertResults.push({
                     vehicleId,
-                    testResultId,
+                    testResultRecordId,
                     testStationId,
                     testerId,
                     vehicleClassId,
