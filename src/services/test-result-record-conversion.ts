@@ -86,7 +86,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
 
                 debugLog(`upsertTestResults: Upserting test result...`);
 
-                const response = await executePartialUpsert(
+                const response = await executeFullUpsert(
                     TEST_RESULT_TABLE,
                     [
                         vehicleId,
