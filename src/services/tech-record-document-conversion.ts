@@ -21,6 +21,7 @@ import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
 import {EntityConverter} from "./entity-conversion";
 import {debugLog} from "./logger";
+import "../utils/cleanser";
 
 export const techRecordDocumentConverter = (): EntityConverter<TechRecordDocument> => {
     return {
@@ -67,7 +68,7 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
         const techRecordConnection = await pool.getConnection();
 
         try {
-            await vehicleConnection.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
+            await techRecordConnection.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
 
             debugLog(`upsertTechRecords: Upserting tech record...`);
 
@@ -226,7 +227,7 @@ const upsertVehicle = async (connection: Connection, techRecordDocument: TechRec
             techRecordDocument.vin,
             techRecordDocument.primaryVrm,
             techRecordDocument.trailerId,
-            new Date().toISOString().substr(0, 23)
+            new Date().toISOString().substring(0, 23)
         ],
         connection
     );
@@ -253,7 +254,7 @@ const upsertMakeModel = async (connection: Connection, techRecord: TechRecord): 
             techRecord.bodyType?.description,
             techRecord.fuelPropulsionSystem,
             null // intentional hack until JSON path of make-model dtpCode is documented
-        ],
+        ].fingerprintCleanser(),
         connection
     );
 
@@ -274,7 +275,7 @@ const upsertVehicleClass = async (connection: Connection, techRecord: TechRecord
             techRecord.vehicleSize,
             techRecord.vehicleConfiguration,
             techRecord.euVehicleCategory,
-        ],
+        ].fingerprintCleanser(),
         connection
     );
 
@@ -301,7 +302,7 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
             [
                 vehicleClassId,
                 vehicleSubclass
-            ],
+            ].fingerprintCleanser(),
             connection
         );
 
@@ -321,7 +322,7 @@ const upsertIdentity = async (connection: Connection, id: string, name: string):
         [
             id,
             name
-        ],
+        ].fingerprintCleanser(),
         connection
     );
 
@@ -345,7 +346,7 @@ const upsertContactDetails = async (connection: Connection, techRecord: TechReco
             techRecord.applicantDetails?.emailAddress,
             techRecord.applicantDetails?.telephoneNumber,
             getFaxNumber(techRecord)
-        ],
+        ].fingerprintCleanser(),
         connection
     );
 
@@ -477,7 +478,7 @@ const upsertAxles = async (connection: Connection, techRecordId: any, techRecord
     const insertedIds: number[] = [];
 
     for (const axle of techRecord.axles) {
-        const tyreUpsertResponse = await executePartialUpsert(
+        const tyreUpsertResponse = await executePartialUpsertIfNotExists(
             TYRE_TABLE,
             [
                 axle.tyres?.tyreSize,
@@ -486,7 +487,7 @@ const upsertAxles = async (connection: Connection, techRecordId: any, techRecord
                 axle.tyres?.dataTrAxles,
                 axle.tyres?.speedCategorySymbol,
                 axle.tyres?.tyreCode,
-            ],
+            ].fingerprintCleanser(),
             connection
         );
 

@@ -22,6 +22,7 @@ import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
 import {EntityConverter} from "./entity-conversion";
 import {debugLog} from "./logger";
+import "../utils/cleanser";
 
 export const testResultsConverter = (): EntityConverter<TestResults> => {
     return {
@@ -78,9 +79,9 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
             const createdById = await upsertIdentity(testResultConnection, testResult.createdById!, testResult.createdByName!);
             const lastUpdatedById = await upsertIdentity(testResultConnection, testResult.lastUpdatedById!, testResult.lastUpdatedByName!);
 
-            await testResultConnection.beginTransaction();
-
             for (const testType of testResult.testTypes!) {
+                await testResultConnection.beginTransaction();
+
                 const fuelEmissionId = await upsertFuelEmission(testResultConnection, testType);
                 const testTypeId = await upsertTestType(testResultConnection, testType);
 
@@ -203,7 +204,7 @@ const upsertTestStation = async (connection: Connection, testResult: TestResult)
             testResult.testStationPNumber,
             testResult.testStationName,
             testResult.testStationType
-        ],
+        ].fingerprintCleanser(),
         connection
     );
 
@@ -221,7 +222,7 @@ const upsertTester = async (connection: Connection, testResult: TestResult): Pro
             testResult.testerStaffId,
             testResult.testerName,
             testResult.testerEmailAddress,
-        ],
+        ].fingerprintCleanser(),
         connection
     );
 
@@ -242,7 +243,7 @@ const upsertVehicleClass = async (connection: Connection, testResult: TestResult
             testResult.vehicleSize,
             testResult.vehicleConfiguration,
             testResult.euVehicleCategory,
-        ],
+        ].fingerprintCleanser(),
         connection
     );
 
@@ -267,7 +268,7 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
             [
                 vehicleClassId,
                 vehicleSubclass
-            ],
+            ].fingerprintCleanser(),
             connection
         );
 
@@ -289,7 +290,7 @@ const upsertFuelEmission = async (connection: Connection, testType: TestType): P
             testType.modType?.description,
             testType.emissionStandard,
             testType.fuelType,
-        ],
+        ].fingerprintCleanser(),
         connection
     );
 
@@ -306,7 +307,7 @@ const upsertTestType = async (connection: Connection, testType: TestType): Promi
         [
             testType.testTypeClassification,
             testType.testTypeName,
-        ],
+        ].fingerprintCleanser(),
         connection
     );
 
@@ -323,7 +324,7 @@ const upsertPreparer = async (connection: Connection, testResult: TestResult): P
         [
             testResult.preparerId,
             testResult.preparerName,
-        ],
+        ].fingerprintCleanser(),
         connection
     );
 
@@ -340,7 +341,7 @@ const upsertIdentity = async (connection: Connection, id: string, name: string):
         [
             id,
             name
-        ],
+        ].fingerprintCleanser(),
         connection
     );
 
@@ -372,7 +373,7 @@ const upsertDefects = async (connection: Connection, testResultId: number, testT
                 defect.deficiencyCategory,
                 defect.deficiencyText,
                 defect.stdForProhibition,
-            ],
+            ].fingerprintCleanser(),
             connection
         );
 
@@ -392,7 +393,7 @@ const upsertDefects = async (connection: Connection, testResultId: number, testT
                 defect.additionalInformation?.location?.rowNumber,
                 defect.additionalInformation?.location?.seatNumber,
                 defect.additionalInformation?.location?.axleNumber,
-            ],
+            ].fingerprintCleanser(),
             connection
         );
 
