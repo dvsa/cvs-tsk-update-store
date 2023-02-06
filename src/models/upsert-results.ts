@@ -16,7 +16,7 @@ export interface TechRecordUpsertResult {
 
 export interface TestResultUpsertResult {
     vehicleId: number;
-    testResultId: number;
+    testResultRecordId: number;
     testStationId: number;
     testerId: number;
     vehicleClassId: number;
