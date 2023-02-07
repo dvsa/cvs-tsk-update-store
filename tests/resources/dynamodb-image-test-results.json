@@ -28,7 +28,7 @@
             "S": "REASON-FOR-CREATION"
           },
           "createdAt": {
-            "S": "2020-01-01T00:00:00.000"
+            "S": "2020-01-01T00:00:00.000Z"
           },
           "createdByName": {
             "S": "CREATED-BY-NAME"
@@ -37,7 +37,7 @@
             "S": "CREATED-BY-ID"
           },
           "lastUpdatedAt": {
-            "S": "2020-01-01T00:00:00.000"
+            "S": "2020-01-01T00:00:00.000Z"
           },
           "lastUpdatedByName": {
             "S": "LAST-UPDATED-BY-NAME"
@@ -145,7 +145,7 @@
               {
                 "M": {
                   "createdAt": {
-                    "S": "2020-01-01T00:00:00.000Z"
+                    "S": "2020-01-01T00:00:00.123Z"
                   },
                   "lastUpdatedAt": {
                     "S": "2020-01-01T00:00:00.000Z"
