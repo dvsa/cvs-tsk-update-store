@@ -4,7 +4,7 @@
       {
         "M": {
           "systemNumber": {
-            "S": "SYSTEM-NUMBER"
+            "S": "SYSTEM-NUMBER-1"
           },
           "vrm": {
             "S": "VRM"
@@ -22,52 +22,52 @@
             "L": []
           },
           "testVersion": {
-            "S": "TEST-VERSION"
+            "S": "TEST-VERSION-2"
           },
           "reasonForCreation": {
-            "S": "REASON-FOR-CREATION"
+            "S": "REASON-FOR-CREATION-2"
           },
           "createdAt": {
-            "S": "2020-01-01T00:00:00.000"
+            "S": "2020-01-01T00:00:00.000Z"
           },
           "createdByName": {
-            "S": "CREATED-BY-NAME"
+            "S": "CREATED-BY-NAME-2"
           },
           "createdById": {
-            "S": "CREATED-BY-ID"
+            "S": "CREATED-BY-ID-2"
           },
           "lastUpdatedAt": {
-            "S": "2020-01-01T00:00:00.000"
+            "S": "2020-01-01T00:00:00.000Z"
           },
           "lastUpdatedByName": {
-            "S": "LAST-UPDATED-BY-NAME"
+            "S": "LAST-UPDATED-BY-NAME-2"
           },
           "lastUpdatedById": {
-            "S": "LAST-UPDATED-BY-ID"
+            "S": "LAST-UPDATED-BY-ID-2"
           },
           "shouldEmailCertificate": {
-            "S": "SHOULD-EMAIL-CERTIFICATE"
+            "S": "SHOULD-EMAIL-CERTIFICATE-2"
           },
           "testStationName": {
-            "S": "TEST-STATION-NAME"
+            "S": "TEST-STATION-NAME-2"
           },
           "testStationPNumber": {
-            "S": "P-NUMBER"
+            "S": "P-NUMBER-2"
           },
           "testStationType": {
             "S": "atf"
           },
           "testerName": {
-            "S": "TESTER-NAME"
+            "S": "TESTER-NAME-2"
           },
           "testerStaffId": {
-            "S": "999999999"
+            "S": "999999998"
           },
           "testResultId": {
-            "S": "TEST-RESULT-ID"
+            "S": "TEST-RESULT-ID-NEW"
           },
           "testerEmailAddress": {
-            "S": "TESTER-EMAIL-ADDRESS"
+            "S": "TESTER-EMAIL-ADDRESS-2"
           },
           "testStartTimestamp": {
             "S": "2020-01-01T00:00:00.000Z"
@@ -79,27 +79,27 @@
             "S": "submitted"
           },
           "reasonForCancellation": {
-            "S": "REASON-FOR-CANCELLATION"
+            "S": "REASON-FOR-CANCELLATION-2"
           },
           "vehicleClass": {
             "M": {
               "code": {
-                "S": "2"
+                "S": "v"
               },
               "description": {
-                "S": "motorbikes over 200cc or with a sidecar"
+                "S": "heavy goods vehicle"
               }
             }
           },
           "vehicleSubclass": {
             "L": [
               {
-                "S": "1"
+                "S": "2"
               }
             ]
           },
           "vehicleType": {
-            "S": "psv"
+            "S": "hgv"
           },
           "numberOfSeats": {
             "N": "1"
@@ -114,10 +114,10 @@
             "S": "KILOMETRES"
           },
           "preparerId": {
-            "S": "999999999"
+            "S": "999999998"
           },
           "preparerName": {
-            "S": "PREPARER-NAME"
+            "S": "PREPARER-NAME-2"
           },
           "numberOfWheelsDriven": {
             "N": "1"
@@ -126,13 +126,13 @@
             "S": "m1"
           },
           "countryOfRegistration": {
-            "S": "COUNTRY-OF-REGISTRATION"
+            "S": "COUNTRY-OF-REGISTRATION-2"
           },
           "vehicleSize": {
             "S": "large"
           },
           "noOfAxles": {
-            "N": "1"
+            "N": "4"
           },
           "regnDate": {
             "S": "2020-01-01"
@@ -190,7 +190,7 @@
                     "S": "2020-01-01T00:00:00.000Z"
                   },
                   "testTypeEndTimestamp": {
-                    "S": "2020-01-01T00:00:00.000Z"
+                    "S": "2020-01-01T16:54:44.123Z"
                   },
                   "statusUpdatedFlag": {
                     "BOOL": true
@@ -341,11 +341,99 @@
                     ]
                   }
                 }
+              },
+              {
+                "M": {
+                  "additionalCommentsForAbandon": {
+                    "NULL": true
+                  },
+                  "additionalNotesRecorded": {
+                    "S": "No emission plate default 0.70"
+                  },
+                  "certificateNumber": {
+                    "S": "W123123"
+                  },
+                  "createdAt": {
+                    "S": "2021-06-21T12:59:08.000Z"
+                  },
+                  "customDefects": {
+                    "NULL": true
+                  },
+                  "defects": {
+                    "L": []
+                  },
+                  "emissionStandard": {
+                    "NULL": true
+                  },
+                  "fuelType": {
+                    "NULL": true
+                  },
+                  "lastUpdatedAt": {
+                    "S": "2021-06-21T12:59:08.000Z"
+                  },
+                  "modificationTypeUsed": {
+                    "NULL": true
+                  },
+                  "modType": {
+                    "NULL": true
+                  },
+                  "name": {
+                    "S": "Annual test"
+                  },
+                  "particulateTrapFitted": {
+                    "NULL": true
+                  },
+                  "particulateTrapSerialNumber": {
+                    "NULL": true
+                  },
+                  "prohibitionIssued": {
+                    "BOOL": false
+                  },
+                  "reasonForAbandoning": {
+                    "NULL": true
+                  },
+                  "secondaryCertificateNumber": {
+                    "NULL": true
+                  },
+                  "smokeTestKLimitApplied": {
+                    "NULL": true
+                  },
+                  "testAnniversaryDate": {
+                    "S": "2022-06-30T00:00:00.000Z"
+                  },
+                  "testCode": {
+                    "S": "aav"
+                  },
+                  "testExpiryDate": {
+                    "S": "2022-06-30T00:00:00.000Z"
+                  },
+                  "testNumber": {
+                    "S": "W123123"
+                  },
+                  "testResult": {
+                    "S": "pass"
+                  },
+                  "testTypeClassification": {
+                    "S": "Annual With Certificate"
+                  },
+                  "testTypeEndTimestamp": {
+                    "S": "2021-06-21T12:59:07.000Z"
+                  },
+                  "testTypeId": {
+                    "S": "94"
+                  },
+                  "testTypeName": {
+                    "S": "Annual test"
+                  },
+                  "testTypeStartTimestamp": {
+                    "S": "2021-06-21T12:07:22.000Z"
+                  }
+                }
               }
             ]
           }
         }
       }
-    ]
-  }
+      ]
+    }
 }
