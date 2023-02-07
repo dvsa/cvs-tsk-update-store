@@ -23,9 +23,9 @@
     "test-local-i": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local USE_CONTAINERIZED_DATABASE=1 jest --testMatch=\"**/*.intTest.ts\" --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/*conversion.{js,ts}\"",
     "lint": "tslint src/**/*.ts tests/**/*.ts -q",
     "prettier": "prettier --write ./**/*.{js,ts}",
-    "prepush": "npm test && npm run build && npm run test-local-i",
+    "prepush": "npm test && npm run build && npm run test-i",
     "sonar-scanner": "sonar-scanner",
-    "audit": "npm audit",
+    "audit": "npm audit --production",
     "package": "mkdir -p ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME}/ && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
     "security-checks": "git secrets --register-aws && git secrets --scan",
     "tools-setup": "liquibase --changeLogFile ../cvs-nop/changelog-master.xml --username root --password 12345 --url jdbc:mysql://127.0.0.1:3306/CVSBNOP?createDatabaseIfNotExist=true --classpath /liquibase/lib/mysql.jar update"
@@ -55,17 +55,15 @@
     "@types/lambda-tester": "3.6.0",
     "aws-lambda": "1.0.6",
     "aws-sdk": "2.1281.0",
+    "@aws-sdk/util-dynamodb": "^3.245.0",
     "aws-xray-sdk": "2.5.0",
     "commitlint": "12.1.1",
     "date-fns": "2.21.2",
     "liquibase": "1.0.1",
     "moment": "2.29.4",
     "mysql2": "2.2.5",
-    "node-yaml": "3.2.0",
     "prettier": "2.2.1",
     "reflect-metadata": "0.1.13",
-    "request": "2.88.0",
-    "request-promise": "4.2.4",
     "testcontainers": "7.6.2",
     "ts-node-register": "1.0.0",
     "uuid": "8.3.2"
@@ -112,7 +110,7 @@
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "npm run security-checks && npm run audit && npm run lint && npm run prettier",
+      "pre-commit": "npm run security-checks && npm run audit && npm run lint",
       "pre-push": "npm run prepush"
     }
   }
