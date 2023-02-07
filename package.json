@@ -52,10 +52,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "3.266.0",
+    "@aws-sdk/util-dynamodb": "3.266.0",
     "@types/lambda-tester": "3.6.0",
     "aws-lambda": "1.0.6",
     "aws-sdk": "2.1281.0",
-    "@aws-sdk/util-dynamodb": "^3.245.0",
     "aws-xray-sdk": "2.5.0",
     "commitlint": "12.1.1",
     "date-fns": "2.21.2",
