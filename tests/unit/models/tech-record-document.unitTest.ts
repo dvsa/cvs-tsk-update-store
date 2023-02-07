@@ -12,6 +12,7 @@ describe("parseTechRecordDocument()", () => {
         // check only first property of each root, for now
         expect(techRecordDocument.systemNumber).toEqual("SYSTEM-NUMBER-1");
         expect(techRecordDocument.techRecord![0].recordCompleteness).toEqual("88888888");
+        expect(techRecordDocument.techRecord![0].createdAt).toEqual("2020-01-01 00:00:00.455");
         expect(techRecordDocument.techRecord![0].authIntoService?.cocIssueDate).toEqual("2020-01-01");
         expect(techRecordDocument.techRecord![0].lettersOfAuth?.letterType).toEqual("Trailer authorization");
         expect(techRecordDocument.techRecord![0].applicantDetails?.name).toEqual("NAME");

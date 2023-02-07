@@ -63,8 +63,8 @@ export const parseTestTypes = (image?: DynamoDbImage): TestTypes => {
 
 export const parseTestType = (image: DynamoDbImage): TestType => {
     return {
-        createdAt: image.getString("createdAt"),
-        lastUpdatedAt: image.getString("lastUpdatedAt"),
+        createdAt: image.getDate("createdAt"),
+        lastUpdatedAt: image.getDate("lastUpdatedAt"),
         deletionFlag: image.getBoolean("deletionFlag"),
         testCode: image.getString("testCode"),
         testTypeClassification: image.getString("testTypeClassification"),
@@ -75,10 +75,10 @@ export const parseTestType = (image: DynamoDbImage): TestType => {
         certificateNumber: image.getString("certificateNumber"),
         secondaryCertificateNumber: image.getString("secondaryCertificateNumber"),
         certificateLink: image.getString("certificateLink"),
-        testExpiryDate: image.getString("testExpiryDate"),
-        testAnniversaryDate: image.getString("testAnniversaryDate"),
-        testTypeStartTimestamp: image.getString("testTypeStartTimestamp"),
-        testTypeEndTimestamp: image.getString("testTypeEndTimestamp"),
+        testExpiryDate: image.getDate("testExpiryDate"),
+        testAnniversaryDate: image.getDate("testAnniversaryDate"),
+        testTypeStartTimestamp: image.getDate("testTypeStartTimestamp"),
+        testTypeEndTimestamp: image.getDate("testTypeEndTimestamp"),
         statusUpdatedFlag: image.getBoolean("statusUpdatedFlag"),
         numberOfSeatbeltsFitted: image.getNumber("numberOfSeatbeltsFitted"),
         lastSeatbeltInstallationCheckDate: image.getString("lastSeatbeltInstallationCheckDate"),

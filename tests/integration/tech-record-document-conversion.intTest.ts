@@ -77,12 +77,13 @@ describe("convertTechRecordDocument() integration tests", () => {
 
         const vehicleId = vehicleResultSet.rows[0].id;
         const technicalRecordSet = await executeSql(
-            `SELECT \`make_model_id\`, \`vehicle_class_id\`, \`createdBy_Id\`, \`lastUpdatedBy_Id\`, \`applicant_detail_id\`, \`purchaser_detail_id\`, \`manufacturer_detail_id\`, \`id\`
+            `SELECT \`make_model_id\`, \`vehicle_class_id\`, \`createdBy_Id\`, \`lastUpdatedBy_Id\`, \`applicant_detail_id\`, \`purchaser_detail_id\`, \`manufacturer_detail_id\`, \`id\`, \`createdAt\`
             FROM \`technical_record\`
             WHERE \`technical_record\`.\`vehicle_id\` = ${vehicleId}`
         );
 
         expect(technicalRecordSet.rows.length).toEqual(1);
+        expect((technicalRecordSet.rows[0].createdAt as Date).toISOString()).toEqual("2020-01-01T00:00:00.455Z");
 
         const { make_model_id, vehicle_class_id, createdBy_Id, lastUpdatedBy_Id, applicant_detail_id, purchaser_detail_id, manufacturer_detail_id } = technicalRecordSet.rows[0];
 
@@ -531,7 +532,7 @@ describe("convertTechRecordDocument() integration tests", () => {
                             eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
                             eventName: "INSERT",
                             dynamodb: {
-                                NewImage: techRecordDocumentJson
+                                NewImage: techRecordDocumentJsonNew
                             }
                         })
                     }
