@@ -78,12 +78,6 @@ describe("convertTestResults() integration tests", () => {
         expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
         expect((vehicleResultSet.rows[0].createdAt as Date).toUTCString()).not.toBeNull();
 
-        // const testResultSet = await executeSql(
-        //     `SELECT \`test_station_id\`, \`tester_id\`, \`vehicle_class_id\`, \`preparer_id\`, \`createdBy_Id\`, \`lastUpdatedBy_Id\`, \`fuel_emission_id\`, \`test_type_id\`, \`id\`
-        //      FROM \`test_result\`
-        //      WHERE \`test_result\`.\`vehicle_id\` = ${vehicleResultSet.rows[0].id}`
-        // );
-
         const testResultSet = await executeSql(
             `SELECT \`test_station_id\`, \`tester_id\`, \`vehicle_class_id\`, \`preparer_id\`, \`createdBy_Id\`, \`lastUpdatedBy_Id\`,
                     \`fuel_emission_id\`, \`test_type_id\`, \`id\`, \`testResultId\`, \`testCode\`,  \`certificateNumber\`,  \`secondaryCertificateNumber\`,
