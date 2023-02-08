@@ -350,6 +350,7 @@ export const TEST_RESULT_TABLE: TableDetails = {
         "preparer_id",
         "vehicle_class_id",
         "test_type_id",
+        "testResultId",
         "testStatus",
         "reasonForCancellation",
         "numberOfSeats",
@@ -381,7 +382,7 @@ export const TEST_RESULT_TABLE: TableDetails = {
         "modificationTypeUsed",
         "smokeTestKLimitApplied",
         "createdBy_Id",
-        "lastUpdatedBy_Id",
+        "lastUpdatedBy_Id"
     ]
 };
 
