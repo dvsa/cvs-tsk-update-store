@@ -15,7 +15,7 @@ import {
     VEHICLE_SUBCLASS_TABLE,
     VEHICLE_TABLE
 } from "./table-details";
-import {executeFullUpsert, executePartialUpsert, executePartialUpsertIfNotExists} from "./sql-execution";
+import {executeFullUpsert, executePartialUpsertIfNotExists} from "./sql-execution";
 import {TechRecordUpsertResult} from "../models/upsert-results";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";

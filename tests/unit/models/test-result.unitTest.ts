@@ -13,7 +13,7 @@ describe("parseTestResults()", () => {
         // check only first property of each root, for now
         expect(testResult.systemNumber).toEqual("SYSTEM-NUMBER");
         expect(testResult.vehicleClass?.code).toEqual("2");
-        expect(testResult.testTypes![0].createdAt).toEqual("2020-01-01T00:00:00.000");
+        expect(testResult.testTypes![0].createdAt).toEqual("2020-01-01 00:00:00.123");
         expect(testResult.testTypes![0].modType?.code).toEqual("p");
         expect(testResult.testTypes![0].defects![0].imNumber).toEqual(1);
         expect(testResult.testTypes![0].defects![0].additionalInformation?.location?.vertical).toEqual("upper");
