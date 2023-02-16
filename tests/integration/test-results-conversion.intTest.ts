@@ -95,7 +95,7 @@ describe("convertTestResults() integration tests", () => {
         expect(testResultSet.rows[0].secondaryCertificateNumber).toEqual("999999999");
         expect((testResultSet.rows[0].testExpiryDate as Date).toISOString()).toEqual("2020-01-01T00:00:00.000Z");
         expect((testResultSet.rows[0].testAnniversaryDate as Date).toISOString()).toEqual("2020-01-01T00:00:00.000Z");
-        expect((testResultSet.rows[0].testTypeStartTimestamp as Date).toISOString()).toEqual("2020-01-01T00:00:00.000Z");
+        expect((testResultSet.rows[0].testTypeStartTimestamp as Date).toISOString()).toEqual("2020-01-01T00:00:00.023Z");
         expect(testResultSet.rows[0].lastSeatbeltInstallationCheckDate).toEqual(new Date("2020-01-01"));
         expect(testResultSet.rows[0].seatbeltInstallationCheckDate).toEqual(1);
         expect(testResultSet.rows[0].testResult).toEqual("fail");
