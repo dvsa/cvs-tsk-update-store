@@ -1,6 +1,7 @@
 import {AttributeValue} from "aws-sdk/clients/dynamodbstreams";
 import { parseISO } from "date-fns";
 import {Maybe} from "../models/optionals";
+import { padWithZeros } from "../utils/padwithzeros";
 
 export type DynamoDbItemType = "NULL" | "BOOL" | "S" | "N" | "B" | "M" | "L";
 export type DynamoDbArrayType = "SS" | "NS" | "BS";
@@ -94,7 +95,7 @@ export class DynamoDbImage {
                 const hours = padToTwo(parsedDate.getUTCHours());
                 const minutes = padToTwo(parsedDate.getUTCMinutes());
                 const seconds = padToTwo(parsedDate.getUTCSeconds());
-                const ms = parsedDate.getUTCMilliseconds();
+                const ms = padWithZeros(parsedDate.getUTCMilliseconds(), 3);
 
                 return `${year}-${month}-${date} ${hours}:${minutes}:${seconds}.${ms}`;
             }));
