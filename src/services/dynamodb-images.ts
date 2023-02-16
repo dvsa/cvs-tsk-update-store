@@ -215,7 +215,7 @@ export class DynamoDbImage {
                 return defaultValue;
             }
             default: {
-                verifyType(expectedType, field);
+                verifyType(expectedType, field, field.value);
                 return parser(field.value);
             }
         }
@@ -224,10 +224,13 @@ export class DynamoDbImage {
 
 const padToTwo = (digit: number): string => {
     return digit > 9 ? digit.toString() : "0" + digit;
-  };
+};
 
-const verifyType = (expectedType: DynamoDbType, field: DynamoDbField) => {
+const verifyType = (expectedType: DynamoDbType, field: DynamoDbField, value: any) => {
     if (expectedType !== field.type) {
+        if (expectedType === "N" && field.type === "S" && !isNaN(value) && !isNaN(parseFloat(value))) {
+            return;
+        }
         throw new Error(`field ${field.key} is not of type "${expectedType}" (actual: "${field.type}")`);
     }
 };

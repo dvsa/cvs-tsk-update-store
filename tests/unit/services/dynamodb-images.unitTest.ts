@@ -57,4 +57,49 @@ describe("parse()", () => {
         const image = DynamoDbImage.parse(castToImageShape(primitivesJson));
         expect(() => image.getString("NumberField")).toThrowError("not of type");
     });
+    
+    it("should handle a number when presented as a null", () => {
+        let image = DynamoDbImage.parse(castToImageShape({ NumberField: {NULL: true} }));
+        expect(image.getNumber("NumberField")).toEqual(undefined);
+    });
+    
+    it("should handle a number when presented as a string", () => {
+        let image = DynamoDbImage.parse(castToImageShape({ NumberField: {S: "2.2"} }));
+        expect(image.getNumber("NumberField")).toEqual(2.2);
+        
+        image = DynamoDbImage.parse(castToImageShape({ NumberField: {S: "22"} }));
+        expect(image.getNumber("NumberField")).toEqual(22);
+        
+        image = DynamoDbImage.parse(castToImageShape({ NumberField: {S: "-2.2"} }));
+        expect(image.getNumber("NumberField")).toEqual(-2.2);
+        
+        image = DynamoDbImage.parse(castToImageShape({ NumberField: {S: ".2"} }));
+        expect(image.getNumber("NumberField")).toEqual(0.2);
+    });
+    
+    it("should reject a number when presented as non numerical strings", () => {
+        let image = DynamoDbImage.parse(castToImageShape({ NumberField: {S: " "} }));
+        expect(() => image.getNumber("NumberField")).toThrowError("not of type");
+
+        image = DynamoDbImage.parse(castToImageShape({ NumberField: {S: ""} }));
+        expect(() => image.getNumber("NumberField")).toThrowError("not of type");
+        
+        image = DynamoDbImage.parse(castToImageShape({ NumberField: {S: "."} }));
+        expect(() => image.getNumber("NumberField")).toThrowError("not of type");
+        
+        image = DynamoDbImage.parse(castToImageShape({ NumberField: {S: "1.."} }));
+        expect(() => image.getNumber("NumberField")).toThrowError("not of type");
+        
+        image = DynamoDbImage.parse(castToImageShape({ NumberField: {S: "..1"} }));
+        expect(() => image.getNumber("NumberField")).toThrowError("not of type");
+        
+        image = DynamoDbImage.parse(castToImageShape({ NumberField: {S: "1aa"} }));
+        expect(() => image.getNumber("NumberField")).toThrowError("not of type");
+        
+        image = DynamoDbImage.parse(castToImageShape({ NumberField: {S: "aa1"} }));
+        expect(() => image.getNumber("NumberField")).toThrowError("not of type");
+        
+        image = DynamoDbImage.parse(castToImageShape({ NumberField: {S: "string"} }));
+        expect(() => image.getNumber("NumberField")).toThrowError("not of type");
+    });
 });
