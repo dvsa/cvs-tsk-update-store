@@ -1,5 +1,3 @@
-export {};
-
 declare global {
   interface Array<T> {
     /**
@@ -23,4 +21,8 @@ if (!Array.prototype.fingerprintCleanser) {
         .map((i) => i === "" ? null : i);
     }
   });
+}
+
+export function vinCleanser(vin: string | undefined): string {
+  return vin ? vin.replace(/[^a-zA-Z0-9]/g, "") : "";
 }

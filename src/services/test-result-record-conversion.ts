@@ -22,7 +22,7 @@ import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
 import {EntityConverter} from "./entity-conversion";
 import {debugLog} from "./logger";
-import "../utils/cleanser";
+import { vinCleanser } from "../utils/cleanser";
 
 export const testResultsConverter = (): EntityConverter<TestResults> => {
     return {
@@ -183,10 +183,10 @@ const upsertVehicle = async (connection: Connection, testResult: TestResult): Pr
         VEHICLE_TABLE,
         [
             testResult.systemNumber,
-            testResult.vin,
+            vinCleanser(testResult.vin),
             testResult.vrm,
             testResult.trailerId,
-            new Date().toISOString().substr(0, 23)
+            new Date().toISOString().substring(0, 23)
         ],
         connection
     );

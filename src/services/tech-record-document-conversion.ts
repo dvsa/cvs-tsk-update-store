@@ -21,7 +21,7 @@ import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
 import {EntityConverter} from "./entity-conversion";
 import {debugLog} from "./logger";
-import "../utils/cleanser";
+import { vinCleanser } from "../utils/cleanser";
 
 export const techRecordDocumentConverter = (): EntityConverter<TechRecordDocument> => {
     return {
@@ -224,7 +224,7 @@ const upsertVehicle = async (connection: Connection, techRecordDocument: TechRec
         VEHICLE_TABLE,
         [
             techRecordDocument.systemNumber,
-            techRecordDocument.vin,
+            vinCleanser(techRecordDocument.vin),
             techRecordDocument.primaryVrm,
             techRecordDocument.trailerId,
             new Date().toISOString().substring(0, 23)
