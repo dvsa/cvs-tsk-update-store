@@ -1,5 +1,6 @@
 import { BodyType } from "../../src/models/body-type";
-import "../../src/utils/cleanser";
+import { TechRecordDocument } from "../../src/models/tech-record-document";
+import { vinCleanser } from "../../src/utils/cleanser";
 
 describe("fingerprintCleanser function", () => {
     it("should trim and null empty strings from data", () => {
@@ -37,5 +38,23 @@ describe("fingerprintCleanser function", () => {
         expect(cleansedData[4]).toBe(expectedCleansedData[4]);
         expect(cleansedData[5]).toBe(expectedCleansedData[5]);
         expect(cleansedData[6]).toBe(expectedCleansedData[6]);
+    });
+});
+
+describe("vinCleanser function", () => {
+    it("should remove all non alphanumeric characters", () => {
+        const techRecord: TechRecordDocument = {
+            vin: " V!I-N&1[2    ]3`45      "
+        };
+        const cleansedVin = vinCleanser(techRecord.vin);
+
+        expect(cleansedVin).toBe("VIN12345");
+    });
+
+    it("should convert a null vin to an empty string", () => {
+        const techRecord: TechRecordDocument = {};
+        const cleansedVin = vinCleanser(techRecord.vin);
+
+        expect(cleansedVin).toBe("");
     });
 });

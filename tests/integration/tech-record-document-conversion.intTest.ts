@@ -474,7 +474,7 @@ describe("convertTechRecordDocument() integration tests", () => {
             // arrange - create a record so we can later query for it and assert for is existence
             const techRecordDocumentJsonNew = techRecordDocumentJson;
             techRecordDocumentJsonNew.systemNumber = {S : "SYSTEM-NUMBER-2"};
-            techRecordDocumentJsonNew.vin =  {S : "VIN-2"};
+            techRecordDocumentJsonNew.vin =  {S : "VIN2"};
             techRecordDocumentJsonNew.primaryVrm =  {S : "VRM7777"};
 
             const event = {
@@ -511,7 +511,7 @@ describe("convertTechRecordDocument() integration tests", () => {
 
             expect(vehicleResultSet.rows.length).toEqual(1);
             expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-2");
-            expect(vehicleResultSet.rows[0].vin).toEqual("VIN-2");
+            expect(vehicleResultSet.rows[0].vin).toEqual("VIN2");
             expect(vehicleResultSet.rows[0].vrm_trm).toEqual("VRM7777");
             expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
             expect((vehicleResultSet.rows[0].createdAt as Date).toUTCString()).not.toBeNull(); // todo This returns null
@@ -522,7 +522,7 @@ describe("convertTechRecordDocument() integration tests", () => {
             // arrange - create a record with existing pair of (SystemNumber, VIN) and new VRM so we can later query for it and assert its value
             const techRecordDocumentJsonNew = techRecordDocumentJson;
             techRecordDocumentJsonNew.systemNumber = {S : "SYSTEM-NUMBER-2"};
-            techRecordDocumentJsonNew.vin =  {S : "VIN-2"};
+            techRecordDocumentJsonNew.vin =  {S : "VIN2"};
             techRecordDocumentJsonNew.primaryVrm =  {S : "VRM888NEW"};
 
             const event = {
@@ -559,7 +559,7 @@ describe("convertTechRecordDocument() integration tests", () => {
 
             expect(vehicleResultSet.rows.length).toEqual(1);
             expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-2");
-            expect(vehicleResultSet.rows[0].vin).toEqual("VIN-2");
+            expect(vehicleResultSet.rows[0].vin).toEqual("VIN2");
             expect(vehicleResultSet.rows[0].vrm_trm).toEqual("VRM888NEW");
             expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
             expect((vehicleResultSet.rows[0].createdAt as Date).toUTCString()).not.toBeNull(); // todo This returns null
