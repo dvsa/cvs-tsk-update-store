@@ -1,0 +1,150 @@
+{
+  "testResults": {
+    "L": [
+      {
+        "M": {
+          "systemNumber": {
+            "S": "SYSTEM-NUMBER-3"
+          },
+          "vrm": {
+            "S": "VRM"
+          },
+          "trailerId": {
+            "S": "88888888"
+          },
+          "vin": {
+            "S": "VIN"
+          },
+          "vehicleId": {
+            "S": "VEHICLE-ID"
+          },
+          "testHistory": {
+            "L": []
+          },
+          "testVersion": {
+            "S": "TEST-VERSION-3"
+          },
+          "reasonForCreation": {
+            "S": "REASON-FOR-CREATION-3"
+          },
+          "createdAt": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "createdByName": {
+            "S": "CREATED-BY-NAME-3"
+          },
+          "createdById": {
+            "S": "CREATED-BY-ID-3"
+          },
+          "lastUpdatedAt": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "lastUpdatedByName": {
+            "S": "LAST-UPDATED-BY-NAME-3"
+          },
+          "lastUpdatedById": {
+            "S": "LAST-UPDATED-BY-ID-3"
+          },
+          "shouldEmailCertificate": {
+            "S": "SHOULD-EMAIL-CERTIFICATE-3"
+          },
+          "testStationName": {
+            "S": "TEST-STATION-NAME-3"
+          },
+          "testStationPNumber": {
+            "S": "P-NUMBER-3"
+          },
+          "testStationType": {
+            "S": "atf"
+          },
+          "testerName": {
+            "S": "TESTER-NAME-3"
+          },
+          "testerStaffId": {
+            "S": "999999998"
+          },
+          "testResultId": {
+            "S": "TEST-RESULT-ID-NEW-3"
+          },
+          "testerEmailAddress": {
+            "S": "TESTER-EMAIL-ADDRESS-3"
+          },
+          "testStartTimestamp": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "testEndTimestamp": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "testStatus": {
+            "S": "submitted"
+          },
+          "reasonForCancellation": {
+            "S": "REASON-FOR-CANCELLATION-3"
+          },
+          "vehicleClass": {
+            "M": {
+              "code": {
+                "S": "v"
+              },
+              "description": {
+                "S": "heavy goods vehicle"
+              }
+            }
+          },
+          "vehicleSubclass": {
+            "L": [
+              {
+                "S": "2"
+              }
+            ]
+          },
+          "vehicleType": {
+            "S": "hgv"
+          },
+          "numberOfSeats": {
+            "N": "1"
+          },
+          "vehicleConfiguration": {
+            "S": "rigid"
+          },
+          "odometerReading": {
+            "N": "1"
+          },
+          "odometerReadingUnits": {
+            "S": "KILOMETRES"
+          },
+          "preparerId": {
+            "S": "999999998"
+          },
+          "preparerName": {
+            "S": "PREPARER-NAME-3"
+          },
+          "numberOfWheelsDriven": {
+            "N": "1"
+          },
+          "euVehicleCategory": {
+            "S": "m1"
+          },
+          "countryOfRegistration": {
+            "S": "COUNTRY-OF-REGISTRATION-3"
+          },
+          "vehicleSize": {
+            "S": "large"
+          },
+          "noOfAxles": {
+            "N": "4"
+          },
+          "regnDate": {
+            "S": "2020-01-01"
+          },
+          "firstUseDate": {
+            "S": "2020-01-01"
+          },
+          "testTypes": {
+            "L": []
+          }
+        }
+      }
+      ]
+    }
+}
