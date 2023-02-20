@@ -1,5 +1,6 @@
 import {DynamoDbImage} from "../../../src/services/dynamodb-images";
 import {default as primitivesJson} from "../../resources/dynamodb-image-primitives.json";
+import {default as stringDateTime} from "../../resources/dynamodb-image-string-timestamps.json";
 import {default as setsJson} from "../../resources/dynamodb-image-sets.json";
 import {default as listJson} from "../../resources/dynamodb-image-list.json";
 import {default as mapJson} from "../../resources/dynamodb-image-map.json";
@@ -14,6 +15,12 @@ describe("parse()", () => {
         expect(image.getNumber("NumberField")).toEqual(123.45);
         expect(image.getString("StringField")).toEqual("Hello");
         expect(image.getBinary("BinaryField")!.toString("utf-8")).toEqual("this text is base64-encoded");
+    });
+
+    it("should parse a Dynamo image containing all primitive types", () => {
+        const image = DynamoDbImage.parse(castToImageShape(stringDateTime));
+        expect(image.getDate("StringISOTimestampField")).toEqual("2023-02-16 12:07:22.056");
+        expect(image.getDate("StringDateField")).toEqual("2023-02-16 00:00:00.000");
     });
 
     it("should parse a Dynamo image containing all set types", () => {

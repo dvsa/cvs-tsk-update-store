@@ -83,7 +83,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         );
 
         expect(technicalRecordSet.rows.length).toEqual(1);
-        expect((technicalRecordSet.rows[0].createdAt as Date).toISOString()).toEqual("2020-01-01T00:00:00.455Z");
+        expect((technicalRecordSet.rows[0].createdAt as Date).toISOString()).toEqual("2020-01-01T00:00:00.055Z");
 
         const { make_model_id, vehicle_class_id, createdBy_Id, lastUpdatedBy_Id, applicant_detail_id, purchaser_detail_id, manufacturer_detail_id } = technicalRecordSet.rows[0];
 
