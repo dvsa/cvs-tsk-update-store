@@ -3,6 +3,7 @@ import {destroyConnectionPool, executeSql} from "../../src/services/connection-p
 import {exampleContext, useLocalDb} from "../utils";
 import testResultsJson from "../resources/dynamodb-image-test-results.json";
 import testResultsJsonWithTestTypes from "../resources/dynamodb-image-test-results-with-testtypes.json";
+import testResultsJsonWithNoSystemNumber from "../resources/dynamodb-image-test-results-with-no-systemNumber.json";
 import {getContainerizedDatabase} from "./cvsbnop-container";
 import {processStreamEvent} from "../../src/functions/process-stream-event";
 import {getConnectionPoolOptions} from "../../src/services/connection-pool-options";
@@ -251,23 +252,23 @@ describe("convertTestResults() integration tests", () => {
     });
     it("Existing Test Result TestType attributes are modified correctly", async () => {
         const deserializedJson = unmarshall(testResultsJson);
-        deserializedJson.testResults[0].testTypes[0].testCode = "444";
-        deserializedJson.testResults[0].testTypes[0].certificateNumber = "W323232";
-        deserializedJson.testResults[0].testTypes[0].secondaryCertificateNumber = "111111";
-        deserializedJson.testResults[0].testTypes[0].testExpiryDate = "2022-01-01T00:00:00.000Z";
-        deserializedJson.testResults[0].testTypes[0].testAnniversaryDate = "2022-01-01T00:00:00.000Z";
-        deserializedJson.testResults[0].testTypes[0].testTypeStartTimestamp = "2021-01-01T00:00:00.000Z";
-        deserializedJson.testResults[0].testTypes[0].numberOfSeatbeltsFitted = 5;
-        deserializedJson.testResults[0].testTypes[0].lastSeatbeltInstallationCheckDate = "2021-01-01";
-        deserializedJson.testResults[0].testTypes[0].seatbeltInstallationCheckDate = false;
-        deserializedJson.testResults[0].testTypes[0].testResult = "pass";
-        deserializedJson.testResults[0].testTypes[0].reasonForAbandoning = "NEW-REASON-FOR-ABANDONING";
-        deserializedJson.testResults[0].testTypes[0].additionalNotesRecorded = "NEW-ADDITIONAL-NOTES-RECORDED";
-        deserializedJson.testResults[0].testTypes[0].additionalCommentsForAbandon = "NEW-ADDITIONAL-COMMENTS-FOR-ABANDON";
-        deserializedJson.testResults[0].testTypes[0].particulateTrapFitted = "t";
-        deserializedJson.testResults[0].testTypes[0].particulateTrapSerialNumber = "trap";
-        deserializedJson.testResults[0].testTypes[0].modificationTypeUsed = "NEW-MODIFICATION-TYPE-USED";
-        deserializedJson.testResults[0].testTypes[0].smokeTestKLimitApplied = "NEW-SMOKE-TEST-K-LIMIT-APPLIED";
+        deserializedJson.testTypes[0].testCode = "444";
+        deserializedJson.testTypes[0].certificateNumber = "W323232";
+        deserializedJson.testTypes[0].secondaryCertificateNumber = "111111";
+        deserializedJson.testTypes[0].testExpiryDate = "2022-01-01T00:00:00.000Z";
+        deserializedJson.testTypes[0].testAnniversaryDate = "2022-01-01T00:00:00.000Z";
+        deserializedJson.testTypes[0].testTypeStartTimestamp = "2021-01-01T00:00:00.000Z";
+        deserializedJson.testTypes[0].numberOfSeatbeltsFitted = 5;
+        deserializedJson.testTypes[0].lastSeatbeltInstallationCheckDate = "2021-01-01";
+        deserializedJson.testTypes[0].seatbeltInstallationCheckDate = false;
+        deserializedJson.testTypes[0].testResult = "pass";
+        deserializedJson.testTypes[0].reasonForAbandoning = "NEW-REASON-FOR-ABANDONING";
+        deserializedJson.testTypes[0].additionalNotesRecorded = "NEW-ADDITIONAL-NOTES-RECORDED";
+        deserializedJson.testTypes[0].additionalCommentsForAbandon = "NEW-ADDITIONAL-COMMENTS-FOR-ABANDON";
+        deserializedJson.testTypes[0].particulateTrapFitted = "t";
+        deserializedJson.testTypes[0].particulateTrapSerialNumber = "trap";
+        deserializedJson.testTypes[0].modificationTypeUsed = "NEW-MODIFICATION-TYPE-USED";
+        deserializedJson.testTypes[0].smokeTestKLimitApplied = "NEW-SMOKE-TEST-K-LIMIT-APPLIED";
 
         const serializedJSONb = marshall(deserializedJson);
 
@@ -713,5 +714,42 @@ describe("convertTestResults() integration tests", () => {
         expect(customDefectResultSet.rows[customDefectLastIndex].defectName).toEqual("DEFECT-NAME");
         expect(customDefectResultSet.rows[customDefectLastIndex].defectNotes).toEqual("DEFECT-NOTES");
 
+    });
+    it("A new Test Result with no systemNumber throws an error", async () => {
+
+        const event = {
+            Records: [
+                {
+                    messageId: "faf41ab1-5b42-462c-b242-c4450e15c724",
+                    body: JSON.stringify({
+                        eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
+                        eventName: "INSERT",
+                        dynamodb: {
+                            NewImage: testResultsJsonWithNoSystemNumber
+                        }
+                    })
+                }
+            ]
+        };
+
+        const consoleSpy = jest.spyOn(global.console, "error");
+        const returnValue = await processStreamEvent(
+            event,
+            exampleContext(),
+            () => {
+                return;
+            }
+        );
+
+        const expectedValue = {
+            batchItemFailures: [{ itemIdentifier: "faf41ab1-5b42-462c-b242-c4450e15c724" }],
+        };
+
+        expect(returnValue).toEqual(expectedValue);
+        expect(consoleSpy).nthCalledWith(
+            1,
+            "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
+            new Error("result is missing required field 'systemNumber'")
+        );
     });
 });
