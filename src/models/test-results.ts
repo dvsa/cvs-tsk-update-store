@@ -21,7 +21,6 @@ export interface TestResult {
     vin?: string;
     vehicleId?: string;
     deletionFlag?: boolean;
-    testHistory?: TestResult[];
     testVersion?: TestVersion;
     reasonForCreation?: string;
     createdAt?: string;
@@ -63,33 +62,17 @@ export interface TestResult {
 
 export const parseTestResults = (image?: DynamoDbImage): TestResults => {
     debugLog("Parsing test results...");
-    debugLog("Expect exactly 2 calls to parseTestResults: root, and recursive call for nested field 'testHistory'");
 
     if (!image) {
-        debugLog("image is null or undefined, no test results / test history to process");
+        debugLog("image is null or undefined, no test results to process");
         return [] as TestResults;
     }
 
-    const testResultsImage = image.getList("testResults");
-
-    if (!testResultsImage) {
-        debugLog("image.testResults is null or undefined: attempting to parse image as single, unwrapped test result instead");
-
-        if (!image.getString("systemNumber")) {
-            debugLog("image missing required field 'systemNumber': this is not a test result, no test results to process");
-            return [] as TestResults;
-        }
-
-        return [ parseTestResult(image) ];
+    if (!image.getString("systemNumber")) {
+        throw new Error("result is missing required field \'systemNumber\'");
     }
 
-    const testResults: TestResults = [];
-
-    for (const key of testResultsImage.getKeys()) {
-        testResults.push(parseTestResult(testResultsImage.getMap(key)!));
-    }
-
-    return testResults;
+    return [ parseTestResult(image) ];
 };
 
 export const parseTestResult = (image: DynamoDbImage): TestResult => {
@@ -100,7 +83,6 @@ export const parseTestResult = (image: DynamoDbImage): TestResult => {
         vin: image.getString("vin"),
         vehicleId: image.getString("vehicleId"),
         deletionFlag: image.getBoolean("deletionFlag"),
-        testHistory: parseTestResults(image.getList("testHistory")),
         testVersion: image.getString("testVersion") as TestVersion,
         reasonForCreation: image.getString("reasonForCreation"),
         createdAt: image.getDate("createdAt"),

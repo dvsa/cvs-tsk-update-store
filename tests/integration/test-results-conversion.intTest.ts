@@ -3,6 +3,8 @@ import {destroyConnectionPool, executeSql} from "../../src/services/connection-p
 import {exampleContext, useLocalDb} from "../utils";
 import testResultsJson from "../resources/dynamodb-image-test-results.json";
 import testResultsJsonWithTestTypes from "../resources/dynamodb-image-test-results-with-testtypes.json";
+import testResultsJsonWithNoSystemNumber from "../resources/dynamodb-image-test-results-with-no-systemNumber.json";
+import testResultsJsonWithoutTestTypes from "../resources/dynamodb-image-test-results-without-testtypes.json";
 import {getContainerizedDatabase} from "./cvsbnop-container";
 import {processStreamEvent} from "../../src/functions/process-stream-event";
 import {getConnectionPoolOptions} from "../../src/services/connection-pool-options";
@@ -249,25 +251,26 @@ describe("convertTestResults() integration tests", () => {
         expect(customDefectResultSet.rows[customDefectLastIndex].defectName).toEqual("DEFECT-NAME");
         expect(customDefectResultSet.rows[customDefectLastIndex].defectNotes).toEqual("DEFECT-NOTES");
     });
+
     it("Existing Test Result TestType attributes are modified correctly", async () => {
         const deserializedJson = unmarshall(testResultsJson);
-        deserializedJson.testResults[0].testTypes[0].testCode = "444";
-        deserializedJson.testResults[0].testTypes[0].certificateNumber = "W323232";
-        deserializedJson.testResults[0].testTypes[0].secondaryCertificateNumber = "111111";
-        deserializedJson.testResults[0].testTypes[0].testExpiryDate = "2022-01-01T00:00:00.000Z";
-        deserializedJson.testResults[0].testTypes[0].testAnniversaryDate = "2022-01-01T00:00:00.000Z";
-        deserializedJson.testResults[0].testTypes[0].testTypeStartTimestamp = "2021-01-01T00:00:00.000Z";
-        deserializedJson.testResults[0].testTypes[0].numberOfSeatbeltsFitted = 5;
-        deserializedJson.testResults[0].testTypes[0].lastSeatbeltInstallationCheckDate = "2021-01-01";
-        deserializedJson.testResults[0].testTypes[0].seatbeltInstallationCheckDate = false;
-        deserializedJson.testResults[0].testTypes[0].testResult = "pass";
-        deserializedJson.testResults[0].testTypes[0].reasonForAbandoning = "NEW-REASON-FOR-ABANDONING";
-        deserializedJson.testResults[0].testTypes[0].additionalNotesRecorded = "NEW-ADDITIONAL-NOTES-RECORDED";
-        deserializedJson.testResults[0].testTypes[0].additionalCommentsForAbandon = "NEW-ADDITIONAL-COMMENTS-FOR-ABANDON";
-        deserializedJson.testResults[0].testTypes[0].particulateTrapFitted = "t";
-        deserializedJson.testResults[0].testTypes[0].particulateTrapSerialNumber = "trap";
-        deserializedJson.testResults[0].testTypes[0].modificationTypeUsed = "NEW-MODIFICATION-TYPE-USED";
-        deserializedJson.testResults[0].testTypes[0].smokeTestKLimitApplied = "NEW-SMOKE-TEST-K-LIMIT-APPLIED";
+        deserializedJson.testTypes[0].testCode = "444";
+        deserializedJson.testTypes[0].certificateNumber = "W323232";
+        deserializedJson.testTypes[0].secondaryCertificateNumber = "111111";
+        deserializedJson.testTypes[0].testExpiryDate = "2022-01-01T00:00:00.000Z";
+        deserializedJson.testTypes[0].testAnniversaryDate = "2022-01-01T00:00:00.000Z";
+        deserializedJson.testTypes[0].testTypeStartTimestamp = "2021-01-01T00:00:00.000Z";
+        deserializedJson.testTypes[0].numberOfSeatbeltsFitted = 5;
+        deserializedJson.testTypes[0].lastSeatbeltInstallationCheckDate = "2021-01-01";
+        deserializedJson.testTypes[0].seatbeltInstallationCheckDate = false;
+        deserializedJson.testTypes[0].testResult = "pass";
+        deserializedJson.testTypes[0].reasonForAbandoning = "NEW-REASON-FOR-ABANDONING";
+        deserializedJson.testTypes[0].additionalNotesRecorded = "NEW-ADDITIONAL-NOTES-RECORDED";
+        deserializedJson.testTypes[0].additionalCommentsForAbandon = "NEW-ADDITIONAL-COMMENTS-FOR-ABANDON";
+        deserializedJson.testTypes[0].particulateTrapFitted = "t";
+        deserializedJson.testTypes[0].particulateTrapSerialNumber = "trap";
+        deserializedJson.testTypes[0].modificationTypeUsed = "NEW-MODIFICATION-TYPE-USED";
+        deserializedJson.testTypes[0].smokeTestKLimitApplied = "NEW-SMOKE-TEST-K-LIMIT-APPLIED";
 
         const serializedJSONb = marshall(deserializedJson);
 
@@ -480,6 +483,7 @@ describe("convertTestResults() integration tests", () => {
         expect(customDefectResultSet.rows[customDefectLastIndex].defectNotes).toEqual("DEFECT-NOTES");
 
     });
+
     it("A new Test Result with two TestTypes is inserted correctly", async () => {
 
         const event = {
@@ -713,5 +717,205 @@ describe("convertTestResults() integration tests", () => {
         expect(customDefectResultSet.rows[customDefectLastIndex].defectName).toEqual("DEFECT-NAME");
         expect(customDefectResultSet.rows[customDefectLastIndex].defectNotes).toEqual("DEFECT-NOTES");
 
+    });
+    it("A new Test Result with no systemNumber throws an error", async () => {
+
+        const event = {
+            Records: [
+                {
+                    messageId: "faf41ab1-5b42-462c-b242-c4450e15c724",
+                    body: JSON.stringify({
+                        eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
+                        eventName: "INSERT",
+                        dynamodb: {
+                            NewImage: testResultsJsonWithNoSystemNumber
+                        }
+                    })
+                }
+            ]
+        };
+
+        const consoleSpy = jest.spyOn(global.console, "error");
+        const returnValue = await processStreamEvent(
+            event,
+            exampleContext(),
+            () => {
+                return;
+            }
+        );
+
+        const expectedValue = {
+            batchItemFailures: [{ itemIdentifier: "faf41ab1-5b42-462c-b242-c4450e15c724" }],
+        };
+
+        expect(returnValue).toEqual(expectedValue);
+        expect(consoleSpy).nthCalledWith(
+            1,
+            "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
+            new Error("result is missing required field 'systemNumber'")
+        );
+    });
+
+    it("A new Test Result with no TestTypes is inserted correctly", async () => {
+
+        const event = {
+            Records: [
+                {
+                    body: JSON.stringify({
+                        eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
+                        eventName: "INSERT",
+                        dynamodb: {
+                            NewImage: testResultsJsonWithoutTestTypes
+                        }
+                    })
+                }
+            ]
+        };
+
+        await processStreamEvent(
+            event,
+            exampleContext(),
+            () => {
+                return;
+            }
+        );
+
+        const vehicleResultSet = await executeSql(
+            `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`, \`id\`
+             FROM \`vehicle\`
+             WHERE \`vehicle\`.\`id\` IN (
+                SELECT \`id\`
+                FROM \`vehicle\`
+                WHERE \`vehicle\`.\`system_number\` = "SYSTEM-NUMBER-3"
+             )`
+        );
+
+        expect(vehicleResultSet.rows.length).toEqual(1);
+        expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-3");
+        expect(vehicleResultSet.rows[0].vin).toEqual("VIN");
+        expect(vehicleResultSet.rows[0].vrm_trm).toEqual("VRM");
+        expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
+        expect((vehicleResultSet.rows[0].createdAt as Date).toUTCString()).not.toBeNull();
+
+        const testResultSet = await executeSql(
+            `SELECT \`test_station_id\`, \`tester_id\`, \`vehicle_class_id\`, \`preparer_id\`, \`createdBy_Id\`, \`lastUpdatedBy_Id\`,
+                    \`fuel_emission_id\`, \`test_type_id\`, \`id\`, \`testResultId\`, \`testCode\`,  \`certificateNumber\`,  \`secondaryCertificateNumber\`,
+                    \`testExpiryDate\`,  \`testAnniversaryDate\`,  \`testTypeStartTimestamp\`,  \`numberOfSeatbeltsFitted\`, \`lastSeatbeltInstallationCheckDate\`,
+                    \`seatbeltInstallationCheckDate\`,  \`testResult\`,  \`reasonForAbandoning\`,  \`additionalNotesRecorded\`,  \`additionalCommentsForAbandon\`,
+                    \`particulateTrapFitted\`,  \`particulateTrapSerialNumber\`,  \`modificationTypeUsed\`, \`smokeTestKLimitApplied\`, \`testTypeEndTimestamp\`
+            FROM \`test_result\`
+            WHERE \`test_result\`.\`vehicle_id\` = ${vehicleResultSet.rows[0].id}
+            ORDER BY id ASC`
+        );
+
+        expect(testResultSet.rows.length).toEqual(1);
+
+        expect(testResultSet.rows[0].testResultId).toEqual("TEST-RESULT-ID-NEW-3");
+        expect(testResultSet.rows[0].testCode).toBeNull();
+        expect(testResultSet.rows[0].certificateNumber).toBeNull();
+        expect(testResultSet.rows[0].secondaryCertificateNumber).toBeNull();
+        expect(testResultSet.rows[0].testExpiryDate).toBeNull();
+        expect(testResultSet.rows[0].testAnniversaryDate).toBeNull();
+        expect(testResultSet.rows[0].testTypeStartTimestamp).toBeNull();
+        expect(testResultSet.rows[0].testTypeEndTimestamp).toBeNull();
+        expect(testResultSet.rows[0].lastSeatbeltInstallationCheckDate).toBeNull();
+        expect(testResultSet.rows[0].seatbeltInstallationCheckDate).toBeNull();
+        expect(testResultSet.rows[0].testResult).toBeNull();
+        expect(testResultSet.rows[0].reasonForAbandoning).toBeNull();
+        expect(testResultSet.rows[0].additionalNotesRecorded).toBeNull();
+        expect(testResultSet.rows[0].particulateTrapFitted).toBeNull();
+        expect(testResultSet.rows[0].particulateTrapSerialNumber).toBeNull();
+        expect(testResultSet.rows[0].modificationTypeUsed).toBeNull();
+        expect(testResultSet.rows[0].smokeTestKLimitApplied).toBeNull();
+
+        const { test_station_id, tester_id, vehicle_class_id, preparer_id, createdBy_Id, lastUpdatedBy_Id, fuel_emission_id, test_type_id, id } = testResultSet.rows[0];
+
+        const testStationResultSet = await executeSql(
+            `SELECT \`pNumber\`, \`name\`, \`type\`
+             FROM \`test_station\`
+             WHERE \`test_station\`.\`id\` = ${test_station_id}`
+        );
+
+        expect(testStationResultSet.rows.length).toEqual(1);
+        expect(testStationResultSet.rows[0].pNumber).toEqual("P-NUMBER-3");
+        expect(testStationResultSet.rows[0].name).toEqual("TEST-STATION-NAME-3");
+        expect(testStationResultSet.rows[0].type).toEqual("atf");
+
+        const testerResultSet = await executeSql(
+            `SELECT \`staffId\`, \`name\`, \`email_address\`
+             FROM \`tester\`
+             WHERE \`tester\`.\`id\` = ${tester_id}`
+        );
+        expect(testerResultSet.rows.length).toEqual(1);
+        expect(testerResultSet.rows[0].staffId).toEqual("999999998");
+        expect(testerResultSet.rows[0].name).toEqual("TESTER-NAME-3");
+        expect(testerResultSet.rows[0].email_address).toEqual("TESTER-EMAIL-ADDRESS-3");
+
+        const vehicleClassResultSet = await executeSql(
+            `SELECT \`code\`,
+                    \`description\`,
+                    \`vehicleType\`,
+                    \`vehicleSize\`,
+                    \`vehicleConfiguration\`,
+                    \`euVehicleCategory\`
+             FROM \`vehicle_class\`
+             WHERE \`vehicle_class\`.\`id\` = ${vehicle_class_id}`
+        );
+        expect(vehicleClassResultSet.rows.length).toEqual(1);
+        expect(vehicleClassResultSet.rows[0].code).toEqual("v");
+        expect(vehicleClassResultSet.rows[0].description).toEqual("heavy goods vehicle");
+        expect(vehicleClassResultSet.rows[0].vehicleType).toEqual("hgv");
+        expect(vehicleClassResultSet.rows[0].vehicleSize).toEqual("large");
+        expect(vehicleClassResultSet.rows[0].vehicleConfiguration).toEqual("rigid");
+        expect(vehicleClassResultSet.rows[0].euVehicleCategory).toEqual("m1");
+
+        const preparerResultSet = await executeSql(
+            `SELECT \`preparerId\`, \`name\`
+             FROM \`preparer\`
+             WHERE \`preparer\`.\`id\` = ${preparer_id}`
+        );
+        expect(preparerResultSet.rows.length).toEqual(1);
+        expect(preparerResultSet.rows[0].preparerId).toEqual("999999998");
+        expect(preparerResultSet.rows[0].name).toEqual("PREPARER-NAME-3");
+
+        const createdByResultSet = await executeSql(
+            `SELECT \`identityId\`, \`name\`
+             FROM \`identity\`
+             WHERE \`identity\`.\`id\` = ${createdBy_Id}`
+        );
+        expect(createdByResultSet.rows.length).toEqual(1);
+        expect(createdByResultSet.rows[0].identityId).toEqual("CREATED-BY-ID-3");
+        expect(createdByResultSet.rows[0].name).toEqual("CREATED-BY-NAME-3");
+
+        const lastUpdatedByResultSet = await executeSql(
+            `SELECT \`identityId\`, \`name\`
+             FROM \`identity\`
+             WHERE \`identity\`.\`id\` = ${lastUpdatedBy_Id}`
+        );
+        expect(lastUpdatedByResultSet.rows.length).toEqual(1);
+        expect(lastUpdatedByResultSet.rows[0].identityId).toEqual("LAST-UPDATED-BY-ID-3");
+        expect(lastUpdatedByResultSet.rows[0].name).toEqual("LAST-UPDATED-BY-NAME-3");
+
+        const fuelEmissionResultSet = await executeSql(
+            `SELECT \`modTypeCode\`, \`description\`, \`emissionStandard\`, \`fuelType\`
+             FROM \`fuel_emission\`
+             WHERE \`fuel_emission\`.\`id\` = ${fuel_emission_id}`
+        );
+        expect(fuelEmissionResultSet.rows.length).toEqual(0);
+
+        const testTypeResultSet = await executeSql(
+            `SELECT \`testTypeClassification\`, \`testTypeName\`
+             FROM \`test_type\`
+             WHERE \`test_type\`.\`id\` = ${test_type_id}`
+        );
+        expect(testTypeResultSet.rows.length).toEqual(0);
+
+
+        const testDefectResultSet = await executeSql(
+            `SELECT \`test_result_id\`, \`defect_id\`, \`location_id\`, \`notes\`, \`prs\`, \`prohibitionIssued\`
+             FROM \`test_defect\`
+             WHERE \`test_defect\`.\`test_result_id\` = ${id}`
+        );
+        expect(testDefectResultSet.rows.length).toEqual(0);
     });
 });

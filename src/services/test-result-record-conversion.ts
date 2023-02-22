@@ -17,7 +17,6 @@ import {
     VEHICLE_TABLE
 } from "./table-details";
 import {executeFullUpsert, executePartialUpsert, executePartialUpsertIfNotExists} from "./sql-execution";
-import {TestResultUpsertResult} from "../models/upsert-results";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
 import {EntityConverter} from "./entity-conversion";
@@ -32,21 +31,21 @@ export const testResultsConverter = (): EntityConverter<TestResults> => {
     };
 };
 
-const upsertTestResults = async (testResults: TestResults): Promise<TestResultUpsertResult[]> => {
+const upsertTestResults = async (testResults: TestResults): Promise<void> => {
     debugLog(`upsertTestResults: START`);
 
     if (!testResults) {
-        return [];
+        return;
     }
 
     const pool = await getConnectionPool();
 
-    const upsertResults: TestResultUpsertResult[] = [];
-
     debugLog(`Upserting ${testResults.length} test results`);
 
     for (const testResult of testResults) {
-        validateTestResult(testResult);
+        if (!testResult) {
+            throw new Error(`testResult cannot be null`);
+        }
 
         const vehicleConnection = await pool.getConnection();
 
@@ -74,10 +73,61 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
             const testStationId = await upsertTestStation(testResultConnection, testResult);
             const testerId = await upsertTester(testResultConnection, testResult);
             const vehicleClassId = await upsertVehicleClass(testResultConnection, testResult);
-            const vehicleSubclassIds = await upsertVehicleSubclasses(testResultConnection, vehicleClassId, testResult);
+            await upsertVehicleSubclasses(testResultConnection, vehicleClassId, testResult);
             const preparerId = await upsertPreparer(testResultConnection, testResult);
             const createdById = await upsertIdentity(testResultConnection, testResult.createdById!, testResult.createdByName!);
             const lastUpdatedById = await upsertIdentity(testResultConnection, testResult.lastUpdatedById!, testResult.lastUpdatedByName!);
+
+            if (!testResult.testTypes || testResult.testTypes.length < 1) {
+                await executeFullUpsert(
+                    TEST_RESULT_TABLE,
+                    [
+                        vehicleId,
+                        undefined,
+                        testStationId,
+                        testerId,
+                        preparerId,
+                        vehicleClassId,
+                        undefined,
+                        testResult.testResultId,
+                        testResult.testStatus,
+                        testResult.reasonForCancellation,
+                        testResult.numberOfSeats,
+                        testResult.odometerReading,
+                        testResult.odometerReadingUnits,
+                        testResult.countryOfRegistration,
+                        testResult.noOfAxles,
+                        testResult.regnDate,
+                        testResult.firstUseDate,
+                        testResult.createdAt,
+                        testResult.lastUpdatedAt,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        createdById,
+                        lastUpdatedById,
+                    ],
+                    testResultConnection
+                );
+
+                continue;
+            }
 
             for (const testType of testResult.testTypes!) {
                 await testResultConnection.beginTransaction();
@@ -138,26 +188,10 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
 
                 debugLog(`upsertTestResults: Upserted test result (ID: ${testResultRecordId})`);
 
-                const defectIds = await upsertDefects(testResultConnection, testResultRecordId, testType);
-                const customDefectIds = await upsertCustomDefects(testResultConnection, testResultRecordId, testType);
+                await upsertDefects(testResultConnection, testResultRecordId, testType);
+                await upsertCustomDefects(testResultConnection, testResultRecordId, testType);
 
                 await testResultConnection.commit();
-
-                upsertResults.push({
-                    vehicleId,
-                    testResultRecordId,
-                    testStationId,
-                    testerId,
-                    vehicleClassId,
-                    vehicleSubclassIds,
-                    preparerId,
-                    createdById,
-                    lastUpdatedById,
-                    fuelEmissionId,
-                    testTypeId,
-                    defectIds,
-                    customDefectIds,
-                });
             }
         } catch (err) {
             await testResultConnection.rollback();
@@ -168,8 +202,6 @@ const upsertTestResults = async (testResults: TestResults): Promise<TestResultUp
     }
 
     debugLog(`upsertTestResults: END`);
-
-    return upsertResults;
 };
 
 const deleteTestResults = async (testResult: TestResults): Promise<void> => {
@@ -448,16 +480,4 @@ const upsertCustomDefects = async (connection: Connection, testResultId: number,
     }
 
     return insertedIds;
-};
-
-const validateTestResult = (testResult: TestResult): void => {
-    if (!testResult) {
-        throw new Error(`testResult cannot be null`);
-    }
-    if (!testResult.testTypes) {
-        throw new Error(`missing required field testResult.testTypes`);
-    }
-    if (testResult.testTypes.length < 1) {
-        throw new Error(`array testResult.testTypes must contain at least 1 element`);
-    }
 };
