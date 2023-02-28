@@ -244,8 +244,8 @@ describe("convertTechRecordDocument() integration tests", () => {
                     \`width\`,
                     \`frontAxleTo5thWheelMin\`,
                     \`frontAxleTo5thWheelMax\`,
-                    \`frontAxleTo5thWheelCouplingMin\`,
-                    \`frontAxleTo5thWheelCouplingMax\`,
+                    \`frontVehicleTo5thWheelCouplingMin\`,
+                    \`frontVehicleTo5thWheelCouplingMax\`,
                     \`frontAxleToRearAxle\`,
                     \`rearAxleToRearTrl\`,
                     \`couplingCenterToRearAxleMin\`,
@@ -332,8 +332,8 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect((techRecordResultSet.rows[0].width)).toEqual(1);
         expect((techRecordResultSet.rows[0].frontAxleTo5thWheelMin)).toEqual(1);
         expect((techRecordResultSet.rows[0].frontAxleTo5thWheelMax)).toEqual(1);
-        expect((techRecordResultSet.rows[0].frontAxleTo5thWheelCouplingMin)).toEqual(1);
-        expect((techRecordResultSet.rows[0].frontAxleTo5thWheelCouplingMax)).toEqual(1);
+        expect((techRecordResultSet.rows[0].frontVehicleTo5thWheelCouplingMin)).toEqual(1);
+        expect((techRecordResultSet.rows[0].frontVehicleTo5thWheelCouplingMax)).toEqual(1);
         expect((techRecordResultSet.rows[0].frontAxleToRearAxle)).toEqual(1);
         expect((techRecordResultSet.rows[0].rearAxleToRearTrl)).toEqual(1);
         expect((techRecordResultSet.rows[0].couplingCenterToRearAxleMin)).toEqual(1);
