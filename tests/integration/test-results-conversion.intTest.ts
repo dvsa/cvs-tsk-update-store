@@ -752,7 +752,7 @@ describe("convertTestResults() integration tests", () => {
         expect(consoleSpy).nthCalledWith(
             1,
             "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
-            new Error("result is missing required field 'systemNumber'")
+            ["messageId: faf41ab1-5b42-462c-b242-c4450e15c724", new Error("result is missing required field 'systemNumber'")]
         );
     });
 
