@@ -181,7 +181,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
                         testType.modificationTypeUsed,
                         testType.smokeTestKLimitApplied,
                         createdById,
-                        lastUpdatedById, ,
+                        lastUpdatedById,
                         moment().format("YYYY-MM-DD HH:mm:ss.SSS")
                     ],
                     testResultConnection
