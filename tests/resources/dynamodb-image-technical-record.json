@@ -412,10 +412,10 @@
           "frontAxleTo5thWheelMax": {
             "N": "1"
           },
-          "frontAxleTo5thWheelCouplingMin": {
+          "frontVehicleTo5thWheelCouplingMin": {
             "N": "1"
           },
-          "frontAxleTo5thWheelCouplingMax": {
+          "frontVehicleTo5thWheelCouplingMax": {
             "N": "1"
           },
           "frontAxleToRearAxle": {

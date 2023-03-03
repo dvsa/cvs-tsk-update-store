@@ -90,8 +90,8 @@ export interface TechRecord {
     dimensions?: Dimensions;
     frontAxleTo5thWheelMin?: number;
     frontAxleTo5thWheelMax?: number;
-    frontAxleTo5thWheelCouplingMin?: number;
-    frontAxleTo5thWheelCouplingMax?: number;
+    frontVehicleTo5thWheelCouplingMin?: number;
+    frontVehicleTo5thWheelCouplingMax?: number;
     frontAxleToRearAxle?: number;
     rearAxleToRearTrl?: number;
     couplingCenterToRearAxleMin?: number;
@@ -226,8 +226,8 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
         dimensions: parseDimensions(image.getMap("dimensions")),
         frontAxleTo5thWheelMin: image.getNumber("frontAxleTo5thWheelMin"),
         frontAxleTo5thWheelMax: image.getNumber("frontAxleTo5thWheelMax"),
-        frontAxleTo5thWheelCouplingMin: image.getNumber("frontAxleTo5thWheelCouplingMin"),
-        frontAxleTo5thWheelCouplingMax: image.getNumber("frontAxleTo5thWheelCouplingMax"),
+        frontVehicleTo5thWheelCouplingMin: image.getNumber("frontVehicleTo5thWheelCouplingMin"),
+        frontVehicleTo5thWheelCouplingMax: image.getNumber("frontVehicleTo5thWheelCouplingMax"),
         frontAxleToRearAxle: image.getNumber("frontAxleToRearAxle"),
         rearAxleToRearTrl: image.getNumber("rearAxleToRearTrl"),
         couplingCenterToRearAxleMin: image.getNumber("couplingCenterToRearAxleMin"),
