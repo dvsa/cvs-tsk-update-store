@@ -1,4 +1,11 @@
-import {generateFullUpsertSql, generatePartialUpsertSql, generateSelectSql} from "../../../src/services/sql-generation";
+import {
+    generateDeleteBasedOnSelect,
+    generateDeleteBasedOnWhere,
+    generateFullUpsertSql,
+    generatePartialUpsertSql,
+    generateSelectRecordIds,
+    generateSelectSql
+} from "../../../src/services/sql-generation";
 
 const tableName = "myTable";
 const columnNames = ["columnA", "columnZ"];
@@ -36,5 +43,49 @@ describe("generateSelectSql", () => {
         expect(generateSelectSql({ tableName, columnNames })).toEqual(
             "SELECT id insertId FROM `myTable` WHERE fingerprint = MD5(CONCAT_WS('|', IFNULL(?, ''), IFNULL(?, '')))"
         );
+    });
+});
+
+describe("generateDeleteBasedOnSelect ", () => {
+    it("should construct a correct Delete SQL query, based on SELECT from the child table", async () => {
+        const targetTableName = "test_defect";
+        const foreignTableName = "test_result";
+        const foreignTableId = "test_result_id";    
+        const attributes = {
+            vehicle_id: 1,
+            testResultId: "TEST-RESULT-ID",
+        };
+    
+        const expectedQuery = "DELETE FROM test_defect WHERE test_result_id IN (SELECT id FROM test_result WHERE vehicle_id=? AND testResultId=?)";
+        const result = generateDeleteBasedOnSelect(targetTableName, foreignTableName, foreignTableId, attributes);
+        expect(result).toEqual(expectedQuery);
+    });
+});
+
+describe("generateDeleteBasedOnWhere ", () => {
+    it("should construct a correct Delete SQL query, based on WHERE clause", async () => {
+        const targetTableName = "test_result";
+        const attributes = {
+            vehicle_id: 1,
+            testResultId: "TEST-RESULT-ID",
+        };
+    
+        const expectedQuery = "DELETE FROM test_result WHERE vehicle_id=? AND testResultId=?";
+        const result = generateDeleteBasedOnWhere(targetTableName, attributes);
+        expect(result).toEqual(expectedQuery);
+    });
+});
+
+describe("generateSelectRecordIds ", () => {
+    it("should construct a correct Select SQL query, based on WHERE clause", async () => {
+        const targetTableName = "test_result";
+        const attributes = {
+            vehicle_id: 1,
+            testResultId: "TEST-RESULT-ID",
+        };
+    
+        const expectedQuery = "SELECT id FROM test_result WHERE vehicle_id=? AND testResultId=?";
+        const result = generateSelectRecordIds(targetTableName, attributes);
+        expect(result).toEqual(expectedQuery);
     });
 });
