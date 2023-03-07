@@ -1,15 +1,15 @@
 {
   "systemNumber": {
-    "S": "SYSTEM-NUMBER-1"
+    "S": "SYSTEM-NUMBER-3"
   },
   "vrm": {
-    "S": "VRM"
+    "S": "VRM-3"
   },
   "trailerId": {
-    "S": "88888888"
+    "S": "TRL-3"
   },
   "vin": {
-    "S": "VIN"
+    "S": "VIN-3"
   },
   "vehicleId": {
     "S": "VEHICLE-ID"
@@ -18,52 +18,52 @@
     "L": []
   },
   "testVersion": {
-    "S": "TEST-VERSION-2"
+    "S": "TEST-VERSION-3"
   },
   "reasonForCreation": {
-    "S": "REASON-FOR-CREATION-2"
+    "S": "REASON-FOR-CREATION-3"
   },
   "createdAt": {
     "S": "2020-01-01T00:00:00.000Z"
   },
   "createdByName": {
-    "S": "CREATED-BY-NAME-2"
+    "S": "CREATED-BY-NAME-3"
   },
   "createdById": {
-    "S": "CREATED-BY-ID-2"
+    "S": "CREATED-BY-ID-3"
   },
   "lastUpdatedAt": {
     "S": "2020-01-01T00:00:00.000Z"
   },
   "lastUpdatedByName": {
-    "S": "LAST-UPDATED-BY-NAME-2"
+    "S": "LAST-UPDATED-BY-NAME-3"
   },
   "lastUpdatedById": {
-    "S": "LAST-UPDATED-BY-ID-2"
+    "S": "LAST-UPDATED-BY-ID-3"
   },
   "shouldEmailCertificate": {
-    "S": "SHOULD-EMAIL-CERTIFICATE-2"
+    "S": "SHOULD-EMAIL-CERTIFICATE-3"
   },
   "testStationName": {
-    "S": "TEST-STATION-NAME-2"
+    "S": "TEST-STATION-NAME-3"
   },
   "testStationPNumber": {
-    "S": "P-NUMBER-2"
+    "S": "P-NUMBER-3"
   },
   "testStationType": {
     "S": "atf"
   },
   "testerName": {
-    "S": "TESTER-NAME-2"
+    "S": "TESTER-NAME-3"
   },
   "testerStaffId": {
     "S": "999999998"
   },
   "testResultId": {
-    "S": "TEST-RESULT-ID-NEW"
+    "S": "TEST-RESULT-ID-3"
   },
   "testerEmailAddress": {
-    "S": "TESTER-EMAIL-ADDRESS-2"
+    "S": "TESTER-EMAIL-ADDRESS-3"
   },
   "testStartTimestamp": {
     "S": "2020-01-01T00:00:00.000Z"
@@ -75,7 +75,7 @@
     "S": "submitted"
   },
   "reasonForCancellation": {
-    "S": "REASON-FOR-CANCELLATION-2"
+    "S": "REASON-FOR-CANCELLATION-3"
   },
   "vehicleClass": {
     "M": {
@@ -113,7 +113,7 @@
     "S": "999999998"
   },
   "preparerName": {
-    "S": "PREPARER-NAME-2"
+    "S": "PREPARER-NAME-3"
   },
   "numberOfWheelsDriven": {
     "N": "1"
@@ -122,7 +122,7 @@
     "S": "m1"
   },
   "countryOfRegistration": {
-    "S": "COUNTRY-OF-REGISTRATION-2"
+    "S": "COUNTRY-OF-REGISTRATION-3"
   },
   "vehicleSize": {
     "S": "large"
@@ -168,10 +168,10 @@
             "S": "TEST-NUMBER"
           },
           "certificateNumber": {
-            "S": "999999999"
+            "S": "CERTIFICATE-NO"
           },
           "secondaryCertificateNumber": {
-            "S": "999999999"
+            "S": "2ND-CERTIFICATE-NO"
           },
           "certificateLink": {
             "S": "CERTIFICATE-LINK"
@@ -248,10 +248,10 @@
               {
                 "M": {
                   "imNumber": {
-                    "N": "1"
+                    "N": "3"
                   },
                   "imDescription": {
-                    "S": "IM-DESCRIPTION"
+                    "S": "IM-DESCRIPTION-3"
                   },
                   "additionalInformation": {
                     "M": {
@@ -289,10 +289,10 @@
                     "N": "1"
                   },
                   "itemDescription": {
-                    "S": "ITEM-DESCRIPTION"
+                    "S": "ITEM-DESCRIPTION-3"
                   },
                   "deficiencyRef": {
-                    "S": "DEFICIENCY-REF"
+                    "S": "DEFICIENCY-REF-3"
                   },
                   "deficiencyId": {
                     "S": "a"
@@ -304,7 +304,7 @@
                     "S": "advisory"
                   },
                   "deficiencyText": {
-                    "S": "DEFICIENCY-TEXT"
+                    "S": "DEFICIENCY-TEXT-3"
                   },
                   "stdForProhibition": {
                     "BOOL": true
@@ -324,13 +324,13 @@
               {
                 "M": {
                   "referenceNumber": {
-                    "S": "1010101010"
+                    "S": "def3"
                   },
                   "defectName": {
-                    "S": "DEFECT-NAME"
+                    "S": "DEFECT-NAME-3"
                   },
                   "defectNotes": {
-                    "S": "DEFECT-NOTES"
+                    "S": "DEFECT-NOTES-3"
                   }
                 }
               }
