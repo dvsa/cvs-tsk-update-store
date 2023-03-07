@@ -34,6 +34,27 @@ export const generateSelectSql = (tableDetails: TableDetails): string => {
     return query;
 };
 
+export const generateDeleteBasedOnSelect = (targetTableName: string, foreignTableName: string, foreignTableId: string, conditionAttributes: { [key: string]: any; }): string => {
+    return `DELETE FROM ${targetTableName} WHERE ${foreignTableId} IN (SELECT id FROM ${foreignTableName} WHERE ${Object.entries(conditionAttributes)
+        .map(([key]) => {
+            return `${key}=?`;
+        }).join(" AND ")})`;
+};
+
+export const generateDeleteBasedOnWhere = (targetTableName: string, conditionAttributes: { [key: string]: any; }): string => {
+    return `DELETE FROM ${targetTableName} WHERE ${Object.entries(conditionAttributes)
+        .map(([key]) => {
+            return `${key}=?`;
+        }).join(" AND ")}`;
+};
+
+export const generateSelectRecordIds = (targetTableName: string, conditionAttributes: { [key: string]: any; }): string => {
+    return `SELECT id FROM ${targetTableName} WHERE ${Object.entries(conditionAttributes)
+        .map(([key]) => {
+            return `${key}=?`;
+        }).join(" AND ")}`;
+};
+
 const generateUpsertSql = (tableDetails: TableDetails, updatePlaceholders: string[]): string => {
     return `INSERT INTO \`${tableDetails.tableName}\` (${tableDetails.columnNames.map((c) => `\`${c}\``).join(", ")})`
         + ` VALUES (${(nCopies(tableDetails.columnNames.length, "?").join(", "))})`

@@ -1,7 +1,14 @@
 import {executeSql, QueryResponse} from "./connection-pool";
 import {Connection} from "mysql2/promise";
 import {TableDetails} from "./table-details";
-import {generateFullUpsertSql, generateSelectSql, generatePartialUpsertSql} from "./sql-generation";
+import {
+    generateFullUpsertSql,
+    generateSelectSql,
+    generatePartialUpsertSql,
+    generateDeleteBasedOnSelect,
+    generateDeleteBasedOnWhere,
+    generateSelectRecordIds
+} from "./sql-generation";
 
 /**
  * Execute a "partial upsert" on a fingerprinted table:
@@ -69,3 +76,33 @@ export const executeFullUpsert = async (tableDetails: TableDetails, templateVari
         connection
     );
 };
+
+export async function deleteRecordsBasedOnIds(targetTableName: string, foreignTableName: string, foreignTableId: string, conditionAttributes: { [key: string]: any }, connection: Connection): Promise<QueryResponse> {
+    const values: any[] | undefined = Object.values(conditionAttributes);
+
+    return executeSql(
+        generateDeleteBasedOnSelect(targetTableName, foreignTableName, foreignTableId, conditionAttributes),
+        values,
+        connection
+    );
+}
+
+export async function deleteRecordsBasedOnColumns(targetTableName: string, conditionAttributes: { [key: string]: any }, connection: Connection): Promise<QueryResponse> {
+    const values: any[] | undefined = Object.values(conditionAttributes);
+
+    return executeSql(
+        generateDeleteBasedOnWhere(targetTableName, conditionAttributes),
+        values,
+        connection
+    );
+}
+
+export async function selectRecordIds(targetTableName: string, conditionAttributes: { [key: string]: any }, connection: Connection): Promise<QueryResponse> {
+    const values: any[] | undefined = Object.values(conditionAttributes);
+
+    return executeSql(
+        generateSelectRecordIds(targetTableName, conditionAttributes),
+        values,
+        connection
+    );
+}

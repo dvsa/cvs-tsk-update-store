@@ -16,7 +16,14 @@ import {
     VEHICLE_SUBCLASS_TABLE,
     VEHICLE_TABLE
 } from "./table-details";
-import {executeFullUpsert, executePartialUpsert, executePartialUpsertIfNotExists} from "./sql-execution";
+import {
+    deleteRecordsBasedOnColumns,
+    deleteRecordsBasedOnIds,
+    executeFullUpsert,
+    executePartialUpsert,
+    executePartialUpsertIfNotExists,
+    selectRecordIds
+} from "./sql-execution";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
 import {EntityConverter} from "./entity-conversion";
@@ -127,6 +134,13 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
                 );
 
                 continue;
+            }
+
+            const existingTestResults = await selectRecordIds("test_result", {vehicle_id: vehicleId, testResultId: testResult.testResultId}, testResultConnection);
+            if (existingTestResults.rows.length > 0) {
+                await deleteRecordsBasedOnIds("custom_defect", "test_result", "test_result_id", {vehicle_id: vehicleId, testResultId: testResult.testResultId}, testResultConnection);
+                await deleteRecordsBasedOnIds("test_defect", "test_result", "test_result_id", {vehicle_id: vehicleId, testResultId: testResult.testResultId}, testResultConnection);
+                await deleteRecordsBasedOnColumns("test_result", {vehicle_id: vehicleId, testResultId: testResult.testResultId}, testResultConnection);
             }
 
             for (const testType of testResult.testTypes!) {
