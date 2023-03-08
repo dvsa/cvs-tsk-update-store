@@ -135,12 +135,14 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
                 continue;
             }
 
-            const existingTestResultIds = await selectRecordIds(TEST_RESULT_TABLE.tableName, {vehicle_id: vehicleId, testResultId: testResult.testResultId}, testResultConnection);
-            if (existingTestResultIds.rows.length > 0) {
-                const testResultIds = existingTestResultIds.rows.map((row: { id: any; }) => row.id);
-                await deleteBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, "test_result_id", testResultIds, testResultConnection);
-                await deleteBasedOnWhereIn(TEST_DEFECT_TABLE.tableName, "test_result_id", testResultIds, testResultConnection);
-                await deleteBasedOnWhereIn(TEST_RESULT_TABLE.tableName, "id", testResultIds, testResultConnection);
+            if (!process.env.DISABLE_DELETE_ON_UPDATE) {
+                const existingTestResultIds = await selectRecordIds(TEST_RESULT_TABLE.tableName, {vehicle_id: vehicleId, testResultId: testResult.testResultId}, testResultConnection);
+                if (existingTestResultIds.rows.length > 0) {
+                    const testResultIds = existingTestResultIds.rows.map((row: { id: any; }) => row.id);
+                    await deleteBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, "test_result_id", testResultIds, testResultConnection);
+                    await deleteBasedOnWhereIn(TEST_DEFECT_TABLE.tableName, "test_result_id", testResultIds, testResultConnection);
+                    await deleteBasedOnWhereIn(TEST_RESULT_TABLE.tableName, "id", testResultIds, testResultConnection);
+                }
             }
 
             for (const testType of testResult.testTypes!) {
