@@ -28,6 +28,7 @@ import {Connection} from "mysql2/promise";
 import {EntityConverter} from "./entity-conversion";
 import {debugLog} from "./logger";
 import { vinCleanser } from "../utils/cleanser";
+import moment from "moment";
 
 export const testResultsConverter = (): EntityConverter<TestResults> => {
     return {
@@ -128,6 +129,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
                         undefined,
                         createdById,
                         lastUpdatedById,
+                        moment().format("YYYY-MM-DD HH:mm:ss.SSS"),
                     ],
                     testResultConnection
                 );
@@ -196,6 +198,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
                         testType.smokeTestKLimitApplied,
                         createdById,
                         lastUpdatedById,
+                        moment().format("YYYY-MM-DD HH:mm:ss.SSS"),
                     ],
                     testResultConnection
                 );
