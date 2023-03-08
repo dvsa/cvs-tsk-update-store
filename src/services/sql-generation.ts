@@ -34,18 +34,12 @@ export const generateSelectSql = (tableDetails: TableDetails): string => {
     return query;
 };
 
-export const generateDeleteBasedOnSelect = (targetTableName: string, foreignTableName: string, foreignTableId: string, conditionAttributes: { [key: string]: any; }): string => {
-    return `DELETE FROM ${targetTableName} WHERE ${foreignTableId} IN (SELECT id FROM ${foreignTableName} WHERE ${Object.entries(conditionAttributes)
-        .map(([key]) => {
-            return `${key}=?`;
-        }).join(" AND ")})`;
-};
-
-export const generateDeleteBasedOnWhere = (targetTableName: string, conditionAttributes: { [key: string]: any; }): string => {
-    return `DELETE FROM ${targetTableName} WHERE ${Object.entries(conditionAttributes)
-        .map(([key]) => {
-            return `${key}=?`;
-        }).join(" AND ")}`;
+export const generateDeleteBasedOnWhereIn = (targetTableName: string, targetColumnName: string, conditionAttributes: any[]): string => {
+    return `DELETE FROM ${targetTableName} WHERE ${targetColumnName} IN (${Object.entries(conditionAttributes)
+        .map(() => {
+            return `?`;
+        })
+    })`;
 };
 
 export const generateSelectRecordIds = (targetTableName: string, conditionAttributes: { [key: string]: any; }): string => {

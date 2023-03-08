@@ -5,9 +5,8 @@ import {
     generateFullUpsertSql,
     generateSelectSql,
     generatePartialUpsertSql,
-    generateDeleteBasedOnSelect,
-    generateDeleteBasedOnWhere,
-    generateSelectRecordIds
+    generateSelectRecordIds,
+    generateDeleteBasedOnWhereIn
 } from "./sql-generation";
 
 /**
@@ -77,21 +76,11 @@ export const executeFullUpsert = async (tableDetails: TableDetails, templateVari
     );
 };
 
-export async function deleteRecordsBasedOnIds(targetTableName: string, foreignTableName: string, foreignTableId: string, conditionAttributes: { [key: string]: any }, connection: Connection): Promise<QueryResponse> {
-    const values: any[] | undefined = Object.values(conditionAttributes);
+export async function deleteBasedOnWhereIn(targetTableName: string, targetColumnName: string, ids: any[], connection: Connection): Promise<QueryResponse> {
+    const values: any[] | undefined = Object.values(ids);
 
     return executeSql(
-        generateDeleteBasedOnSelect(targetTableName, foreignTableName, foreignTableId, conditionAttributes),
-        values,
-        connection
-    );
-}
-
-export async function deleteRecordsBasedOnColumns(targetTableName: string, conditionAttributes: { [key: string]: any }, connection: Connection): Promise<QueryResponse> {
-    const values: any[] | undefined = Object.values(conditionAttributes);
-
-    return executeSql(
-        generateDeleteBasedOnWhere(targetTableName, conditionAttributes),
+        generateDeleteBasedOnWhereIn(targetTableName, targetColumnName, ids),
         values,
         connection
     );

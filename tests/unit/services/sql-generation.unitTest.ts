@@ -1,6 +1,5 @@
 import {
-    generateDeleteBasedOnSelect,
-    generateDeleteBasedOnWhere,
+    generateDeleteBasedOnWhereIn,
     generateFullUpsertSql,
     generatePartialUpsertSql,
     generateSelectRecordIds,
@@ -46,37 +45,19 @@ describe("generateSelectSql", () => {
     });
 });
 
-describe("generateDeleteBasedOnSelect ", () => {
-    it("should construct a correct Delete SQL query, based on SELECT from the child table", async () => {
-        const targetTableName = "test_defect";
-        const foreignTableName = "test_result";
-        const foreignTableId = "test_result_id";    
-        const attributes = {
-            vehicle_id: 1,
-            testResultId: "TEST-RESULT-ID",
-        };
-    
-        const expectedQuery = "DELETE FROM test_defect WHERE test_result_id IN (SELECT id FROM test_result WHERE vehicle_id=? AND testResultId=?)";
-        const result = generateDeleteBasedOnSelect(targetTableName, foreignTableName, foreignTableId, attributes);
-        expect(result).toEqual(expectedQuery);
-    });
-});
-
-describe("generateDeleteBasedOnWhere ", () => {
-    it("should construct a correct Delete SQL query, based on WHERE clause", async () => {
+describe("generateDeleteBasedOnWhereIn", () => {
+    it("should construct a correct Delete SQL query, based on WHERE IN clause", async () => {
         const targetTableName = "test_result";
-        const attributes = {
-            vehicle_id: 1,
-            testResultId: "TEST-RESULT-ID",
-        };
+        const targetColumnName = "test_result_id";
+        const ids = [1, 3, 5, 6];
     
-        const expectedQuery = "DELETE FROM test_result WHERE vehicle_id=? AND testResultId=?";
-        const result = generateDeleteBasedOnWhere(targetTableName, attributes);
+        const expectedQuery = "DELETE FROM test_result WHERE test_result_id IN (?,?,?,?)";
+        const result = generateDeleteBasedOnWhereIn(targetTableName, targetColumnName, ids);
         expect(result).toEqual(expectedQuery);
     });
 });
 
-describe("generateSelectRecordIds ", () => {
+describe("generateSelectRecordIds", () => {
     it("should construct a correct Select SQL query, based on WHERE clause", async () => {
         const targetTableName = "test_result";
         const attributes = {

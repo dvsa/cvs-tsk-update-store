@@ -17,8 +17,7 @@ import {
     VEHICLE_TABLE
 } from "./table-details";
 import {
-    deleteRecordsBasedOnColumns,
-    deleteRecordsBasedOnIds,
+    deleteBasedOnWhereIn,
     executeFullUpsert,
     executePartialUpsert,
     executePartialUpsertIfNotExists,
@@ -136,11 +135,12 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
                 continue;
             }
 
-            const existingTestResults = await selectRecordIds("test_result", {vehicle_id: vehicleId, testResultId: testResult.testResultId}, testResultConnection);
-            if (existingTestResults.rows.length > 0) {
-                await deleteRecordsBasedOnIds("custom_defect", "test_result", "test_result_id", {vehicle_id: vehicleId, testResultId: testResult.testResultId}, testResultConnection);
-                await deleteRecordsBasedOnIds("test_defect", "test_result", "test_result_id", {vehicle_id: vehicleId, testResultId: testResult.testResultId}, testResultConnection);
-                await deleteRecordsBasedOnColumns("test_result", {vehicle_id: vehicleId, testResultId: testResult.testResultId}, testResultConnection);
+            const existingTestResultIds = await selectRecordIds(TEST_RESULT_TABLE.tableName, {vehicle_id: vehicleId, testResultId: testResult.testResultId}, testResultConnection);
+            if (existingTestResultIds.rows.length > 0) {
+                const testResultIds = existingTestResultIds.rows.map((row: { id: any; }) => row.id);
+                await deleteBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, "test_result_id", testResultIds, testResultConnection);
+                await deleteBasedOnWhereIn(TEST_DEFECT_TABLE.tableName, "test_result_id", testResultIds, testResultConnection);
+                await deleteBasedOnWhereIn(TEST_RESULT_TABLE.tableName, "id", testResultIds, testResultConnection);
             }
 
             for (const testType of testResult.testTypes!) {
