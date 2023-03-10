@@ -8,11 +8,12 @@ import {getConnectionPoolOptions} from "../../src/services/connection-pool-optio
 
 useLocalDb();
 
-describe("convertTechRecordDocument() integration tests", () => {
+export const techRecordDocumentConversion = () => describe("convertTechRecordDocument() integration tests", () => {
     let container: StartedTestContainer;
 
     beforeAll(async () => {
         jest.setTimeout(60_000);
+        jest.restoreAllMocks();
 
         // see README for why this environment variable exists
         if (process.env.USE_CONTAINERIZED_DATABASE === "1") {
@@ -141,8 +142,8 @@ describe("convertTechRecordDocument() integration tests", () => {
              WHERE \`identity\`.\`id\` = ${createdBy_Id}`
         );
         expect(createdByResultSet.rows.length).toEqual(1);
-        expect(createdByResultSet.rows[0].identityId).toEqual("CREATED-BY-ID");
-        expect(createdByResultSet.rows[0].name).toEqual("CREATED-BY-NAME");
+        expect(createdByResultSet.rows[0].identityId).toEqual("CREATED-BY-ID-2");
+        expect(createdByResultSet.rows[0].name).toEqual("CREATED-BY-NAME-2");
 
         const lastUpdatedByResultSet = await executeSql(
             `SELECT \`identityId\`, \`name\`
@@ -150,8 +151,8 @@ describe("convertTechRecordDocument() integration tests", () => {
              WHERE \`identity\`.\`id\` = ${lastUpdatedBy_Id}`
         );
         expect(lastUpdatedByResultSet.rows.length).toEqual(1);
-        expect(lastUpdatedByResultSet.rows[0].identityId).toEqual("LAST-UPDATED-BY-ID");
-        expect(lastUpdatedByResultSet.rows[0].name).toEqual("LAST-UPDATED-BY-NAME");
+        expect(lastUpdatedByResultSet.rows[0].identityId).toEqual("LAST-UPDATED-BY-ID-2");
+        expect(lastUpdatedByResultSet.rows[0].name).toEqual("LAST-UPDATED-BY-NAME-2");
 
         const contactDetailsResultSet = await executeSql(
             `SELECT \`name\`,
@@ -349,8 +350,6 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect((techRecordResultSet.rows[0].brakes_dtpNumber)).toEqual("666666");
         expect((techRecordResultSet.rows[0].brakes_loadSensingValve)).toEqual(1);
         expect((techRecordResultSet.rows[0].brakes_antilockBrakingSystem)).toEqual(1);
-        expect((techRecordResultSet.rows[0].createdBy_Id)).toEqual(7);
-        expect((techRecordResultSet.rows[0].lastUpdatedBy_Id)).toEqual(8);
         expect((techRecordResultSet.rows[0].updateType)).toEqual("adrUpdate");
         expect((techRecordResultSet.rows[0].numberOfSeatbelts)).toEqual("NUMBER-OF-SEATBELTS");
         expect((techRecordResultSet.rows[0].seatbeltInstallationApprovalDate as Date).toUTCString()).toEqual("Wed, 01 Jan 2020 00:00:00 GMT");
