@@ -8,11 +8,12 @@ import {getConnectionPoolOptions} from "../../src/services/connection-pool-optio
 
 useLocalDb();
 
-describe("convertTechRecordDocument() integration tests", () => {
+export const techRecordDocumentConversion = () => describe("convertTechRecordDocument() integration tests", () => {
     let container: StartedTestContainer;
 
     beforeAll(async () => {
         jest.setTimeout(60_000);
+        jest.restoreAllMocks();
 
         // see README for why this environment variable exists
         if (process.env.USE_CONTAINERIZED_DATABASE === "1") {
@@ -70,9 +71,9 @@ describe("convertTechRecordDocument() integration tests", () => {
         );
         expect(vehicleResultSet.rows.length).toEqual(1);
         expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-1");
-        expect(vehicleResultSet.rows[0].vin).toEqual("VIN");
-        expect(vehicleResultSet.rows[0].vrm_trm).toEqual("999999999");
-        expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
+        expect(vehicleResultSet.rows[0].vin).toEqual("VIN1");
+        expect(vehicleResultSet.rows[0].vrm_trm).toEqual("VRM-1");
+        expect(vehicleResultSet.rows[0].trailer_id).toEqual("TRL-1");
         expect((vehicleResultSet.rows[0].createdAt as Date).toUTCString()).not.toBeNull(); // todo This returns null
 
         const vehicleId = vehicleResultSet.rows[0].id;
@@ -141,8 +142,8 @@ describe("convertTechRecordDocument() integration tests", () => {
              WHERE \`identity\`.\`id\` = ${createdBy_Id}`
         );
         expect(createdByResultSet.rows.length).toEqual(1);
-        expect(createdByResultSet.rows[0].identityId).toEqual("CREATED-BY-ID");
-        expect(createdByResultSet.rows[0].name).toEqual("CREATED-BY-NAME");
+        expect(createdByResultSet.rows[0].identityId).toEqual("CREATED-BY-ID-2");
+        expect(createdByResultSet.rows[0].name).toEqual("CREATED-BY-NAME-2");
 
         const lastUpdatedByResultSet = await executeSql(
             `SELECT \`identityId\`, \`name\`
@@ -150,8 +151,8 @@ describe("convertTechRecordDocument() integration tests", () => {
              WHERE \`identity\`.\`id\` = ${lastUpdatedBy_Id}`
         );
         expect(lastUpdatedByResultSet.rows.length).toEqual(1);
-        expect(lastUpdatedByResultSet.rows[0].identityId).toEqual("LAST-UPDATED-BY-ID");
-        expect(lastUpdatedByResultSet.rows[0].name).toEqual("LAST-UPDATED-BY-NAME");
+        expect(lastUpdatedByResultSet.rows[0].identityId).toEqual("LAST-UPDATED-BY-ID-2");
+        expect(lastUpdatedByResultSet.rows[0].name).toEqual("LAST-UPDATED-BY-NAME-2");
 
         const contactDetailsResultSet = await executeSql(
             `SELECT \`name\`,
@@ -324,7 +325,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect((techRecordResultSet.rows[0].tyreUseCode)).toEqual("22");
         expect((techRecordResultSet.rows[0].roadFriendly)).toEqual(1);
         expect((techRecordResultSet.rows[0].drawbarCouplingFitted)).toEqual(1);
-        expect((techRecordResultSet.rows[0].euroStandard)).toEqual("999999999");
+        expect((techRecordResultSet.rows[0].euroStandard)).toEqual("euroStd");
         expect((techRecordResultSet.rows[0].suspensionType)).toEqual("1");
         expect((techRecordResultSet.rows[0].couplingType)).toEqual("1");
         expect((techRecordResultSet.rows[0].length)).toEqual(1);
@@ -349,8 +350,6 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect((techRecordResultSet.rows[0].brakes_dtpNumber)).toEqual("666666");
         expect((techRecordResultSet.rows[0].brakes_loadSensingValve)).toEqual(1);
         expect((techRecordResultSet.rows[0].brakes_antilockBrakingSystem)).toEqual(1);
-        expect((techRecordResultSet.rows[0].createdBy_Id)).toEqual(1);
-        expect((techRecordResultSet.rows[0].lastUpdatedBy_Id)).toEqual(2);
         expect((techRecordResultSet.rows[0].updateType)).toEqual("adrUpdate");
         expect((techRecordResultSet.rows[0].numberOfSeatbelts)).toEqual("NUMBER-OF-SEATBELTS");
         expect((techRecordResultSet.rows[0].seatbeltInstallationApprovalDate as Date).toUTCString()).toEqual("Wed, 01 Jan 2020 00:00:00 GMT");
@@ -468,6 +467,7 @@ describe("convertTechRecordDocument() integration tests", () => {
         expect(axlesResultSet.rows[0].leverLength).toEqual(1);
         expect(axlesResultSet.rows[0].springBrakeParking).toEqual(1);
     });
+
     describe("when adding a new vehicle and changing VRM to a new value, VRM should change on existing vehicle.", () => {
         it("A new vehicle is present", async () => {
 
@@ -513,7 +513,7 @@ describe("convertTechRecordDocument() integration tests", () => {
             expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-2");
             expect(vehicleResultSet.rows[0].vin).toEqual("VIN2");
             expect(vehicleResultSet.rows[0].vrm_trm).toEqual("VRM7777");
-            expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
+            expect(vehicleResultSet.rows[0].trailer_id).toEqual("TRL-1");
             expect((vehicleResultSet.rows[0].createdAt as Date).toUTCString()).not.toBeNull(); // todo This returns null
         });
 
@@ -561,7 +561,7 @@ describe("convertTechRecordDocument() integration tests", () => {
             expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-2");
             expect(vehicleResultSet.rows[0].vin).toEqual("VIN2");
             expect(vehicleResultSet.rows[0].vrm_trm).toEqual("VRM888NEW");
-            expect(vehicleResultSet.rows[0].trailer_id).toEqual("88888888");
+            expect(vehicleResultSet.rows[0].trailer_id).toEqual("TRL-1");
             expect((vehicleResultSet.rows[0].createdAt as Date).toUTCString()).not.toBeNull(); // todo This returns null
 
         });

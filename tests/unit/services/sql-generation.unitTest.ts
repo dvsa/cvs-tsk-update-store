@@ -1,4 +1,10 @@
-import {generateFullUpsertSql, generatePartialUpsertSql, generateSelectSql} from "../../../src/services/sql-generation";
+import {
+    generateDeleteBasedOnWhereIn,
+    generateFullUpsertSql,
+    generatePartialUpsertSql,
+    generateSelectRecordIds,
+    generateSelectSql
+} from "../../../src/services/sql-generation";
 
 const tableName = "myTable";
 const columnNames = ["columnA", "columnZ"];
@@ -36,5 +42,31 @@ describe("generateSelectSql", () => {
         expect(generateSelectSql({ tableName, columnNames })).toEqual(
             "SELECT id insertId FROM `myTable` WHERE fingerprint = MD5(CONCAT_WS('|', IFNULL(?, ''), IFNULL(?, '')))"
         );
+    });
+});
+
+describe("generateDeleteBasedOnWhereIn", () => {
+    it("should construct a correct Delete SQL query, based on WHERE IN clause", async () => {
+        const targetTableName = "test_result";
+        const targetColumnName = "test_result_id";
+        const ids = [1, 3, 5, 6];
+    
+        const expectedQuery = "DELETE FROM test_result WHERE test_result_id IN (?,?,?,?)";
+        const result = generateDeleteBasedOnWhereIn(targetTableName, targetColumnName, ids);
+        expect(result).toEqual(expectedQuery);
+    });
+});
+
+describe("generateSelectRecordIds", () => {
+    it("should construct a correct Select SQL query, based on WHERE clause", async () => {
+        const targetTableName = "test_result";
+        const attributes = {
+            vehicle_id: 1,
+            testResultId: "TEST-RESULT-ID",
+        };
+    
+        const expectedQuery = "SELECT id FROM test_result WHERE vehicle_id=? AND testResultId=?";
+        const result = generateSelectRecordIds(targetTableName, attributes);
+        expect(result).toEqual(expectedQuery);
     });
 });

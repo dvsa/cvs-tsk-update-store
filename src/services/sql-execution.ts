@@ -1,7 +1,13 @@
 import {executeSql, QueryResponse} from "./connection-pool";
 import {Connection} from "mysql2/promise";
 import {TableDetails} from "./table-details";
-import {generateFullUpsertSql, generateSelectSql, generatePartialUpsertSql} from "./sql-generation";
+import {
+    generateFullUpsertSql,
+    generateSelectSql,
+    generatePartialUpsertSql,
+    generateSelectRecordIds,
+    generateDeleteBasedOnWhereIn
+} from "./sql-generation";
 
 /**
  * Execute a "partial upsert" on a fingerprinted table:
@@ -69,3 +75,23 @@ export const executeFullUpsert = async (tableDetails: TableDetails, templateVari
         connection
     );
 };
+
+export async function deleteBasedOnWhereIn(targetTableName: string, targetColumnName: string, ids: any[], connection: Connection): Promise<QueryResponse> {
+    const values: any[] | undefined = Object.values(ids);
+
+    return executeSql(
+        generateDeleteBasedOnWhereIn(targetTableName, targetColumnName, ids),
+        values,
+        connection
+    );
+}
+
+export async function selectRecordIds(targetTableName: string, conditionAttributes: { [key: string]: any }, connection: Connection): Promise<QueryResponse> {
+    const values: any[] | undefined = Object.values(conditionAttributes);
+
+    return executeSql(
+        generateSelectRecordIds(targetTableName, conditionAttributes),
+        values,
+        connection
+    );
+}

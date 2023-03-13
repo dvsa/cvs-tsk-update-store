@@ -6,7 +6,7 @@
     "S": "PARTIAL-VIN"
   },
   "primaryVrm": {
-    "S": "999999999"
+    "S": "VRM-1"
   },
   "secondaryVrms": {
     "L": [
@@ -16,10 +16,10 @@
     ]
   },
   "vin": {
-    "S": "VIN"
+    "S": "VIN-1"
   },
   "trailerId": {
-    "S": "88888888"
+    "S": "TRL-1"
   },
   "techRecord": {
     "L": [
@@ -371,7 +371,7 @@
             "BOOL": true
           },
           "euroStandard": {
-            "S": "999999999"
+            "S": "euroStd"
           },
           "suspensionType": {
             "S": "1"
@@ -449,16 +449,16 @@
             "S": "1"
           },
           "createdByName": {
-            "S": "CREATED-BY-NAME"
+            "S": "CREATED-BY-NAME-2"
           },
           "createdById": {
-            "S": "CREATED-BY-ID"
+            "S": "CREATED-BY-ID-2"
           },
           "lastUpdatedByName": {
-            "S": "LAST-UPDATED-BY-NAME"
+            "S": "LAST-UPDATED-BY-NAME-2"
           },
           "lastUpdatedById": {
-            "S": "LAST-UPDATED-BY-ID"
+            "S": "LAST-UPDATED-BY-ID-2"
           },
           "updateType": {
             "S": "adrUpdate"

@@ -16,12 +16,19 @@ import {
     VEHICLE_SUBCLASS_TABLE,
     VEHICLE_TABLE
 } from "./table-details";
-import {executeFullUpsert, executePartialUpsert, executePartialUpsertIfNotExists} from "./sql-execution";
+import {
+    deleteBasedOnWhereIn,
+    executeFullUpsert,
+    executePartialUpsert,
+    executePartialUpsertIfNotExists,
+    selectRecordIds
+} from "./sql-execution";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
 import {EntityConverter} from "./entity-conversion";
 import {debugLog} from "./logger";
 import { vinCleanser } from "../utils/cleanser";
+import moment from "moment";
 
 export const testResultsConverter = (): EntityConverter<TestResults> => {
     return {
@@ -122,11 +129,26 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
                         undefined,
                         createdById,
                         lastUpdatedById,
+                        moment().format("YYYY-MM-DD HH:mm:ss.SSS"),
                     ],
                     testResultConnection
                 );
 
                 continue;
+            }
+
+            if (!process.env.DISABLE_DELETE_ON_UPDATE) {
+                const existingTestResultIds = await selectRecordIds(TEST_RESULT_TABLE.tableName, {vehicle_id: vehicleId, testResultId: testResult.testResultId}, testResultConnection);
+                if (existingTestResultIds.rows.length > 0) {
+                    await testResultConnection.beginTransaction();
+
+                    const testResultIds = existingTestResultIds.rows.map((row: { id: any; }) => row.id);
+                    await deleteBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, "test_result_id", testResultIds, testResultConnection);
+                    await deleteBasedOnWhereIn(TEST_DEFECT_TABLE.tableName, "test_result_id", testResultIds, testResultConnection);
+                    await deleteBasedOnWhereIn(TEST_RESULT_TABLE.tableName, "id", testResultIds, testResultConnection);
+
+                    await testResultConnection.commit();
+                }
             }
 
             for (const testType of testResult.testTypes!) {
@@ -180,6 +202,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
                         testType.smokeTestKLimitApplied,
                         createdById,
                         lastUpdatedById,
+                        moment().format("YYYY-MM-DD HH:mm:ss.SSS"),
                     ],
                     testResultConnection
                 );

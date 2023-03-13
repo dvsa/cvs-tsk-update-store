@@ -1,15 +1,15 @@
 {
   "systemNumber": {
-    "S": "SYSTEM-NUMBER-3"
+    "S": "SYSTEM-NUMBER-4"
   },
   "vrm": {
-    "S": "VRM"
+    "S": "VRM-4"
   },
   "trailerId": {
-    "S": "88888888"
+    "S": "TRL-4"
   },
   "vin": {
-    "S": "VIN"
+    "S": "VIN-4"
   },
   "vehicleId": {
     "S": "VEHICLE-ID"
@@ -18,52 +18,52 @@
     "L": []
   },
   "testVersion": {
-    "S": "TEST-VERSION-3"
+    "S": "TEST-VERSION-4"
   },
   "reasonForCreation": {
-    "S": "REASON-FOR-CREATION-3"
+    "S": "REASON-FOR-CREATION-4"
   },
   "createdAt": {
     "S": "2020-01-01T00:00:00.000Z"
   },
   "createdByName": {
-    "S": "CREATED-BY-NAME-3"
+    "S": "CREATED-BY-NAME-4"
   },
   "createdById": {
-    "S": "CREATED-BY-ID-3"
+    "S": "CREATED-BY-ID-4"
   },
   "lastUpdatedAt": {
     "S": "2020-01-01T00:00:00.000Z"
   },
   "lastUpdatedByName": {
-    "S": "LAST-UPDATED-BY-NAME-3"
+    "S": "LAST-UPDATED-BY-NAME-4"
   },
   "lastUpdatedById": {
-    "S": "LAST-UPDATED-BY-ID-3"
+    "S": "LAST-UPDATED-BY-ID-4"
   },
   "shouldEmailCertificate": {
-    "S": "SHOULD-EMAIL-CERTIFICATE-3"
+    "S": "SHOULD-EMAIL-CERTIFICATE-4"
   },
   "testStationName": {
-    "S": "TEST-STATION-NAME-3"
+    "S": "TEST-STATION-NAME-4"
   },
   "testStationPNumber": {
-    "S": "P-NUMBER-3"
+    "S": "P-NUMBER-4"
   },
   "testStationType": {
     "S": "atf"
   },
   "testerName": {
-    "S": "TESTER-NAME-3"
+    "S": "TESTER-NAME-4"
   },
   "testerStaffId": {
     "S": "999999998"
   },
   "testResultId": {
-    "S": "TEST-RESULT-ID-NEW-3"
+    "S": "TEST-RESULT-ID-4"
   },
   "testerEmailAddress": {
-    "S": "TESTER-EMAIL-ADDRESS-3"
+    "S": "TESTER-EMAIL-ADDRESS-4"
   },
   "testStartTimestamp": {
     "S": "2020-01-01T00:00:00.000Z"
@@ -75,7 +75,7 @@
     "S": "submitted"
   },
   "reasonForCancellation": {
-    "S": "REASON-FOR-CANCELLATION-3"
+    "S": "REASON-FOR-CANCELLATION-4"
   },
   "vehicleClass": {
     "M": {
@@ -113,7 +113,7 @@
     "S": "999999998"
   },
   "preparerName": {
-    "S": "PREPARER-NAME-3"
+    "S": "PREPARER-NAME-4"
   },
   "numberOfWheelsDriven": {
     "N": "1"
@@ -122,7 +122,7 @@
     "S": "m1"
   },
   "countryOfRegistration": {
-    "S": "COUNTRY-OF-REGISTRATION-3"
+    "S": "COUNTRY-OF-REGISTRATION-4"
   },
   "vehicleSize": {
     "S": "large"

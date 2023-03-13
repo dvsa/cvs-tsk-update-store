@@ -210,7 +210,7 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
         grossKerbWeight: image.getNumber("grossKerbWeight"),
         grossLadenWeight: image.getNumber("grossLadenWeight"),
         grossGbWeight: image.getNumber("grossGbWeight"),
-        grossDesignWeight: image.getNumber("grossGbWeight"),
+        grossDesignWeight: image.getNumber("grossDesignWeight"),
         trainGbWeight: image.getNumber("trainGbWeight"),
         trainDesignWeight: image.getNumber("trainDesignWeight"),
         maxTrainGbWeight: image.getNumber("maxTrainGbWeight"),
