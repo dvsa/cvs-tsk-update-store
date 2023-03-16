@@ -10,7 +10,7 @@ export interface AuthIntoService {
 }
 
 export const parseAuthIntoService = (authIntoService?: DynamoDbImage): Maybe<AuthIntoService> => {
-    if (!authIntoService) {
+    if (!authIntoService || authIntoService.fields.size === 0) {
         return undefined;
     }
 

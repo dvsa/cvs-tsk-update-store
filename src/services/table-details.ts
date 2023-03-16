@@ -233,6 +233,18 @@ export const AXLES_TABLE: TableDetails = {
     ]
 };
 
+export const AUTH_INTO_SERVICE_TABLE: TableDetails = {
+    tableName: "auth_into_service",
+    columnNames: [
+        "technical_record_id",
+        "cocIssueDate",
+        "dateReceived",
+        "datePending",
+        "dateAuthorised",
+        "dateRejected",
+    ]
+};
+
 export const TYRE_TABLE: TableDetails = {
     tableName: "tyre",
     columnNames: [

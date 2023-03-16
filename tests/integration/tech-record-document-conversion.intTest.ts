@@ -63,11 +63,7 @@ export const techRecordDocumentConversion = () => describe("convertTechRecordDoc
         const vehicleResultSet = await executeSql(
             `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`, \`id\`
              FROM \`vehicle\`
-             WHERE \`vehicle\`.\`id\` IN (
-                SELECT \`id\`
-                FROM \`vehicle\`
-                WHERE \`vehicle\`.\`system_number\` = "SYSTEM-NUMBER-1"
-             )`
+             WHERE \`vehicle\`.\`system_number\` = "SYSTEM-NUMBER-1"`
         );
         expect(vehicleResultSet.rows.length).toEqual(1);
         expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-1");
@@ -466,13 +462,31 @@ export const techRecordDocumentConversion = () => describe("convertTechRecordDoc
         expect(axlesResultSet.rows[0].brakeActuator).toEqual(1);
         expect(axlesResultSet.rows[0].leverLength).toEqual(1);
         expect(axlesResultSet.rows[0].springBrakeParking).toEqual(1);
+
+        const authIntoServiceResultSet = await executeSql(
+            `SELECT \`technical_record_id\`,
+                    \`cocIssueDate\`,
+                    \`dateReceived\`,
+                    \`datePending\`,
+                    \`dateAuthorised\`,
+                    \`dateRejected\`
+             FROM \`auth_into_service\`
+             WHERE \`auth_into_service\`.\`technical_record_id\` = ${technicalRecordId}`
+        );
+        expect(authIntoServiceResultSet.rows.length).toEqual(1);
+        expect(authIntoServiceResultSet.rows[0].technical_record_id).toEqual(technicalRecordId);
+        expect((authIntoServiceResultSet.rows[0].cocIssueDate as Date).toUTCString()).toEqual("Wed, 01 Jan 2020 00:00:00 GMT");
+        expect((authIntoServiceResultSet.rows[0].dateReceived as Date).toUTCString()).toEqual("Sun, 02 Feb 2020 00:00:00 GMT");
+        expect((authIntoServiceResultSet.rows[0].datePending as Date).toUTCString()).toEqual("Tue, 03 Mar 2020 00:00:00 GMT");
+        expect((authIntoServiceResultSet.rows[0].dateAuthorised as Date).toUTCString()).toEqual("Sat, 04 Apr 2020 00:00:00 GMT");
+        expect((authIntoServiceResultSet.rows[0].dateRejected as Date).toUTCString()).toEqual("Tue, 05 May 2020 00:00:00 GMT");
     });
 
     describe("when adding a new vehicle and changing VRM to a new value, VRM should change on existing vehicle.", () => {
         it("A new vehicle is present", async () => {
 
             // arrange - create a record so we can later query for it and assert for is existence
-            const techRecordDocumentJsonNew = techRecordDocumentJson;
+            const techRecordDocumentJsonNew = JSON.parse(JSON.stringify(techRecordDocumentJson));
             techRecordDocumentJsonNew.systemNumber = {S : "SYSTEM-NUMBER-2"};
             techRecordDocumentJsonNew.vin =  {S : "VIN2"};
             techRecordDocumentJsonNew.primaryVrm =  {S : "VRM7777"};
@@ -484,7 +498,7 @@ export const techRecordDocumentConversion = () => describe("convertTechRecordDoc
                             eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
                             eventName: "INSERT",
                             dynamodb: {
-                                NewImage: techRecordDocumentJson
+                                NewImage: techRecordDocumentJsonNew
                             }
                         })
                     }
@@ -502,11 +516,7 @@ export const techRecordDocumentConversion = () => describe("convertTechRecordDoc
             const vehicleResultSet = await executeSql(
                 `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`
                  FROM \`vehicle\`
-                 WHERE \`vehicle\`.\`id\` IN (
-                    SELECT \`id\`
-                    FROM \`vehicle\`
-                    WHERE \`system_number\` = "SYSTEM-NUMBER-2"
-                 )`
+                 WHERE \`system_number\` = "SYSTEM-NUMBER-2"`
             );
 
             expect(vehicleResultSet.rows.length).toEqual(1);
@@ -520,7 +530,7 @@ export const techRecordDocumentConversion = () => describe("convertTechRecordDoc
         it("VRM has changed", async () => {
 
             // arrange - create a record with existing pair of (SystemNumber, VIN) and new VRM so we can later query for it and assert its value
-            const techRecordDocumentJsonNew = techRecordDocumentJson;
+            const techRecordDocumentJsonNew = JSON.parse(JSON.stringify(techRecordDocumentJson));
             techRecordDocumentJsonNew.systemNumber = {S : "SYSTEM-NUMBER-2"};
             techRecordDocumentJsonNew.vin =  {S : "VIN2"};
             techRecordDocumentJsonNew.primaryVrm =  {S : "VRM888NEW"};
@@ -550,11 +560,7 @@ export const techRecordDocumentConversion = () => describe("convertTechRecordDoc
             const vehicleResultSet = await executeSql(
                 `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`
                  FROM \`vehicle\`
-                 WHERE \`vehicle\`.\`id\` IN (
-                    SELECT \`id\`
-                    FROM \`vehicle\`
-                    WHERE \`system_number\` = "SYSTEM-NUMBER-2"
-                 )`
+                 WHERE \`system_number\` = "SYSTEM-NUMBER-2"`
             );
 
             expect(vehicleResultSet.rows.length).toEqual(1);
@@ -564,6 +570,365 @@ export const techRecordDocumentConversion = () => describe("convertTechRecordDoc
             expect(vehicleResultSet.rows[0].trailer_id).toEqual("TRL-1");
             expect((vehicleResultSet.rows[0].createdAt as Date).toUTCString()).not.toBeNull(); // todo This returns null
 
+        });
+    });
+
+    describe("when adding a new vehicle with an empty authIntoService.", () => {
+        it("should not insert into auth_into_service", async () => {
+            // arrange - create a record so we can later query for it and assert for is existence
+            const techRecordDocumentJsonNew = JSON.parse(JSON.stringify(techRecordDocumentJson));
+            techRecordDocumentJsonNew.systemNumber = {S : "SYSTEM-NUMBER-1a"};
+            techRecordDocumentJsonNew.vin =  {S : "VIN1a"};
+            techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService = {M : {}};
+
+            const event = {
+                Records: [
+                    {
+                        body: JSON.stringify({
+                            eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
+                            eventName: "INSERT",
+                            dynamodb: {
+                                NewImage: techRecordDocumentJsonNew
+                            }
+                        })
+                    }
+                ]
+            };
+            // array of arrays: event contains array of records, each with array of tech record entities
+            await processStreamEvent(
+                event,
+                exampleContext(),
+                () => {
+                    return;
+                }
+            );
+
+            const vehicleResultSet = await executeSql(
+                `SELECT \`system_number\`, \`vin\`, \`id\`
+                FROM \`vehicle\`
+                WHERE \`vehicle\`.\`system_number\` = "SYSTEM-NUMBER-1a"`
+            );
+            expect(vehicleResultSet.rows.length).toEqual(1);
+            expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-1a");
+            expect(vehicleResultSet.rows[0].vin).toEqual("VIN1a");
+            const vehicleId = vehicleResultSet.rows[0].id;
+
+            const technicalRecordSet = await executeSql(
+                `SELECT \`id\`
+                FROM \`technical_record\`
+                WHERE \`technical_record\`.\`vehicle_id\` = ${vehicleId}`
+            );
+            const technicalRecordId = technicalRecordSet.rows[0].id;
+
+            const authIntoServiceResultSet = await executeSql(
+                `SELECT \`id\`
+                FROM \`auth_into_service\`
+                WHERE \`auth_into_service\`.\`technical_record_id\` = ${technicalRecordId}`
+            );
+
+            expect(authIntoServiceResultSet.rows.length).toEqual(0);
+        });
+
+        it("should insert into auth_into_service when the vehicle is updated with an authIntoService", async () => {
+            // arrange - create a record so we can later query for it and assert for is existence
+            const techRecordDocumentJsonNew = JSON.parse(JSON.stringify(techRecordDocumentJson));
+            techRecordDocumentJsonNew.systemNumber = {S : "SYSTEM-NUMBER-1a"};
+            techRecordDocumentJsonNew.vin =  {S : "VIN1a"};
+
+            const event = {
+                Records: [
+                    {
+                        body: JSON.stringify({
+                            eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
+                            eventName: "INSERT",
+                            dynamodb: {
+                                NewImage: techRecordDocumentJsonNew
+                            }
+                        })
+                    }
+                ]
+            };
+            // array of arrays: event contains array of records, each with array of tech record entities
+            await processStreamEvent(
+                event,
+                exampleContext(),
+                () => {
+                    return;
+                }
+            );
+
+            const vehicleResultSet = await executeSql(
+                `SELECT \`system_number\`, \`vin\`, \`id\`
+                FROM \`vehicle\`
+                WHERE \`vehicle\`.\`system_number\` = "SYSTEM-NUMBER-1a"`
+            );
+            expect(vehicleResultSet.rows.length).toEqual(1);
+            expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-1a");
+            expect(vehicleResultSet.rows[0].vin).toEqual("VIN1a");
+            const vehicleId = vehicleResultSet.rows[0].id;
+
+            const technicalRecordSet = await executeSql(
+                `SELECT \`id\`
+                FROM \`technical_record\`
+                WHERE \`technical_record\`.\`vehicle_id\` = ${vehicleId}`
+            );
+            const technicalRecordId = technicalRecordSet.rows[0].id;
+
+            const authIntoServiceResultSet = await executeSql(
+                `SELECT \`technical_record_id\`,
+                        \`cocIssueDate\`,
+                        \`dateReceived\`,
+                        \`datePending\`,
+                        \`dateAuthorised\`,
+                        \`dateRejected\`
+                FROM \`auth_into_service\`
+                WHERE \`auth_into_service\`.\`technical_record_id\` = ${technicalRecordId}`
+            );
+
+            expect(authIntoServiceResultSet.rows.length).toEqual(1);
+            expect(authIntoServiceResultSet.rows[0].technical_record_id).toEqual(technicalRecordId);
+            expect((authIntoServiceResultSet.rows[0].cocIssueDate as Date).toUTCString()).toEqual("Wed, 01 Jan 2020 00:00:00 GMT");
+            expect((authIntoServiceResultSet.rows[0].dateReceived as Date).toUTCString()).toEqual("Sun, 02 Feb 2020 00:00:00 GMT");
+            expect((authIntoServiceResultSet.rows[0].datePending as Date).toUTCString()).toEqual("Tue, 03 Mar 2020 00:00:00 GMT");
+            expect((authIntoServiceResultSet.rows[0].dateAuthorised as Date).toUTCString()).toEqual("Sat, 04 Apr 2020 00:00:00 GMT");
+            expect((authIntoServiceResultSet.rows[0].dateRejected as Date).toUTCString()).toEqual("Tue, 05 May 2020 00:00:00 GMT");
+        });
+
+        it("should remove auth_into_service when the vehicle if updated and authIntoService is empty", async () => {
+            // arrange - create a record so we can later query for it and assert for is existence
+            const techRecordDocumentJsonNew = JSON.parse(JSON.stringify(techRecordDocumentJson));
+            techRecordDocumentJsonNew.systemNumber = {S : "SYSTEM-NUMBER-1a"};
+            techRecordDocumentJsonNew.vin =  {S : "VIN1a"};
+            techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService = {M : {}};
+
+            const event = {
+                Records: [
+                    {
+                        body: JSON.stringify({
+                            eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
+                            eventName: "INSERT",
+                            dynamodb: {
+                                NewImage: techRecordDocumentJsonNew
+                            }
+                        })
+                    }
+                ]
+            };
+            // array of arrays: event contains array of records, each with array of tech record entities
+            await processStreamEvent(
+                event,
+                exampleContext(),
+                () => {
+                    return;
+                }
+            );
+
+            const vehicleResultSet = await executeSql(
+                `SELECT \`system_number\`, \`vin\`, \`id\`
+                FROM \`vehicle\`
+                WHERE \`vehicle\`.\`system_number\` = "SYSTEM-NUMBER-1a"`
+            );
+            expect(vehicleResultSet.rows.length).toEqual(1);
+            expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-1a");
+            expect(vehicleResultSet.rows[0].vin).toEqual("VIN1a");
+            const vehicleId = vehicleResultSet.rows[0].id;
+
+            const technicalRecordSet = await executeSql(
+                `SELECT \`id\`
+                FROM \`technical_record\`
+                WHERE \`technical_record\`.\`vehicle_id\` = ${vehicleId}`
+            );
+            const technicalRecordId = technicalRecordSet.rows[0].id;
+
+            const authIntoServiceResultSet = await executeSql(
+                `SELECT \`id\`
+                FROM \`auth_into_service\`
+                WHERE \`auth_into_service\`.\`technical_record_id\` = ${technicalRecordId}`
+            );
+
+            expect(authIntoServiceResultSet.rows.length).toEqual(0);
+        });
+    });
+
+    describe("when adding a new vehicle and authIntoService is not present.", () => {
+        it("should not insert into auth_into_service", async () => {
+            // arrange - create a record so we can later query for it and assert for is existence
+            const techRecordDocumentJsonNew = JSON.parse(JSON.stringify(techRecordDocumentJson));
+            techRecordDocumentJsonNew.systemNumber = {S : "SYSTEM-NUMBER-1b"};
+            techRecordDocumentJsonNew.vin =  {S : "VIN1b"};
+            delete techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService;
+
+            const event = {
+                Records: [
+                    {
+                        body: JSON.stringify({
+                            eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
+                            eventName: "INSERT",
+                            dynamodb: {
+                                NewImage: techRecordDocumentJsonNew
+                            }
+                        })
+                    }
+                ]
+            };
+            // array of arrays: event contains array of records, each with array of tech record entities
+            await processStreamEvent(
+                event,
+                exampleContext(),
+                () => {
+                    return;
+                }
+            );
+
+            const vehicleResultSet = await executeSql(
+                `SELECT \`system_number\`, \`vin\`, \`id\`
+                FROM \`vehicle\`
+                WHERE \`vehicle\`.\`system_number\` = "SYSTEM-NUMBER-1b"`
+            );
+            expect(vehicleResultSet.rows.length).toEqual(1);
+            expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-1b");
+            expect(vehicleResultSet.rows[0].vin).toEqual("VIN1b");
+            const vehicleId = vehicleResultSet.rows[0].id;
+
+            const technicalRecordSet = await executeSql(
+                `SELECT \`id\`
+                FROM \`technical_record\`
+                WHERE \`technical_record\`.\`vehicle_id\` = ${vehicleId}`
+            );
+            const technicalRecordId = technicalRecordSet.rows[0].id;
+
+            const authIntoServiceResultSet = await executeSql(
+                `SELECT \`technical_record_id\`,
+                        \`cocIssueDate\`,
+                        \`dateReceived\`,
+                        \`datePending\`,
+                        \`dateAuthorised\`,
+                        \`dateRejected\`
+                FROM \`auth_into_service\`
+                WHERE \`auth_into_service\`.\`technical_record_id\` = ${technicalRecordId}`
+            );
+
+            expect(authIntoServiceResultSet.rows.length).toEqual(0);
+        });
+
+        it("should insert into auth_into_service when the vehicle is updated with an authIntoService", async () => {
+            // arrange - create a record so we can later query for it and assert for is existence
+            const techRecordDocumentJsonNew = JSON.parse(JSON.stringify(techRecordDocumentJson));
+            techRecordDocumentJsonNew.systemNumber = {S : "SYSTEM-NUMBER-1b"};
+            techRecordDocumentJsonNew.vin =  {S : "VIN1b"};
+
+            const event = {
+                Records: [
+                    {
+                        body: JSON.stringify({
+                            eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
+                            eventName: "INSERT",
+                            dynamodb: {
+                                NewImage: techRecordDocumentJsonNew
+                            }
+                        })
+                    }
+                ]
+            };
+            // array of arrays: event contains array of records, each with array of tech record entities
+            await processStreamEvent(
+                event,
+                exampleContext(),
+                () => {
+                    return;
+                }
+            );
+
+            const vehicleResultSet = await executeSql(
+                `SELECT \`system_number\`, \`vin\`, \`id\`
+                FROM \`vehicle\`
+                WHERE \`vehicle\`.\`system_number\` = "SYSTEM-NUMBER-1b"`
+            );
+            expect(vehicleResultSet.rows.length).toEqual(1);
+            expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-1b");
+            expect(vehicleResultSet.rows[0].vin).toEqual("VIN1b");
+            const vehicleId = vehicleResultSet.rows[0].id;
+
+            const technicalRecordSet = await executeSql(
+                `SELECT \`id\`
+                FROM \`technical_record\`
+                WHERE \`technical_record\`.\`vehicle_id\` = ${vehicleId}`
+            );
+            const technicalRecordId = technicalRecordSet.rows[0].id;
+
+            const authIntoServiceResultSet = await executeSql(
+                `SELECT \`technical_record_id\`,
+                        \`cocIssueDate\`,
+                        \`dateReceived\`,
+                        \`datePending\`,
+                        \`dateAuthorised\`,
+                        \`dateRejected\`
+                FROM \`auth_into_service\`
+                WHERE \`auth_into_service\`.\`technical_record_id\` = ${technicalRecordId}`
+            );
+
+            expect(authIntoServiceResultSet.rows.length).toEqual(1);
+            expect(authIntoServiceResultSet.rows[0].technical_record_id).toEqual(technicalRecordId);
+            expect((authIntoServiceResultSet.rows[0].cocIssueDate as Date).toUTCString()).toEqual("Wed, 01 Jan 2020 00:00:00 GMT");
+            expect((authIntoServiceResultSet.rows[0].dateReceived as Date).toUTCString()).toEqual("Sun, 02 Feb 2020 00:00:00 GMT");
+            expect((authIntoServiceResultSet.rows[0].datePending as Date).toUTCString()).toEqual("Tue, 03 Mar 2020 00:00:00 GMT");
+            expect((authIntoServiceResultSet.rows[0].dateAuthorised as Date).toUTCString()).toEqual("Sat, 04 Apr 2020 00:00:00 GMT");
+            expect((authIntoServiceResultSet.rows[0].dateRejected as Date).toUTCString()).toEqual("Tue, 05 May 2020 00:00:00 GMT");
+        });
+
+        it("should remove auth_into_service when the vehicle if updated and authIntoService is not present", async () => {
+            // arrange - create a record so we can later query for it and assert for is existence
+            const techRecordDocumentJsonNew = JSON.parse(JSON.stringify(techRecordDocumentJson));
+            techRecordDocumentJsonNew.systemNumber = {S : "SYSTEM-NUMBER-1b"};
+            techRecordDocumentJsonNew.vin =  {S : "VIN1b"};
+            delete techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService;
+
+            const event = {
+                Records: [
+                    {
+                        body: JSON.stringify({
+                            eventSourceARN: "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
+                            eventName: "INSERT",
+                            dynamodb: {
+                                NewImage: techRecordDocumentJsonNew
+                            }
+                        })
+                    }
+                ]
+            };
+            // array of arrays: event contains array of records, each with array of tech record entities
+            await processStreamEvent(
+                event,
+                exampleContext(),
+                () => {
+                    return;
+                }
+            );
+
+            const vehicleResultSet = await executeSql(
+                `SELECT \`system_number\`, \`vin\`, \`id\`
+                FROM \`vehicle\`
+                WHERE \`vehicle\`.\`system_number\` = "SYSTEM-NUMBER-1b"`
+            );
+            expect(vehicleResultSet.rows.length).toEqual(1);
+            expect(vehicleResultSet.rows[0].system_number).toEqual("SYSTEM-NUMBER-1b");
+            expect(vehicleResultSet.rows[0].vin).toEqual("VIN1b");
+            const vehicleId = vehicleResultSet.rows[0].id;
+
+            const technicalRecordSet = await executeSql(
+                `SELECT \`id\`
+                FROM \`technical_record\`
+                WHERE \`technical_record\`.\`vehicle_id\` = ${vehicleId}`
+            );
+            const technicalRecordId = technicalRecordSet.rows[0].id;
+
+            const authIntoServiceResultSet = await executeSql(
+                `SELECT \`id\`
+                FROM \`auth_into_service\`
+                WHERE \`auth_into_service\`.\`technical_record_id\` = ${technicalRecordId}`
+            );
+
+            expect(authIntoServiceResultSet.rows.length).toEqual(0);
         });
     });
 });

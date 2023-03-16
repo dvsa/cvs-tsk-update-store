@@ -13,9 +13,10 @@ import {
     TYRE_TABLE,
     VEHICLE_CLASS_TABLE,
     VEHICLE_SUBCLASS_TABLE,
-    VEHICLE_TABLE
+    VEHICLE_TABLE,
+    AUTH_INTO_SERVICE_TABLE
 } from "./table-details";
-import {executeFullUpsert, executePartialUpsertIfNotExists} from "./sql-execution";
+import {deleteBasedOnWhereIn, executeFullUpsert, executePartialUpsertIfNotExists} from "./sql-execution";
 import {TechRecordUpsertResult} from "../models/upsert-results";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
@@ -181,6 +182,7 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
             const microfilmId = await upsertMicrofilm(techRecordConnection, techRecordId, techRecord);
             const plateIds = await upsertPlates(techRecordConnection, techRecordId, techRecord);
             const axleIds = await upsertAxles(techRecordConnection, techRecordId, techRecord);
+            await upsertAuthIntoService(techRecordConnection, techRecordId, techRecord);
 
             await techRecordConnection.commit();
 
@@ -520,4 +522,29 @@ const upsertAxles = async (connection: Connection, techRecordId: any, techRecord
     }
 
     return insertedIds;
+};
+
+const upsertAuthIntoService = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<void> => {
+    debugLog(`upsertTechRecords: Upserting authIntoService (tech-record-id: ${techRecordId})...`);
+
+    if (!techRecord.authIntoService) {
+        debugLog(`upsertTechRecords: no authIntoService present`);
+        const mooi = await deleteBasedOnWhereIn(AUTH_INTO_SERVICE_TABLE.tableName, "technical_record_id", [techRecordId], connection);
+        return;
+    }
+
+    const response = await executeFullUpsert(
+        AUTH_INTO_SERVICE_TABLE,
+        [
+            techRecordId,
+            techRecord.authIntoService?.cocIssueDate,
+            techRecord.authIntoService?.dateAuthorised,
+            techRecord.authIntoService?.datePending,
+            techRecord.authIntoService?.dateReceived,
+            techRecord.authIntoService?.dateRejected,
+        ],
+        connection
+    );
+
+    debugLog(`upsertTechRecords: Upserted authIntoService (tech-record-id: ${techRecordId}, ID: ${response.rows.insertId})`);
 };

@@ -17,7 +17,7 @@ export interface DynamoDbField {
  * Concise, utility-focused representation of a DynamoDb "image", i.e. a document snapshot.
  */
 export class DynamoDbImage {
-    private readonly fields: Map<string, DynamoDbField>;
+    public readonly fields: Map<string, DynamoDbField>;
 
     private constructor(list: DynamoDbField[]) {
         this.fields = list.reduce(
