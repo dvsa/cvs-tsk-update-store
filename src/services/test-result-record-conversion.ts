@@ -27,7 +27,7 @@ import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
 import {EntityConverter} from "./entity-conversion";
 import {debugLog} from "./logger";
-import { vinCleanser } from "../utils/cleanser";
+import {vinCleanser} from "../utils/cleanser";
 import moment from "moment";
 
 export const testResultsConverter = (): EntityConverter<TestResults> => {
@@ -308,15 +308,13 @@ const upsertVehicleClass = async (connection: Connection, testResult: TestResult
     return response.rows.insertId;
 };
 
-const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: number, testResult: TestResult): Promise<number[]> => {
+const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: number, testResult: TestResult): Promise<void> => {
     debugLog(`upsertTestResults: Upserting vehicle subclasses...`);
 
     if (!testResult.vehicleSubclass) {
         debugLog(`upsertTestResults: no vehicle subclasses present`);
-        return [];
+        return;
     }
-
-    const insertedIds: number[] = [];
 
     for (const vehicleSubclass of testResult.vehicleSubclass) {
         const response = await executePartialUpsertIfNotExists(
@@ -329,11 +327,9 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
         );
 
         debugLog(`upsertTestResults: Upserted vehicle subclass (ID: ${response.rows.insertId})`);
-
-        insertedIds.push(response.rows.insertId);
     }
 
-    return insertedIds;
+    return;
 };
 
 const upsertFuelEmission = async (connection: Connection, testType: TestType): Promise<number> => {
@@ -406,9 +402,9 @@ const upsertIdentity = async (connection: Connection, id: string, name: string):
     return response.rows.insertId;
 };
 
-const upsertDefects = async (connection: Connection, testResultId: number, testType: TestType): Promise<number[]> => {
+const upsertDefects = async (connection: Connection, testResultId: number, testType: TestType): Promise<void> => {
     if (!testType.defects) {
-        return [];
+        return;
     }
 
     const insertedIds: number[] = [];
@@ -473,15 +469,13 @@ const upsertDefects = async (connection: Connection, testResultId: number, testT
         debugLog(`upsertTestResults: Upserted defect test-defect mapping`);
     }
 
-    return insertedIds;
+    return;
 };
 
-const upsertCustomDefects = async (connection: Connection, testResultId: number, testType: TestType): Promise<number[]> => {
+const upsertCustomDefects = async (connection: Connection, testResultId: number, testType: TestType): Promise<void> => {
     if (!testType.customDefects) {
-        return [];
+        return;
     }
-
-    const insertedIds: number[] = [];
 
     for (const customDefect of testType.customDefects) {
         debugLog(`upsertTestResults: Upserting custom defect...`);
@@ -498,9 +492,7 @@ const upsertCustomDefects = async (connection: Connection, testResultId: number,
         );
 
         debugLog(`upsertTestResults: Upserted custom defect (ID: ${response.rows.insertId})`);
-
-        insertedIds.push(response.rows.insertId);
     }
 
-    return insertedIds;
+    return;
 };
