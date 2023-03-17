@@ -494,7 +494,7 @@ const upsertAuthIntoService = async (connection: Connection, techRecordId: strin
 
     if (!techRecord.authIntoService) {
         debugLog(`upsertTechRecords: no authIntoService present`);
-        const mooi = await deleteBasedOnWhereIn(AUTH_INTO_SERVICE_TABLE.tableName, "technical_record_id", [techRecordId], connection);
+        await deleteBasedOnWhereIn(AUTH_INTO_SERVICE_TABLE.tableName, "technical_record_id", [techRecordId], connection);
         return;
     }
 

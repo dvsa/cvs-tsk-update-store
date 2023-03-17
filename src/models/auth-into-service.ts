@@ -9,16 +9,20 @@ export interface AuthIntoService {
     dateRejected?: string;
 }
 
-export const parseAuthIntoService = (authIntoService?: DynamoDbImage): Maybe<AuthIntoService> => {
-    if (!authIntoService || authIntoService.fields.size === 0) {
-        return undefined;
+export const parseAuthIntoService = (authIntoServiceImage?: DynamoDbImage): Maybe<AuthIntoService> => {
+    const authIntoService = {
+        cocIssueDate: authIntoServiceImage?.getString("cocIssueDate"),
+        dateAuthorised: authIntoServiceImage?.getString("dateAuthorised"),
+        datePending: authIntoServiceImage?.getString("datePending"),
+        dateReceived: authIntoServiceImage?.getString("dateReceived"),
+        dateRejected: authIntoServiceImage?.getString("dateRejected")
+    };
+
+    for (const value of Object.values(authIntoService)) {
+        if (value) {
+            return authIntoService;
+        }
     }
 
-    return {
-        cocIssueDate: authIntoService.getString("cocIssueDate"),
-        dateAuthorised: authIntoService.getString("dateAuthorised"),
-        datePending: authIntoService.getString("datePending"),
-        dateReceived: authIntoService.getString("dateReceived"),
-        dateRejected: authIntoService.getString("dateRejected")
-    };
+    return undefined;
 };
