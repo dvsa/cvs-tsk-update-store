@@ -13,10 +13,10 @@ import {
     TYRE_TABLE,
     VEHICLE_CLASS_TABLE,
     VEHICLE_SUBCLASS_TABLE,
-    VEHICLE_TABLE
+    VEHICLE_TABLE,
+    AUTH_INTO_SERVICE_TABLE
 } from "./table-details";
-import {executeFullUpsert, executePartialUpsertIfNotExists} from "./sql-execution";
-import {TechRecordUpsertResult} from "../models/upsert-results";
+import {deleteBasedOnWhereIn, executeFullUpsert, executePartialUpsertIfNotExists} from "./sql-execution";
 import {getConnectionPool} from "./connection-pool";
 import {Connection} from "mysql2/promise";
 import {EntityConverter} from "./entity-conversion";
@@ -31,7 +31,7 @@ export const techRecordDocumentConverter = (): EntityConverter<TechRecordDocumen
     };
 };
 
-const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promise<TechRecordUpsertResult[]> => {
+const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promise<void> => {
     debugLog(`upsertTechRecords: START`);
 
     const pool = await getConnectionPool();
@@ -56,10 +56,8 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
 
     const techRecords = techRecordDocument.techRecord;
 
-    const upsertResults: TechRecordUpsertResult[] = [];
-
     if (!techRecords) {
-        return [];
+        return;
     }
 
     debugLog(`upsertTechRecords: ${techRecords.length} tech records to upsert`);
@@ -74,7 +72,7 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
 
             const makeModelId = await upsertMakeModel(techRecordConnection, techRecord);
             const vehicleClassId = await upsertVehicleClass(techRecordConnection, techRecord);
-            const vehicleSubclassIds = await upsertVehicleSubclasses(techRecordConnection, vehicleClassId, techRecord);
+            await upsertVehicleSubclasses(techRecordConnection, vehicleClassId, techRecord);
             const createdById = await upsertIdentity(techRecordConnection, techRecord.createdById!, techRecord.createdByName!);
             const lastUpdatedById = await upsertIdentity(techRecordConnection, techRecord.lastUpdatedById!, techRecord.lastUpdatedByName!);
             const contactDetailsId = await upsertContactDetails(techRecordConnection, techRecord);
@@ -176,29 +174,14 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
 
             debugLog(`upsertTechRecords: Upserted tech record (ID: ${techRecordId})`);
 
-            const psvBrakesId = await upsertPsvBrakes(techRecordConnection, techRecordId, techRecord);
-            const axleSpacingIds = await upsertAxleSpacings(techRecordConnection, techRecordId, techRecord);
-            const microfilmId = await upsertMicrofilm(techRecordConnection, techRecordId, techRecord);
-            const plateIds = await upsertPlates(techRecordConnection, techRecordId, techRecord);
-            const axleIds = await upsertAxles(techRecordConnection, techRecordId, techRecord);
+            await upsertPsvBrakes(techRecordConnection, techRecordId, techRecord);
+            await upsertAxleSpacings(techRecordConnection, techRecordId, techRecord);
+            await upsertMicrofilm(techRecordConnection, techRecordId, techRecord);
+            await upsertPlates(techRecordConnection, techRecordId, techRecord);
+            await upsertAxles(techRecordConnection, techRecordId, techRecord);
+            await upsertAuthIntoService(techRecordConnection, techRecordId, techRecord);
 
             await techRecordConnection.commit();
-
-            upsertResults.push({
-                vehicleId,
-                techRecordId,
-                makeModelId,
-                vehicleClassId,
-                vehicleSubclassIds,
-                createdById,
-                lastUpdatedById,
-                contactDetailsId,
-                psvBrakesId,
-                axleSpacingIds,
-                microfilmId,
-                plateIds,
-                axleIds,
-            });
         } catch (err) {
             console.error(err);
             await techRecordConnection.rollback();
@@ -210,7 +193,7 @@ const upsertTechRecords = async (techRecordDocument: TechRecordDocument): Promis
 
     debugLog(`upsertTechRecords: END`);
 
-    return upsertResults;
+    return;
 };
 
 const deleteTechRecords = async (techRecordDocument: TechRecordDocument): Promise<void> => {
@@ -284,15 +267,13 @@ const upsertVehicleClass = async (connection: Connection, techRecord: TechRecord
     return response.rows.insertId;
 };
 
-const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: number, techRecord: TechRecord): Promise<number[]> => {
+const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: number, techRecord: TechRecord): Promise<void> => {
     debugLog(`upsertTechRecords: Upserting vehicle subclasses...`);
 
     if (!techRecord.vehicleSubclass) {
         debugLog(`upsertTechRecords: no vehicle subclasses present`);
-        return [];
+        return;
     }
-
-    const insertedIds: number[] = [];
 
     debugLog(`upsertTechRecords: ${techRecord.vehicleSubclass.length} vehicle subclasses to upsert`);
 
@@ -307,11 +288,9 @@ const upsertVehicleSubclasses = async (connection: Connection, vehicleClassId: n
         );
 
         debugLog(`upsertTechRecords: Upserted vehicle subclass (ID: ${response.rows.insertId}`);
-
-        insertedIds.push(response.rows.insertId);
     }
 
-    return insertedIds;
+    return;
 };
 
 const upsertIdentity = async (connection: Connection, id: string, name: string): Promise<number> => {
@@ -355,7 +334,7 @@ const upsertContactDetails = async (connection: Connection, techRecord: TechReco
     return response.rows.insertId;
 };
 
-const upsertPsvBrakes = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<number> => {
+const upsertPsvBrakes = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<void> => {
     debugLog(`upsertTechRecords: Upserting PSV brakes (tech-record-id: ${techRecordId})...`);
 
     const response = await executeFullUpsert(
@@ -381,18 +360,16 @@ const upsertPsvBrakes = async (connection: Connection, techRecordId: string, tec
 
     debugLog(`upsertTechRecords: Upserted PSV brakes (tech-record-id: ${techRecordId}, ID: ${response.rows.insertId})`);
 
-    return response.rows.insertId;
+    return;
 };
 
-const upsertAxleSpacings = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<number[]> => {
+const upsertAxleSpacings = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<void> => {
     debugLog(`upsertTechRecords: Upserting axle spacings (tech-record-id: ${techRecordId})...`);
 
     if (!techRecord.dimensions?.axleSpacing) {
         debugLog(`upsertTechRecords: no axle spacings present`);
-        return [];
+        return;
     }
-
-    const insertedIds: number[] = [];
 
     debugLog(`upsertTechRecords: ${techRecord.dimensions.axleSpacing.length} axle spacings to upsert`);
 
@@ -408,14 +385,12 @@ const upsertAxleSpacings = async (connection: Connection, techRecordId: string, 
         );
 
         debugLog(`upsertTechRecords: Upserted axle spacing (tech-record-id: ${techRecordId}, ID: ${response.rows.insertId})`);
-
-        insertedIds.push(response.rows.insertId);
     }
 
-    return insertedIds;
+    return;
 };
 
-const upsertMicrofilm = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<number> => {
+const upsertMicrofilm = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<void> => {
     debugLog(`upsertTechRecords: Upserting microfilm (tech-record-id: ${techRecordId})...`);
 
     const response = await executeFullUpsert(
@@ -431,18 +406,16 @@ const upsertMicrofilm = async (connection: Connection, techRecordId: string, tec
 
     debugLog(`upsertTechRecords: Upserted microfilm (tech-record-id: ${techRecordId}, ID: ${response.rows.insertId})`);
 
-    return response.rows.insertId;
+    return;
 };
 
-const upsertPlates = async (connection: Connection, techRecordId: any, techRecord: TechRecord): Promise<number[]> => {
+const upsertPlates = async (connection: Connection, techRecordId: any, techRecord: TechRecord): Promise<void> => {
     debugLog(`upsertTechRecords: Upserting plates (tech-record-id: ${techRecordId})...`);
 
     if (!techRecord.plates) {
         debugLog(`upsertTechRecords: no plates present`);
-        return [];
+        return;
     }
-
-    const insertedIds: number[] = [];
 
     debugLog(`upsertTechRecords: ${techRecord.plates.length} plates to upsert`);
 
@@ -460,22 +433,18 @@ const upsertPlates = async (connection: Connection, techRecordId: any, techRecor
         );
 
         debugLog(`upsertTechRecords: Upserted plate (tech-record-id: ${techRecordId}, ID: ${response.rows.insertId})`);
-
-        insertedIds.push(response.rows.insertId);
     }
 
-    return insertedIds;
+    return;
 };
 
-const upsertAxles = async (connection: Connection, techRecordId: any, techRecord: TechRecord): Promise<number[]> => {
+const upsertAxles = async (connection: Connection, techRecordId: any, techRecord: TechRecord): Promise<void> => {
     debugLog(`upsertTechRecords: Upserting axles (tech-record-id: ${techRecordId})...`);
 
     if (!techRecord.axles) {
         debugLog(`upsertTechRecords: no axles present`);
-        return [];
+        return;
     }
-
-    const insertedIds: number[] = [];
 
     for (const axle of techRecord.axles) {
         const tyreUpsertResponse = await executePartialUpsertIfNotExists(
@@ -515,9 +484,32 @@ const upsertAxles = async (connection: Connection, techRecordId: any, techRecord
         );
 
         debugLog(`upsertTechRecords: Upserted axle (tech-record-id: ${techRecordId}, ID: ${axleUpsertResponse.rows.insertId})`);
-
-        insertedIds.push(axleUpsertResponse.rows.insertId);
     }
 
-    return insertedIds;
+    return;
+};
+
+const upsertAuthIntoService = async (connection: Connection, techRecordId: string, techRecord: TechRecord): Promise<void> => {
+    debugLog(`upsertTechRecords: Upserting authIntoService (tech-record-id: ${techRecordId})...`);
+
+    if (!techRecord.authIntoService) {
+        debugLog(`upsertTechRecords: no authIntoService present`);
+        await deleteBasedOnWhereIn(AUTH_INTO_SERVICE_TABLE.tableName, "technical_record_id", [techRecordId], connection);
+        return;
+    }
+
+    const response = await executeFullUpsert(
+        AUTH_INTO_SERVICE_TABLE,
+        [
+            techRecordId,
+            techRecord.authIntoService?.cocIssueDate,
+            techRecord.authIntoService?.dateAuthorised,
+            techRecord.authIntoService?.datePending,
+            techRecord.authIntoService?.dateReceived,
+            techRecord.authIntoService?.dateRejected,
+        ],
+        connection
+    );
+
+    debugLog(`upsertTechRecords: Upserted authIntoService (tech-record-id: ${techRecordId}, ID: ${response.rows.insertId})`);
 };
