@@ -56,7 +56,7 @@
     "aws-lambda": "1.0.6",
     "aws-sdk": "2.1281.0",
     "aws-xray-sdk": "2.5.0",
-    "commitlint": "12.1.1",
+    "commitlint": "17.0.0",
     "date-fns": "2.21.2",
     "liquibase": "1.0.1",
     "moment": "2.29.4",
