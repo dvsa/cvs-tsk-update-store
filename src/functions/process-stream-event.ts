@@ -19,6 +19,8 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
     try {
         debugLog("Received SQS event: ", event);
 
+        console.log("Received SQS event: ", event)
+
         validateEvent(event);
 
         const region = process.env.AWS_REGION;
@@ -43,6 +45,8 @@ export const processStreamEvent: Handler = async (event: SQSEvent, context: Cont
 
             // is this an INSERT, UPDATE, or DELETE?
             const operationType: SqlOperation = deriveSqlOperation(dynamoRecord.eventName!);
+
+            console.log('operation type:', operationType)
 
             // parse native DynamoDB format to usable TS map
             const image: DynamoDbImage = selectImage(operationType, dynamoRecord.dynamodb!);
