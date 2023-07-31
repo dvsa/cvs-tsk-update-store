@@ -4,8 +4,8 @@
   "description": "Update Store Microservice",
   "main": "handler.js",
   "engines": {
-    "node": "14.*",
-    "npm": "5.6.0"
+    "node": "18.*",
+    "npm": "9.*"
   },
   "repository": {
     "type": "git",
@@ -25,7 +25,7 @@
     "prettier": "prettier --write ./**/*.{js,ts}",
     "prepush": "npm test && npm run build && npm run test-local-i",
     "sonar-scanner": "sonar-scanner",
-    "audit": "npm audit --production",
+    "audit": "npm audit --omit=dev",
     "package": "mkdir -p ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME}/ && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
     "security-checks": "git secrets --register-aws && git secrets --scan",
     "tools-setup": "liquibase --changeLogFile ../cvs-nop/changelog-master.xml --username root --password 12345 --url jdbc:mysql://127.0.0.1:3306/CVSBNOP?createDatabaseIfNotExist=true --classpath /liquibase/lib/mysql.jar update"

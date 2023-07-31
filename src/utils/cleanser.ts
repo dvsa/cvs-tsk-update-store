@@ -16,10 +16,10 @@ if (!Array.prototype.fingerprintCleanser) {
     writable: false,
     configurable: false,
     value: function fingerprintCleanser(this: any[]): any[] {
-      return this
-        .map((i) => typeof i === "string" ? i?.trim() : i)
-        .map((i) => i === "" ? null : i);
-    }
+      return this.map((i) => (typeof i === "string" ? i?.trim() : i)).map((i) =>
+        i === "" ? null : i
+      );
+    },
   });
 }
 
