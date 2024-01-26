@@ -44,6 +44,8 @@ export type compatibilityGroupJEnum = "I" | "E"
 
 export type additionalNotesNumberEnum =  "1" | "1A" | "2" | "3" | "V1B" | "T1B"
 
+export type additionalNotesguidanceNotesEnum =  "New certificate requested" | "M145 Statement"
+
 export type substancesPermittedEnum = "Substances permitted under the tank code and any special provisions specified in 9 may be carried" |
                                       "Substances (Class UN number and if necessary packing group and proper shipping name) may be carried"
 
@@ -73,7 +75,7 @@ export interface ApplicantDetails {
 
 export interface AdditionalNotes {
   number?: additionalNotesNumberEnum[];
-  // guidanceNotes?: string[];
+  guidanceNotes?: additionalNotesguidanceNotesEnum[];
 }
 
 export interface Tank {
@@ -129,9 +131,9 @@ export const parseAdrDetails = (
   )!;
   const additionalNotes: AdditionalNotes = {
     number: parseStringArray(additionalNotesImage.getList("number")) as additionalNotesNumberEnum[],
-    // guidanceNotes: parseStringArray(
-    //   additionalNotesImage.getList("guidanceNotes")
-    // ),
+    guidanceNotes: parseStringArray(
+      additionalNotesImage.getList("guidanceNotes")
+    ) as additionalNotesguidanceNotesEnum[],
   };
 
   const applicantDetailsImage: DynamoDbImage = adrDetails.getMap(
