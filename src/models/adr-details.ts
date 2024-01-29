@@ -18,6 +18,7 @@ export interface AdrDetails {
   applicantDetails?: ApplicantDetails;
   dangerousGoods?: boolean;
   memosApply?: string[];
+  m145?: boolean;
   additionalNotes?: AdditionalNotes;
   adrTypeApprovalNo?: string;
   adrCertificateNotes?: string;
@@ -44,7 +45,7 @@ export type compatibilityGroupJEnum = "I" | "E"
 
 export type additionalNotesNumberEnum =  "1" | "1A" | "2" | "3" | "V1B" | "T1B"
 
-export type additionalNotesguidanceNotesEnum =  "New certificate requested" | "M145 Statement"
+// export type additionalNotesguidanceNotesEnum =  "New certificate requested" | "M145 Statement"
 
 export type substancesPermittedEnum = "Substances permitted under the tank code and any special provisions specified in 9 may be carried" |
                                       "Substances (Class UN number and if necessary packing group and proper shipping name) may be carried"
@@ -75,7 +76,7 @@ export interface ApplicantDetails {
 
 export interface AdditionalNotes {
   number?: additionalNotesNumberEnum[];
-  guidanceNotes?: additionalNotesguidanceNotesEnum[];
+  // guidanceNotes?: additionalNotesguidanceNotesEnum[];
 }
 
 export interface Tank {
@@ -131,9 +132,9 @@ export const parseAdrDetails = (
   )!;
   const additionalNotes: AdditionalNotes = {
     number: parseStringArray(additionalNotesImage.getList("number")) as additionalNotesNumberEnum[],
-    guidanceNotes: parseStringArray(
-      additionalNotesImage.getList("guidanceNotes")
-    ) as additionalNotesguidanceNotesEnum[],
+    // guidanceNotes: parseStringArray(
+    //   additionalNotesImage.getList("guidanceNotes")
+    // ) as additionalNotesguidanceNotesEnum[],
   };
 
   const applicantDetailsImage: DynamoDbImage = adrDetails.getMap(
@@ -250,6 +251,7 @@ export const parseAdrDetails = (
     applicantDetails,
     dangerousGoods: adrDetails.getBoolean("dangerousGoods"),
     memosApply: parseStringArray(adrDetails.getList("memosApply")) as memosApplyEnum[],
+    m145: adrDetails.getBoolean("m145"),
     additionalNotes,
     adrTypeApprovalNo: adrDetails.getString("adrTypeApprovalNo"),
     adrCertificateNotes: adrDetails.getString("adrCertificateNotes"),
