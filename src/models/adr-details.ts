@@ -11,13 +11,13 @@ export interface AdrDetails {
   brakeDeclarationIssuer?: string;
   brakeEndurance?: boolean;
   weight?: number;
-  compatibilityGroupJ?: string;
+  compatibilityGroupJ?: compatibilityGroupJEnum;
   documents?: string[];
-  permittedDangerousGoods?: string[];
+  permittedDangerousGoods?: permittedDangerousGoodsEnum[];
   additionalExaminerNotes?: AdditionalExaminerNotes;
   applicantDetails?: ApplicantDetails;
   dangerousGoods?: boolean;
-  memosApply?: string[];
+  memosApply?: memosApplyEnum[];
   m145?: boolean;
   additionalNotes?: AdditionalNotes;
   adrTypeApprovalNo?: string;
@@ -26,33 +26,35 @@ export interface AdrDetails {
 }
 
 // define Enums
-export type VehicleDetailsTypeEnum = "Artic tractor" | "Rigid box body" | "Rigid sheeted load" | "Rigid tank" | 
-                                 "Rigid skeletal" | "Rigid battery" | "Full drawbar box body" | 
-                                 "Full drawbar sheeted load" | "Full drawbar tank" | "Full drawbar skeletal" | 
-                                 "Full drawbar battery" | "Centre axle box body" | "Centre axle sheeted load" | 
-                                 "Centre axle tank" | "Centre axle skeletal" | "Centre axle battery" | 
-                                 "Semi trailer box body" | "Semi trailer sheeted load" | "Semi trailer tank" | 
-                                 "Semi trailer skeletal" | "Semi trailer battery Enum"
+export type VehicleDetailsTypeEnum = "Artic tractor" | "Rigid box body" | "Rigid sheeted load" | "Rigid tank" |
+                                 "Rigid skeletal" | "Rigid battery" | "Full drawbar box body" |
+                                 "Full drawbar sheeted load" | "Full drawbar tank" | "Full drawbar skeletal" |
+                                 "Full drawbar battery" | "Centre axle box body" | "Centre axle sheeted load" |
+                                 "Centre axle tank" | "Centre axle skeletal" | "Centre axle battery" |
+                                 "Semi trailer box body" | "Semi trailer sheeted load" | "Semi trailer tank" |
+                                 "Semi trailer skeletal" | "Semi trailer battery Enum";
 
 export type Tc2TypeEnum = "initial";
 
 export type Tc3TypeEnum = "intermediate" | "periodic" | "exceptional";
 
 export type permittedDangerousGoodsEnum = "FP <61 (FL)" | "AT" | "Class 5.1 Hydrogen Peroxide (OX)" | "MEMU" |
-                                          "Carbon Disulphide" | "Hydrogen" | "Explosives (type 2)" | "Explosives (type 3)"
+                                          "Carbon Disulphide" | "Hydrogen" | "Explosives (type 2)" | "Explosives (type 3)";
 
-export type compatibilityGroupJEnum = "I" | "E"
+export type compatibilityGroupJEnum = "I" | "E";
 
-export type additionalNotesNumberEnum =  "1" | "1A" | "2" | "3" | "V1B" | "T1B"
+export type additionalNotesNumberEnum =  "1" | "1A" | "2" | "3" | "V1B" | "T1B";
 
 // export type additionalNotesguidanceNotesEnum =  "New certificate requested" | "M145 Statement"
 
 export type substancesPermittedEnum = "Substances permitted under the tank code and any special provisions specified in 9 may be carried" |
-                                      "Substances (Class UN number and if necessary packing group and proper shipping name) may be carried"
+                                      "Substances (Class UN number and if necessary packing group and proper shipping name) may be carried";
 
-export type memosApplyEnum = "07/09 3mth leak ext"
+export type memosApplyEnum = "07/09 3mth leak ext";
 
-// define AdrDetails' sub-attributes data types 
+export type tankStatementSelectEnum = "Statement" | "Product list";
+
+// define AdrDetails' sub-attributes data types
 export interface VehicleDetails {
   type?: VehicleDetailsTypeEnum;
   approvalDate?: string;
@@ -96,8 +98,8 @@ export interface TankDetails {
 }
 
 export interface TankStatement {
-  substancesPermitted?: string;
-  select?: string;
+  select?: tankStatementSelectEnum;
+  substancesPermitted?: substancesPermittedEnum;
   statement?: string;
   productListRefNo?: string;
   productListUnNo?: string[];
@@ -119,7 +121,7 @@ export interface Tc3DetailsItem {
   tc3PeriodicExpiryDate?: string;
 }
 
-// function to parse AdrDetails' high-level and sub attributes + return AdrDetails object 
+// function to parse AdrDetails' high-level and sub attributes + return AdrDetails object
 export const parseAdrDetails = (
   adrDetails?: DynamoDbImage
 ): Maybe<AdrDetails> => {
@@ -203,7 +205,7 @@ export const parseAdrDetails = (
   const tankStatementImage: DynamoDbImage = tankImage.getMap("tankStatement")!;
   const tankStatement: TankStatement = {
     substancesPermitted: tankStatementImage.getString("substancesPermitted") as substancesPermittedEnum,
-    select: tankStatementImage.getString("select"),
+    select: tankStatementImage.getString("select") as tankStatementSelectEnum,
     statement: tankStatementImage.getString("statement"),
     productListRefNo: tankStatementImage.getString("productListRefNo"),
     productListUnNo: parseStringArray(
@@ -230,7 +232,7 @@ export const parseAdrDetails = (
       createdAtDate: additionalExaminerNotesItemImage.getString("createdAtDate"),
       lastUpdatedBy: additionalExaminerNotesItemImage.getString("lastUpdatedBy"),
     });
-  };
+  }
 
 
   return {
@@ -247,7 +249,7 @@ export const parseAdrDetails = (
     permittedDangerousGoods: parseStringArray(
       adrDetails.getList("permittedDangerousGoods")
     ) as permittedDangerousGoodsEnum[],
-    additionalExaminerNotes: additionalExaminerNotes,
+    additionalExaminerNotes,
     applicantDetails,
     dangerousGoods: adrDetails.getBoolean("dangerousGoods"),
     memosApply: parseStringArray(adrDetails.getList("memosApply")) as memosApplyEnum[],

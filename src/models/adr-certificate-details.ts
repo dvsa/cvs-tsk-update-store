@@ -7,9 +7,9 @@ export interface AdrCertificateDetails {
 }
 
 // define Enums
-export type certificateIdEnum = "PASS" | "REPLACEMENT"
+export type certificateIdEnum = "PASS" | "REPLACEMENT";
 
-// define AdrCertificateDetails' sub-attributes data types 
+// define AdrCertificateDetails' sub-attributes data types
 export type AdrPassCertificateDetails = AdrPassCertificateDetailsItems[];
 
 export interface AdrPassCertificateDetailsItems {
@@ -41,9 +41,7 @@ export const parseAdrCertificateDetails = (
         certificateId: adrPassCertificateDetailsItemImage.getString("certificateId") as certificateIdEnum,
         });
     }
-
-
-  return {
-    adrPassCertificateDetails
-  };
+    return {
+      adrPassCertificateDetails
+    };
 };
