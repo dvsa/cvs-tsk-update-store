@@ -84,7 +84,7 @@ export type substancesPermittedEnum =
   | "Substances permitted under the tank code and any special provisions specified in 9 may be carried"
   | "Substances (Class UN number and if necessary packing group and proper shipping name) may be carried";
 
-export type memosApplyEnum = "07/09 3mth leak ext";
+export type memosApplyEnum = "07/09 3mth leak ext ";
 
 export type tankStatementSelectEnum =
   | "Statement"
