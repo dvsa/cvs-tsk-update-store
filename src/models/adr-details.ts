@@ -48,7 +48,7 @@ export type VehicleDetailsTypeEnum =
   | "Semi trailer sheeted load"
   | "Semi trailer tank"
   | "Semi trailer skeletal"
-  | "Semi trailer battery Enum";
+  | "Semi trailer battery";
 
 export type Tc2TypeEnum = "initial";
 
