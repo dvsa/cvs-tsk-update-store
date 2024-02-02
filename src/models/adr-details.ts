@@ -26,33 +26,69 @@ export interface AdrDetails {
 }
 
 // define Enums
-export type VehicleDetailsTypeEnum = "Artic tractor" | "Rigid box body" | "Rigid sheeted load" | "Rigid tank" |
-                                 "Rigid skeletal" | "Rigid battery" | "Full drawbar box body" |
-                                 "Full drawbar sheeted load" | "Full drawbar tank" | "Full drawbar skeletal" |
-                                 "Full drawbar battery" | "Centre axle box body" | "Centre axle sheeted load" |
-                                 "Centre axle tank" | "Centre axle skeletal" | "Centre axle battery" |
-                                 "Semi trailer box body" | "Semi trailer sheeted load" | "Semi trailer tank" |
-                                 "Semi trailer skeletal" | "Semi trailer battery Enum";
+export type VehicleDetailsTypeEnum =
+  | "Artic tractor"
+  | "Rigid box body"
+  | "Rigid sheeted load"
+  | "Rigid tank"
+  | "Rigid skeletal"
+  | "Rigid battery"
+  | "Full drawbar box body"
+  | "Full drawbar sheeted load"
+  | "Full drawbar tank"
+  | "Full drawbar skeletal"
+  | "Full drawbar battery"
+  | "Centre axle box body"
+  | "Centre axle sheeted load"
+  | "Centre axle tank"
+  | "Centre axle skeletal"
+  | "Centre axle battery"
+  | "Semi trailer box body"
+  | "Semi trailer sheeted load"
+  | "Semi trailer tank"
+  | "Semi trailer skeletal"
+  | "Semi trailer battery Enum";
 
 export type Tc2TypeEnum = "initial";
 
-export type Tc3TypeEnum = "intermediate" | "periodic" | "exceptional";
+export type Tc3TypeEnum =
+  | "intermediate"
+  | "periodic"
+  | "exceptional";
 
-export type permittedDangerousGoodsEnum = "FP <61 (FL)" | "AT" | "Class 5.1 Hydrogen Peroxide (OX)" | "MEMU" |
-                                          "Carbon Disulphide" | "Hydrogen" | "Explosives (type 2)" | "Explosives (type 3)";
+export type permittedDangerousGoodsEnum =
+  | "FP <61 (FL)"
+  | "AT"
+  | "Class 5.1 Hydrogen Peroxide (OX)"
+  | "MEMU"
+  | "Carbon Disulphide"
+  | "Hydrogen"
+  | "Explosives (type 2)"
+  | "Explosives (type 3)";
 
-export type compatibilityGroupJEnum = "I" | "E";
+export type compatibilityGroupJEnum =
+  | "I"
+  | "E";
 
-export type additionalNotesNumberEnum =  "1" | "1A" | "2" | "3" | "V1B" | "T1B";
+export type additionalNotesNumberEnum =
+  | "1"
+  | "1A"
+  | "2"
+  | "3"
+  | "V1B"
+  | "T1B";
 
 // export type additionalNotesguidanceNotesEnum =  "New certificate requested" | "M145 Statement"
 
-export type substancesPermittedEnum = "Substances permitted under the tank code and any special provisions specified in 9 may be carried" |
-                                      "Substances (Class UN number and if necessary packing group and proper shipping name) may be carried";
+export type substancesPermittedEnum =
+  | "Substances permitted under the tank code and any special provisions specified in 9 may be carried"
+  | "Substances (Class UN number and if necessary packing group and proper shipping name) may be carried";
 
 export type memosApplyEnum = "07/09 3mth leak ext";
 
-export type tankStatementSelectEnum = "Statement" | "Product list";
+export type tankStatementSelectEnum =
+  | "Statement"
+  | "Product list";
 
 // define AdrDetails' sub-attributes data types
 export interface VehicleDetails {

@@ -7,7 +7,9 @@ export interface AdrCertificateDetails {
 }
 
 // define Enums
-export type certificateIdEnum = "PASS" | "REPLACEMENT";
+export type certificateIdEnum =
+  | "PASS"
+  | "REPLACEMENT";
 
 // define AdrCertificateDetails' sub-attributes data types
 export type AdrPassCertificateDetails = AdrPassCertificateDetailsItems[];
