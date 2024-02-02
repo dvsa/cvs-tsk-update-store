@@ -364,6 +364,95 @@ export const TEST_RESULT_TABLE: TableDetails = {
   ],
 };
 
+export const ADR_ADDITIONAL_EXAMINER_NOTES_TABLE: TableDetails = {
+  tableName: "adr_additional_examiner_notes",
+  columnNames: ["adr_details_id", "note", "createdAtDate", "lastUpdatedBy"],
+};
+
+export const ADR_ADDITIONAL_NOTES_GUIDANCE_TABLE: TableDetails = {
+  tableName: "adr_additional_notes_guidance",
+  columnNames: ["guidanceNotes", "adr_details_id"],
+};
+
+export const ADR_ADDITIONAL_NOTES_NUMBER_TABLE: TableDetails = {
+  tableName: "adr_additional_notes_number",
+  columnNames: ["number", "adr_details_id"],
+};
+
+export const ADR_DANGEROUS_GOODS_LIST_TABLE: TableDetails = {
+  tableName: "adr_dangerous_goods_list",
+  columnNames: ["name"],
+};
+
+export const ADR_DETAILS_TABLE: TableDetails = {
+  tableName: "adr_details",
+  columnNames: [
+    "technical_record_id",
+    "type",
+    "approvalDate",
+    "listStatementApplicable",
+    "batteryListNumber",
+    "declarationsSeen",
+    "brakeDeclarationsSeen",
+    "brakeDeclarationIssuer",
+    "brakeEndurance",
+    "weight",
+    "compatibilityGroupJ",
+    "additionalExaminerNotes",
+    "applicantDetailsName",
+    "street",
+    "town",
+    "city",
+    "postcode",
+    "memosApply",
+    "adrTypeApprovalNo",
+    "adrCertificateNotes",
+    "tankManufacturer",
+    "yearOfManufacture",
+    "tankCode",
+    "specialProvisions",
+    "tankManufacturerSerialNo",
+    "tankTypeAppNo",
+    "tc2Type",
+    "tc2IntermediateApprovalNo",
+    "tc2IntermediateExpiryDate",
+    "substancesPermitted",
+    "statement",
+    "productListRefNo",
+    "productList",
+  ],
+};
+
+export const ADR_MEMOS_APPLY_TABLE: TableDetails = {
+  tableName: "adr_memos_apply",
+  columnNames: ["adr_details_id", "memo"],
+};
+
+export const ADR_PERMITTED_DANGEROUS_GOODS_TABLE: TableDetails = {
+  tableName: "adr_permitted_dangerous_goods",
+  columnNames: ["adr_details_id", "dangerous_goods_id"],
+};
+
+export const ADR_PRODUCTLISTUNNO_LIST_TABLE: TableDetails = {
+  tableName: "adr_productListUnNo_list",
+  columnNames: ["name"],
+};
+
+export const ADR_PRODUCTLISTUNNO_TABLE: TableDetails = {
+  tableName: "adr_productListUnNo",
+  columnNames: ["adr_details_id", "productListUnNo_id"],
+};
+
+export const ADR_TC3DETAILS_TABLE: TableDetails = {
+  tableName: "adr_tc3Details",
+  columnNames: [
+    "adr_details_id",
+    "tc3Type",
+    "tc3PeriodicNumber",
+    "tc3PeriodicExpiryDate",
+  ],
+};
+
 export const allTables = (): TableDetails[] => {
   return [
     VEHICLE_TABLE,
@@ -389,5 +478,15 @@ export const allTables = (): TableDetails[] => {
     TEST_DEFECT_TABLE,
     CUSTOM_DEFECT_TABLE,
     TEST_RESULT_TABLE,
+    ADR_ADDITIONAL_EXAMINER_NOTES_TABLE,
+    ADR_ADDITIONAL_NOTES_GUIDANCE_TABLE,
+    ADR_ADDITIONAL_NOTES_NUMBER_TABLE,
+    ADR_DANGEROUS_GOODS_LIST_TABLE,
+    ADR_DETAILS_TABLE,
+    ADR_MEMOS_APPLY_TABLE,
+    ADR_PERMITTED_DANGEROUS_GOODS_TABLE,
+    ADR_PRODUCTLISTUNNO_LIST_TABLE,
+    ADR_PRODUCTLISTUNNO_TABLE,
+    ADR_TC3DETAILS_TABLE,
   ];
 };
