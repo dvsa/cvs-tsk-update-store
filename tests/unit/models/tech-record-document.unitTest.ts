@@ -80,7 +80,8 @@ describe("parseTechRecordDocument()", () => {
     expect(techRecordDocument.techRecord![0].adrDetails?.documents![1]).toEqual("documents_2");
     
     expect(techRecordDocument.techRecord![0].adrDetails?.listStatementApplicable).toEqual(true);
-    expect(techRecordDocument.techRecord![0].adrDetails?.m145).toEqual(true);
+    expect(techRecordDocument.techRecord![0].adrDetails?.m145Statement).toEqual(true);
+    expect(techRecordDocument.techRecord![0].adrDetails?.newCertificateRequested).toEqual(false);
     
     expect(techRecordDocument.techRecord![0].adrDetails?.memosApply![0]).toEqual("07/09 3mth leak ext");
     
@@ -190,7 +191,8 @@ describe("parseTechRecordDocument()", () => {
     expect(techRecordDocument.techRecord![0].adrDetails?.documents![1]).toEqual("documents_2");
     
     expect(techRecordDocument.techRecord![0].adrDetails?.listStatementApplicable).toEqual(true);
-    expect(techRecordDocument.techRecord![0].adrDetails?.m145).toEqual(true);
+    expect(techRecordDocument.techRecord![0].adrDetails?.m145Statement).toEqual(true);
+    expect(techRecordDocument.techRecord![0].adrDetails?.newCertificateRequested).toEqual(false);
     
     expect(techRecordDocument.techRecord![0].adrDetails?.memosApply![0]).toEqual("07/09 3mth leak ext");
     

@@ -11,6 +11,7 @@ export interface AdrDetails {
   brakeDeclarationIssuer?: string;
   brakeEndurance?: boolean;
   weight?: number;
+  newCertificateRequested?: boolean;
   compatibilityGroupJ?: compatibilityGroupJEnum;
   documents?: string[];
   permittedDangerousGoods?: permittedDangerousGoodsEnum[];
@@ -18,7 +19,7 @@ export interface AdrDetails {
   applicantDetails?: ApplicantDetails;
   dangerousGoods?: boolean;
   memosApply?: memosApplyEnum[];
-  m145?: boolean;
+  m145Statement?: boolean;
   additionalNotes?: AdditionalNotes;
   adrTypeApprovalNo?: string;
   adrCertificateNotes?: string;
@@ -280,6 +281,7 @@ export const parseAdrDetails = (
     brakeDeclarationIssuer: adrDetails.getString("brakeDeclarationIssuer"),
     brakeEndurance: adrDetails.getBoolean("brakeEndurance"),
     weight: adrDetails.getNumber("weight"),
+    newCertificateRequested: adrDetails.getBoolean("newCertificateRequested"),
     compatibilityGroupJ: adrDetails.getString("compatibilityGroupJ") as compatibilityGroupJEnum,
     documents: parseStringArray(adrDetails.getList("documents")),
     permittedDangerousGoods: parseStringArray(
@@ -289,7 +291,7 @@ export const parseAdrDetails = (
     applicantDetails,
     dangerousGoods: adrDetails.getBoolean("dangerousGoods"),
     memosApply: parseStringArray(adrDetails.getList("memosApply")) as memosApplyEnum[],
-    m145: adrDetails.getBoolean("m145"),
+    m145Statement: adrDetails.getBoolean("m145Statement"),
     additionalNotes,
     adrTypeApprovalNo: adrDetails.getString("adrTypeApprovalNo"),
     adrCertificateNotes: adrDetails.getString("adrCertificateNotes"),

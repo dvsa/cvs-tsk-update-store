@@ -116,9 +116,13 @@
                   "listStatementApplicable": {
                     "BOOL": true
                   },
-                  "m145": {
+                  "m145Statement": {
                     "BOOL": true
                   },
+                  "newCertificateRequested": {
+                    "BOOL": false
+                  },
+
                   "memosApply": {
                     "L": [
                       {
