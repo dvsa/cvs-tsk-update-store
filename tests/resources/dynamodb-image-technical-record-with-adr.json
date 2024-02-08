@@ -25,227 +25,227 @@
     "L": [
       {
         "M": {
-            "adrDetails": {
+          "adrDetails": {
+            "M": {
+              "additionalExaminerNotes": {
+                "L": [
+                  {
+                    "M": {
+                      "note": {
+                        "S": "additionalExaminerNotes_note_1"
+                      },
+                      "createdAtDate": {
+                        "S": "2023-05-30"
+                      },
+                      "lastUpdatedBy": {
+                        "S": "additionalExaminerNotes_lastUpdatedBy_1"
+                      }
+                    }
+                  }
+                ]
+              },
+              "additionalNotes": {
                 "M": {
-                  "additionalExaminerNotes": {
+                  "number": {
                     "L": [
-                        {
-                            "M": {
-                                "note": {
-                                    "S": "additionalExaminerNotes_note_1"
-                                },
-                                "createdAtDate": {
-                                    "S": "2023-05-30"
-                                },
-                                "lastUpdatedBy": {
-                                    "S": "additionalExaminerNotes_lastUpdatedBy_1"
-                                }
-                            }
-                        }
+                      {"S": "1"},
+                      {"S": "T1B"}
                     ]
+                  }
+                }
+              },
+              "adrCertificateNotes": {
+                "S": "adrCertificateNotes_1"
+              },
+              "adrTypeApprovalNo": {
+                "S": "adrTypeApprovalNo_1"
+              },
+              "applicantDetails": {
+                "M": {
+                  "name": {
+                    "S": "applicantDetails_Name"
                   },
-                  "additionalNotes": {
-                    "M": {
-                        "number": {
-                            "L": [
-                                {"S": "1"},
-                                {"S": "T1B"}
-                            ]
-                        }
-                    }
+                  "street": {
+                    "S": "applicantDetailsSTREET"
                   },
-                  "adrCertificateNotes": {
-                    "S": "adrCertificateNotes_1"
+                  "town": {
+                    "S": "applicantDetailsTOWN"
                   },
-                  "adrTypeApprovalNo": {
-                    "S": "adrTypeApprovalNo_1"
+                  "city": {
+                    "S": "applicantDetailsCITY"
                   },
-                  "applicantDetails": {
-                    "M": {
-                      "name": {
-                            "S": "adrDetails_applicantDetails_name_1"
-                          },
-                      "street": {
-                            "S": "adrDetails_applicantDetails_street_1"
-                          },
-                      "town": {
-                            "S": "adrDetails_applicantDetails_town_1"
-                          },
-                      "city": {
-                            "S": "adrDetails_applicantDetails_city_1"
-                          },
-                      "postcode": {
-                            "S": "adrDetails_applicantDetails_postcode_1"
-                          }
-                    }
+                  "postcode": {
+                    "S": "POST-CODE"
+                  }
+                }
+              },
+              "batteryListNumber": {
+                "S": "BATTERY1"
+              },
+              "brakeDeclarationIssuer": {
+                "S": "brakeDeclarationIssuer_1"
+              },
+              "brakeDeclarationsSeen": {
+                "BOOL": true
+              },
+              "brakeEndurance": {
+                "BOOL": false
+              },
+              "compatibilityGroupJ": {
+                "S": "I"
+              },
+              "dangerousGoods": {
+                "BOOL": false
+              },
+              "declarationsSeen": {
+                "BOOL": false
+              },
+              "documents": {
+                "L": [
+                  {
+                    "S": "documents_1"
                   },
-                  "batteryListNumber": {
-                    "S": "batteryListNumber_1"
-                  },
-                  "brakeDeclarationIssuer": {
-                    "S": "brakeDeclarationIssuer_1"
-                  },
-                  "brakeDeclarationsSeen": {
-                    "BOOL": true
-                  },
-                  "brakeEndurance": {
-                    "BOOL": false
-                  },
-                  "compatibilityGroupJ": {
-                    "S": "I"
-                  },
-                  "dangerousGoods": {
-                    "BOOL": false
-                  },
-                  "declarationsSeen": {
-                    "BOOL": false
-                  },
-                  "documents": {
-                    "L": [
-                      {
-                        "S": "documents_1"
-                      },
-                      {
-                        "S": "documents_2"
-                      }, 
-                      {
-                        "S": "documents_3"
-                      }
-                    ]
-                  },
-                  "listStatementApplicable": {
-                    "BOOL": true
-                  },
-                  "m145Statement": {
-                    "BOOL": true
-                  },
-                  "newCertificateRequested": {
-                    "BOOL": false
-                  },
+                  {
+                    "S": "documents_2"
+                  }, 
+                  {
+                    "S": "documents_3"
+                  }
+                ]
+              },
+              "listStatementApplicable": {
+                "BOOL": true
+              },
+              "m145Statement": {
+                "BOOL": true
+              },
+              "newCertificateRequested": {
+                "BOOL": false
+              },
 
-                  "memosApply": {
-                    "L": [
-                      {
-                        "S": "07/09 3mth leak ext"
-                      }
-                    ]
+              "memosApply": {
+                "L": [
+                  {
+                    "S": "07/09 3mth leak ext"
+                  }
+                ]
+              },
+              "permittedDangerousGoods": {
+                "L": [
+                  {
+                    "S": "FP <61 (FL)"
                   },
-                  "permittedDangerousGoods": {
-                    "L": [
-                      {
-                        "S": "FP <61 (FL)"
-                      },
-                      {
-                        "S": "Carbon Disulphide"
-                      }, 
-                      {
-                        "S": "Hydrogen"
-                      }
-                    ]
-                  },
-                  "tank": {
+                  {
+                    "S": "Carbon Disulphide"
+                  }, 
+                  {
+                    "S": "Hydrogen"
+                  }
+                ]
+              },
+              "tank": {
+                "M": {
+                  "tankDetails": {
                     "M": {
-                      "tankDetails": {
+                      "tankManufacturer": {
+                        "S": "tankManufacturer_1"
+                      },
+                      "yearOfManufacture": {
+                        "N": "2012"
+                      },
+                      "tankCode": {
+                        "S": "tankCode_1"
+                      },
+                      "specialProvisions": {
+                        "S": "specialProvisions_1"
+                      },
+                      "tankManufacturerSerialNo": {
+                        "S": "1234"
+                      },
+                      "tankTypeAppNo": {
+                        "S": "9876"
+                      },
+                      "tc2Details": {
                         "M": {
-                          "tankManufacturer": {
-                            "S": "tankManufacturer_1"
+                          "tc2Type": {
+                            "S": "initial"
                           },
-                          "yearOfManufacture": {
-                            "N": "1234"
+                          "tc2IntermediateApprovalNo": {
+                            "S": "12345"
                           },
-                          "tankCode": {
-                            "S": "tankCode_1"
-                          },
-                          "specialProvisions": {
-                            "S": "specialProvisions_1"
-                          },
-                          "tankManufacturerSerialNo": {
-                            "S": "1234"
-                          },
-                          "tankTypeAppNo": {
-                            "S": "9876"
-                          },
-                          "tc2Details": {
+                          "tc2IntermediateExpiryDate": {
+                            "S": "2024-06-01"
+                          }
+                        }
+                      },
+                      "tc3Details": {
+                        "L": [
+                          {
                             "M": {
-                              "tc2Type": {
-                                "S": "initial"
+                              "tc3Type": {
+                                "S": "intermediate"
                               },
-                              "tc2IntermediateApprovalNo": {
-                                "S": "12345"
+                              "tc3PeriodicNumber": {
+                                "S": "98765"
                               },
-                              "tc2IntermediateExpiryDate": {
+                              "tc3PeriodicExpiryDate": {
                                 "S": "2024-06-01"
                               }
                             }
-                          },
-                          "tc3Details": {
-                            "L": [
-                              {
-                                "M": {
-                                  "tc3Type": {
-                                    "S": "intermediate"
-                                  },
-                                  "tc3PeriodicNumber": {
-                                    "S": "98765"
-                                  },
-                                  "tc3PeriodicExpiryDate": {
-                                    "S": "2024-06-01"
-                                  }
-                                }
-                              }
-                            ]
                           }
-                        }
-                      },
-                      "tankStatement": {
-                        "M": {
-                          "select":{
-                            "S": "Product list"
-                          },
-                          "substancesPermitted": {
-                            "S": "Substances permitted under the tank code and any special provisions specified in 9 may be carried"
-                          },
-                          "statement": {
-                            "S": "statement_1"
-                          },
-                          "productListRefNo": {
-                            "S": "123456"
-                          },
-                          "productListUnNo": {
-                            "L": [
-                              {
-                                "S": "123123"
-                              },
-                              {
-                                "S": "987987"
-                              },
-                              {
-                                "S": "135790"
-                              }
-                            ]
-                          },
-                          "productList": {
-                            "S": "productList_1"
-                          }
-                        }
-                      } 
-                    }
-                  },
-                  "vehicleDetails": {
-                    "M": {
-                      "type": {
-                        "S": "Artic tractor"
-                      },
-                      "approvalDate": {
-                        "S": "2023-06-12"
+                        ]
                       }
                     }
                   },
-                  "weight": {
-                    "N": "6789"
+                  "tankStatement": {
+                    "M": {
+                      "select":{
+                        "S": "Product list"
+                      },
+                      "substancesPermitted": {
+                        "S": "Substances permitted under the tank code and any special provisions specified in 9 may be carried"
+                      },
+                      "statement": {
+                        "S": "statement_1"
+                      },
+                      "productListRefNo": {
+                        "S": "123456"
+                      },
+                      "productListUnNo": {
+                        "L": [
+                          {
+                            "S": "123123"
+                          },
+                          {
+                            "S": "987987"
+                          },
+                          {
+                            "S": "135790"
+                          }
+                        ]
+                      },
+                      "productList": {
+                        "S": "productList_1"
+                      }
+                    }
+                  } 
+                }
+              },
+              "vehicleDetails": {
+                "M": {
+                  "type": {
+                    "S": "Artic tractor"
+                  },
+                  "approvalDate": {
+                    "S": "2023-06-12"
                   }
                 }
-              },  
+              },
+              "weight": {
+                "N": "6789"
+              }
+            }
+          },  
           "recordCompleteness": {
             "S": "88888888"
           },
