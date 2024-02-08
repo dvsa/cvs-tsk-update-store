@@ -65,9 +65,9 @@ describe("parseTechRecordDocument()", () => {
     
     expect(techRecordDocument.techRecord![0].adrDetails?.adrTypeApprovalNo).toEqual("adrTypeApprovalNo_1");
     
-    expect(techRecordDocument.techRecord![0].adrDetails?.applicantDetails?.name).toEqual("adrDetails_applicantDetails_name_1");
+    expect(techRecordDocument.techRecord![0].adrDetails?.applicantDetails?.name).toEqual("applicantDetails_Name");
     
-    expect(techRecordDocument.techRecord![0].adrDetails?.batteryListNumber).toEqual("batteryListNumber_1");
+    expect(techRecordDocument.techRecord![0].adrDetails?.batteryListNumber).toEqual("BATTERY1");
     expect(techRecordDocument.techRecord![0].adrDetails?.brakeDeclarationIssuer).toEqual("brakeDeclarationIssuer_1");
     
     expect(techRecordDocument.techRecord![0].adrDetails?.brakeDeclarationsSeen).toEqual(true);
@@ -89,7 +89,7 @@ describe("parseTechRecordDocument()", () => {
     expect(techRecordDocument.techRecord![0].adrDetails?.permittedDangerousGoods![1]).toEqual("Carbon Disulphide");
     
     expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankManufacturer).toEqual("tankManufacturer_1");
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.yearOfManufacture).toEqual(1234);
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.yearOfManufacture).toEqual(2012);
     expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankCode).toEqual("tankCode_1");
     expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.specialProvisions).toEqual("specialProvisions_1");
     expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankManufacturerSerialNo).toEqual("1234");
@@ -176,9 +176,9 @@ describe("parseTechRecordDocument()", () => {
     
     expect(techRecordDocument.techRecord![0].adrDetails?.adrTypeApprovalNo).toEqual("adrTypeApprovalNo_1");
     
-    expect(techRecordDocument.techRecord![0].adrDetails?.applicantDetails?.name).toEqual("adrDetails_applicantDetails_name_1");
+    expect(techRecordDocument.techRecord![0].adrDetails?.applicantDetails?.name).toEqual("applicantDetails_Name");
     
-    expect(techRecordDocument.techRecord![0].adrDetails?.batteryListNumber).toEqual("batteryListNumber_1");
+    expect(techRecordDocument.techRecord![0].adrDetails?.batteryListNumber).toEqual("BATTERY1");
     expect(techRecordDocument.techRecord![0].adrDetails?.brakeDeclarationIssuer).toEqual("brakeDeclarationIssuer_1");
     
     expect(techRecordDocument.techRecord![0].adrDetails?.brakeDeclarationsSeen).toEqual(true);
@@ -200,7 +200,7 @@ describe("parseTechRecordDocument()", () => {
     expect(techRecordDocument.techRecord![0].adrDetails?.permittedDangerousGoods![1]).toEqual("Carbon Disulphide");
     
     expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankManufacturer).toEqual("tankManufacturer_1");
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.yearOfManufacture).toEqual(1234);
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.yearOfManufacture).toEqual(2012);
     expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankCode).toEqual("tankCode_1");
     expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.specialProvisions).toEqual("specialProvisions_1");
     expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankManufacturerSerialNo).toEqual("1234");
