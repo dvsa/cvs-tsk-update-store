@@ -1,5 +1,5 @@
 # Match Aurora MySQL version as closely as possible
-FROM mysql:8.0.32
+FROM mysql:5.7.12
 
 ENV MYSQL_DATABASE=CVSBNOP \
 MYSQL_ROOT_PASSWORD=12345
