@@ -4,7 +4,7 @@ import {
   executeSql,
 } from "../../src/services/connection-pool";
 import { exampleContext, useLocalDb } from "../utils";
-import techRecordDocumentJson from "../resources/dynamodb-image-technical-record.json";
+import techRecordDocumentJsonWithADR from "../resources/dynamodb-image-technical-record-with-adr.json";
 import { getContainerizedDatabase } from "./cvsbnop-container";
 import { processStreamEvent } from "../../src/functions/process-stream-event";
 import { getConnectionPoolOptions } from "../../src/services/connection-pool-options";
@@ -12,7 +12,7 @@ import { getConnectionPoolOptions } from "../../src/services/connection-pool-opt
 useLocalDb();
 
 export const techRecordDocumentConversion = () =>
-  describe("convertTechRecordDocument() integration tests", () => {
+  describe("convertTechRecordDocument() with ADR integration tests", () => {
     let container: StartedTestContainer;
 
     beforeAll(async () => {
@@ -49,7 +49,7 @@ export const techRecordDocumentConversion = () =>
                 "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
               eventName: "INSERT",
               dynamodb: {
-                NewImage: techRecordDocumentJson,
+                NewImage: techRecordDocumentJsonWithADR,
               },
             }),
           },
@@ -590,13 +590,259 @@ export const techRecordDocumentConversion = () =>
       expect(
         (authIntoServiceResultSet.rows[0].dateRejected as Date).toUTCString()
       ).toEqual("Tue, 05 May 2020 00:00:00 GMT");
+
+      // adr_details
+      const adrDetailsResultSet = await executeSql(
+        `SELECT \`id\`,
+                \`technical_record_id\`,
+                \`type\`,
+                \`approvalDate\`,
+                \`listStatementApplicable\`,
+                \`batteryListNumber\`,
+                \`declarationsSeen\`,
+                \`brakeDeclarationsSeen\`,
+                \`brakeDeclarationIssuer\`,
+                \`brakeEndurance\`,
+                \`weight\`,
+                \`compatibilityGroupJ\`,
+                \`applicantDetailsName\`,
+                \`street\`,
+                \`town\`,
+                \`city\`,
+                \`postcode\`,
+                \`adrTypeApprovalNo\`,
+                \`adrCertificateNotes\`,
+                \`tankManufacturer\`,
+                \`yearOfManufacture\`,
+                \`tankCode\`,
+                \`specialProvisions\`,
+                \`tankManufacturerSerialNo\`,
+                \`tankTypeAppNo\`,
+                \`tc2Type\`,
+                \`tc2IntermediateApprovalNo\`,
+                \`tc2IntermediateExpiryDate\`,
+                \`substancesPermitted\`,
+                \`statement\`,
+                \`productListRefNo\`,
+                \`productList\`,
+                \`m145Statement\`
+             FROM \`adr_details\`
+             WHERE \`adr_details\`.\`technical_record_id\` = ${technicalRecordId}`
+      );
+      expect(adrDetailsResultSet.rows.length).toEqual(1);
+      expect(adrDetailsResultSet.rows[0].technical_record_id).toEqual(
+        technicalRecordId
+      );
+      expect(adrDetailsResultSet.rows[0].type).toEqual("Artic tractor");
+      expect(
+        (adrDetailsResultSet.rows[0].approvalDate as Date).toUTCString()
+      ).toEqual("Mon, 12 Jun 2023 00:00:00 GMT");
+      expect(adrDetailsResultSet.rows[0].listStatementApplicable).toEqual(1);
+      expect(adrDetailsResultSet.rows[0].batteryListNumber).toEqual("BATTERY1");
+      expect(adrDetailsResultSet.rows[0].declarationsSeen).toEqual(0);
+      expect(adrDetailsResultSet.rows[0].brakeDeclarationsSeen).toEqual(1);
+      expect(adrDetailsResultSet.rows[0].brakeDeclarationIssuer).toEqual(
+        "brakeDeclarationIssuer_1"
+      );
+      expect(adrDetailsResultSet.rows[0].brakeEndurance).toEqual(0);
+      expect(adrDetailsResultSet.rows[0].weight).toEqual(6789);
+      expect(adrDetailsResultSet.rows[0].compatibilityGroupJ).toEqual("I");
+      expect(adrDetailsResultSet.rows[0].applicantDetailsName).toEqual(
+        "applicantDetails_Name"
+      );
+      expect(adrDetailsResultSet.rows[0].street).toEqual(
+        "applicantDetailsSTREET"
+      );
+      expect(adrDetailsResultSet.rows[0].town).toEqual("applicantDetailsTOWN");
+      expect(adrDetailsResultSet.rows[0].city).toEqual("applicantDetailsCITY");
+      expect(adrDetailsResultSet.rows[0].postcode).toEqual("POST-CODE");
+      expect(adrDetailsResultSet.rows[0].adrTypeApprovalNo).toEqual(
+        "adrTypeApprovalNo_1"
+      );
+      expect(adrDetailsResultSet.rows[0].adrCertificateNotes).toEqual(
+        "adrCertificateNotes_1"
+      );
+      expect(adrDetailsResultSet.rows[0].tankManufacturer).toEqual(
+        "tankManufacturer_1"
+      );
+      expect(adrDetailsResultSet.rows[0].yearOfManufacture).toEqual(2012);
+      expect(adrDetailsResultSet.rows[0].tankCode).toEqual("tankCode_1");
+      expect(adrDetailsResultSet.rows[0].specialProvisions).toEqual(
+        "specialProvisions_1"
+      );
+      expect(adrDetailsResultSet.rows[0].tankManufacturerSerialNo).toEqual(
+        "1234"
+      );
+      expect(adrDetailsResultSet.rows[0].tankTypeAppNo).toEqual("9876");
+      expect(adrDetailsResultSet.rows[0].tc2Type).toEqual("initial");
+      expect(adrDetailsResultSet.rows[0].tc2IntermediateApprovalNo).toEqual(
+        "12345"
+      );
+      expect(
+        (adrDetailsResultSet.rows[0]
+          .tc2IntermediateExpiryDate as Date).toUTCString()
+      ).toEqual("Sat, 01 Jun 2024 00:00:00 GMT");
+      expect(adrDetailsResultSet.rows[0].substancesPermitted).toEqual(
+        "Substances permitted under the tank code and any special provisions specified in 9 may be carried"
+      );
+      expect(adrDetailsResultSet.rows[0].statement).toEqual("statement_1");
+      expect(adrDetailsResultSet.rows[0].productListRefNo).toEqual("123456");
+      expect(adrDetailsResultSet.rows[0].productList).toEqual("productList_1");
+      expect(adrDetailsResultSet.rows[0].m145Statement).toEqual(1);
+
+      const adrDetailsId = adrDetailsResultSet.rows[0].id;
+
+      // adr_memos_apply
+      const adrMemosApplyResultSet = await executeSql(
+        `SELECT \`adr_details_id\`,
+                \`memo\`
+             FROM \`adr_memos_apply\`
+             WHERE \`adr_memos_apply\`.\`adr_details_id\` = ${adrDetailsId}`
+      );
+      expect(adrMemosApplyResultSet.rows.length).toEqual(1);
+      expect(adrMemosApplyResultSet.rows[0].adr_details_id).toEqual(
+        adrDetailsId
+      );
+      expect(adrMemosApplyResultSet.rows[0].memo).toEqual(
+        "07/09 3mth leak ext"
+      );
+
+      // adr_dangerous_goods_list
+      const adrDangerousGoodsListResultSet = await executeSql(
+        `SELECT \`id\`,
+                \`name\`
+             FROM \`adr_dangerous_goods_list\`
+             `
+      );
+      expect(adrDangerousGoodsListResultSet.rows.length).toEqual(3);
+
+      expect(adrDangerousGoodsListResultSet.rows[0].name).toEqual(
+        "FP <61 (FL)"
+      );
+      expect(adrDangerousGoodsListResultSet.rows[1].name).toEqual(
+        "Carbon Disulphide"
+      );
+      expect(adrDangerousGoodsListResultSet.rows[2].name).toEqual("Hydrogen");
+
+      // adr_permitted_dangerous_goods
+      const adrPermittedDangerousGoodsResultSet = await executeSql(
+        `SELECT \`adr_details_id\`,
+                \`adr_dangerous_goods_list_id\`
+             FROM \`adr_permitted_dangerous_goods\`
+             WHERE \`adr_permitted_dangerous_goods\`.\`adr_details_id\` = ${adrDetailsId}`
+      );
+      expect(adrPermittedDangerousGoodsResultSet.rows.length).toEqual(3);
+      expect(
+        adrPermittedDangerousGoodsResultSet.rows[0].adr_details_id
+      ).toEqual(adrDetailsId);
+      expect(
+        adrPermittedDangerousGoodsResultSet.rows[0].adr_dangerous_goods_list_id
+      ).toEqual(1);
+      expect(
+        adrPermittedDangerousGoodsResultSet.rows[1].adr_dangerous_goods_list_id
+      ).toEqual(2);
+      expect(
+        adrPermittedDangerousGoodsResultSet.rows[2].adr_dangerous_goods_list_id
+      ).toEqual(3);
+
+      // adr_productListUnNo_list
+      const adrProductListUnNoListResultSet = await executeSql(
+        `SELECT \`id\`,
+                \`name\`
+             FROM \`adr_productListUnNo_list\`
+             `
+      );
+      expect(adrProductListUnNoListResultSet.rows.length).toEqual(3);
+
+      expect(adrProductListUnNoListResultSet.rows[0].name).toEqual("123123");
+      expect(adrProductListUnNoListResultSet.rows[1].name).toEqual("987987");
+      expect(adrProductListUnNoListResultSet.rows[2].name).toEqual("135790");
+
+      // adr_productListUnNo
+      const adrProductListUnNoResultSet = await executeSql(
+        `SELECT \`adr_details_id\`,
+                \`adr_productListUnNo_list_id\`
+             FROM \`adr_productListUnNo\`
+             WHERE \`adr_productListUnNo\`.\`adr_details_id\` = ${adrDetailsId}`
+      );
+      expect(adrProductListUnNoResultSet.rows.length).toEqual(3);
+      expect(adrProductListUnNoResultSet.rows[0].adr_details_id).toEqual(
+        adrDetailsId
+      );
+      expect(
+        adrProductListUnNoResultSet.rows[0].adr_productListUnNo_list_id
+      ).toEqual(1);
+      expect(
+        adrProductListUnNoResultSet.rows[1].adr_productListUnNo_list_id
+      ).toEqual(2);
+      expect(
+        adrProductListUnNoResultSet.rows[2].adr_productListUnNo_list_id
+      ).toEqual(3);
+
+      // adr_tc3Details
+      const adrTc3DetailsResultSet = await executeSql(
+        `SELECT \`adr_details_id\`,
+                \`tc3Type\`,
+                \`tc3PeriodicNumber\`,
+                \`tc3PeriodicExpiryDate\`
+             FROM \`adr_tc3Details\`
+             WHERE \`adr_tc3Details\`.\`adr_details_id\` = ${adrDetailsId}`
+      );
+      expect(adrTc3DetailsResultSet.rows.length).toEqual(1);
+      expect(adrTc3DetailsResultSet.rows[0].adr_details_id).toEqual(
+        adrDetailsId
+      );
+      expect(adrTc3DetailsResultSet.rows[0].tc3Type).toEqual("intermediate");
+      expect(adrTc3DetailsResultSet.rows[0].tc3PeriodicNumber).toEqual("98765");
+      expect(
+        (adrTc3DetailsResultSet.rows[0]
+          .tc3PeriodicExpiryDate as Date).toUTCString()
+      ).toEqual("Sat, 01 Jun 2024 00:00:00 GMT");
+
+      // adr_additional_examiner_notes
+      const adrAdditionalExaminerNotesResultSet = await executeSql(
+        `SELECT \`adr_details_id\`,
+                \`note\`,
+                \`createdAtDate\`,
+                \`lastUpdatedBy\`
+             FROM \`adr_additional_examiner_notes\`
+             WHERE \`adr_additional_examiner_notes\`.\`adr_details_id\` = ${adrDetailsId}`
+      );
+      expect(adrAdditionalExaminerNotesResultSet.rows.length).toEqual(1);
+      expect(
+        adrAdditionalExaminerNotesResultSet.rows[0].adr_details_id
+      ).toEqual(adrDetailsId);
+      expect(adrAdditionalExaminerNotesResultSet.rows[0].note).toEqual(
+        "additionalExaminerNotes_note_1"
+      );
+      expect(
+        (adrAdditionalExaminerNotesResultSet.rows[0]
+          .createdAtDate as Date).toUTCString()
+      ).toEqual("Tue, 30 May 2023 00:00:00 GMT");
+      expect(adrAdditionalExaminerNotesResultSet.rows[0].lastUpdatedBy).toEqual(
+        "additionalExaminerNotes_lastUpdatedBy_1"
+      );
+
+      // adr_additional_notes_number
+      const adrAdditionalNotesNumberResultSet = await executeSql(
+        `SELECT \`adr_details_id\`,
+                \`number\`
+             FROM \`adr_additional_notes_number\`
+             WHERE \`adr_additional_notes_number\`.\`adr_details_id\` = ${adrDetailsId}`
+      );
+      expect(adrAdditionalNotesNumberResultSet.rows.length).toEqual(2);
+      expect(adrAdditionalNotesNumberResultSet.rows[0].adr_details_id).toEqual(
+        adrDetailsId
+      );
+      expect(adrAdditionalNotesNumberResultSet.rows[0].number).toEqual("1");
+      expect(adrAdditionalNotesNumberResultSet.rows[1].number).toEqual("T1B");
     });
 
     describe("when adding a new vehicle and changing VRM to a new value, VRM should change on existing vehicle.", () => {
       it("A new vehicle is present", async () => {
         // arrange - create a record so we can later query for it and assert for is existence
         const techRecordDocumentJsonNew = JSON.parse(
-          JSON.stringify(techRecordDocumentJson)
+          JSON.stringify(techRecordDocumentJsonWithADR)
         );
         techRecordDocumentJsonNew.systemNumber = { S: "SYSTEM-NUMBER-2" };
         techRecordDocumentJsonNew.vin = { S: "VIN2" };
@@ -642,7 +888,7 @@ export const techRecordDocumentConversion = () =>
       it("VRM has changed", async () => {
         // arrange - create a record with existing pair of (SystemNumber, VIN) and new VRM so we can later query for it and assert its value
         const techRecordDocumentJsonNew = JSON.parse(
-          JSON.stringify(techRecordDocumentJson)
+          JSON.stringify(techRecordDocumentJsonWithADR)
         );
         techRecordDocumentJsonNew.systemNumber = { S: "SYSTEM-NUMBER-2" };
         techRecordDocumentJsonNew.vin = { S: "VIN2" };
