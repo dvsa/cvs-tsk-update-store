@@ -364,6 +364,17 @@ export const TEST_RESULT_TABLE: TableDetails = {
   ],
 };
 
+export const ADR_PASS_CERTIFICATE_DETAILS: TableDetails = {
+  tableName: "adr_PassCertificateDetails",
+  columnNames: [
+    "technical_record_id",
+    "createdByName",
+    "certificateType",
+    "generatedTimestamp",
+    "certificateId",
+  ],
+};
+
 export const ADR_ADDITIONAL_EXAMINER_NOTES_TABLE: TableDetails = {
   tableName: "adr_additional_examiner_notes",
   columnNames: ["adr_details_id", "note", "createdAtDate", "lastUpdatedBy"],
@@ -417,7 +428,6 @@ export const ADR_DETAILS_TABLE: TableDetails = {
     "productList",
     "m145Statement",
     // "newCertificateRequested",
-
   ],
 };
 
@@ -491,5 +501,6 @@ export const allTables = (): TableDetails[] => {
     ADR_PRODUCTLISTUNNO_LIST_TABLE,
     ADR_PRODUCTLISTUNNO_TABLE,
     ADR_TC3DETAILS_TABLE,
+    ADR_PASS_CERTIFICATE_DETAILS,
   ];
 };

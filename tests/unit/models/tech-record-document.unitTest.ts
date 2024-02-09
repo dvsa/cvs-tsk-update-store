@@ -7,7 +7,7 @@ import { default as techRecordDocumentJson } from "../../resources/dynamodb-imag
 import { castToImageShape } from "../../utils";
 
 describe("parseTechRecordDocument()", () => {
-  it("should successfully parse a DynamoDB image with ADR into a TechRecordDocument", () => {
+  it("should successfully parse a DynamoDB image with ADR into a TechRecordDocument", async () => {
     const image = DynamoDbImage.parse(castToImageShape(techRecordDocumentJson));
 
     const techRecordDocument: TechRecordDocument = parseTechRecordDocument(
@@ -114,11 +114,11 @@ describe("parseTechRecordDocument()", () => {
     expect(techRecordDocument.techRecord![0].adrDetails?.vehicleDetails?.type).toEqual("Artic tractor");
     expect(techRecordDocument.techRecord![0].adrDetails?.vehicleDetails?.approvalDate).toEqual("2023-06-12");
     
-    expect(techRecordDocument.techRecord![0].adrDetails?.weight).toEqual(6789);
+    expect(techRecordDocument.techRecord![0].adrDetails?.weight).toEqual(7.50);
 
   });
 
-  it("should successfully parse a DynamoDB image, with ADR, with no authIntoService, into a TechRecordDocument", () => {
+  it("should successfully parse a DynamoDB image, with ADR, with no authIntoService, into a TechRecordDocument", async () => {
     // @ts-ignore
     delete techRecordDocumentJson.techRecord.L[0].M.authIntoService;
     const image = DynamoDbImage.parse(castToImageShape(techRecordDocumentJson));
@@ -225,7 +225,7 @@ describe("parseTechRecordDocument()", () => {
     expect(techRecordDocument.techRecord![0].adrDetails?.vehicleDetails?.type).toEqual("Artic tractor");
     expect(techRecordDocument.techRecord![0].adrDetails?.vehicleDetails?.approvalDate).toEqual("2023-06-12");
     
-    expect(techRecordDocument.techRecord![0].adrDetails?.weight).toEqual(6789);
+    expect(techRecordDocument.techRecord![0].adrDetails?.weight).toEqual(7.50);
     
   });
 });

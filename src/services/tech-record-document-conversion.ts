@@ -28,6 +28,7 @@ import {
   ADR_PRODUCTLISTUNNO_TABLE,
   ADR_TC3DETAILS_TABLE,
   ADR_TANK_DOCUMENTS_TABLE,
+  ADR_PASS_CERTIFICATE_DETAILS,
 } from "./table-details";
 import {
   deleteBasedOnWhereIn,
@@ -229,9 +230,15 @@ const upsertTechRecords = async (
         techRecordId,
         techRecord
       );
+      await upsertAdrPassCertificateDetails(
+        techRecordConnection,
+        techRecordId,
+        techRecord
+      );
 
       // upsert adr-details
       if (techRecord.adrDetails) {
+        debugLog(`upsertTechRecords: Upserting ADR Details...`);
         const adrResponse = await executeFullUpsert(
           ADR_DETAILS_TABLE,
           [
@@ -278,6 +285,10 @@ const upsertTechRecords = async (
 
         const adrDetailsId = adrResponse.rows.insertId;
 
+        debugLog(
+          `upsertTechRecords: Upserted ADR Details (ID: ${adrDetailsId})`
+        );
+
         await upsertAdrMemosApply(
           techRecordConnection,
           adrDetailsId,
@@ -313,6 +324,8 @@ const upsertTechRecords = async (
         //   adrDetailsId,
         //   techRecord
         // );
+
+        debugLog(`upsertTechRecords: Upsert ADR Details END`);
       }
 
       await techRecordConnection.commit();
@@ -760,11 +773,13 @@ const upsertAdrDangerousGoodsList = async (
   connection: Connection,
   dangerousGoodsName: string
 ): Promise<number> => {
-  debugLog(`upsertTechRecords: Selecting/Upserting adr_dangerous_goods_list...`);
+  debugLog(
+    `upsertTechRecords: Selecting/Upserting adr_dangerous_goods_list...`
+  );
 
   const response = await executePartialUpsertIfNotExistsWithCondition(
     ADR_DANGEROUS_GOODS_LIST_TABLE,
-    {name: dangerousGoodsName},
+    { name: dangerousGoodsName },
     connection
   );
 
@@ -814,7 +829,7 @@ const upsertAdrProductListUnNoList = async (
 
   const response = await executePartialUpsertIfNotExistsWithCondition(
     ADR_PRODUCTLISTUNNO_LIST_TABLE,
-    {name: productListUnNo},
+    { name: productListUnNo },
     connection
   );
 
@@ -963,6 +978,37 @@ const upsertAdrTankDocuments = async (
 
       debugLog(
         `upsertTechRecords: Upserted ADR tank documents (adr-details-id: ${adrDetailsId}, ID: ${response.rows.insertId})`
+      );
+    }
+  }
+  return;
+};
+
+const upsertAdrPassCertificateDetails = async (
+  connection: Connection,
+  techRecordId: string,
+  techRecord: TechRecord
+): Promise<void> => {
+  if (techRecord.adrCertificateDetails) {
+    debugLog(
+      `upsertTechRecords: Upserting ADR Pass Certificate Details (tech-record-id: ${techRecordId})...`
+    );
+
+    for (const adrCertificateDetails of techRecord.adrCertificateDetails) {
+      const response = await executeFullUpsert(
+        ADR_PASS_CERTIFICATE_DETAILS,
+        [
+          techRecordId,
+          adrCertificateDetails.createdByName,
+          adrCertificateDetails.certificateType,
+          adrCertificateDetails.generatedTimestamp,
+          adrCertificateDetails.certificateId,
+        ],
+        connection
+      );
+
+      debugLog(
+        `upsertTechRecords: Upserted ADR Pass Certificate Details (tech-record-id: ${techRecordId}, ID: ${response.rows.insertId})`
       );
     }
   }

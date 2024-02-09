@@ -15,7 +15,10 @@ import { parsePlates, Plates } from "./plates";
 import { BodyType, parseBodyType } from "./body-type";
 import { Dimensions, parseDimensions } from "./dimensions";
 import { AdrDetails, parseAdrDetails } from "./adr-details";
-import { AdrCertificateDetails, parseAdrCertificateDetails } from "./adr-certificate-details";
+import {
+  AdrPassCertificateDetails,
+  parseAdrCertificateDetails,
+} from "./adr-certificate-details";
 import { parseVehicleClass, VehicleClass } from "./vehicle-class";
 import { Brakes, parseBrakes } from "./brakes";
 import { Axles, parseAxles } from "./axles";
@@ -115,7 +118,7 @@ export interface TechRecord {
   noOfAxles?: number;
   brakeCode?: string;
   adrDetails?: AdrDetails;
-  adrCertificateDetails?: AdrCertificateDetails;
+  adrCertificateDetails?: AdrPassCertificateDetails;
   createdByName?: string;
   createdById?: string;
   lastUpdatedByName?: string;
@@ -273,7 +276,9 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
     noOfAxles: image.getNumber("noOfAxles"),
     brakeCode: image.getString("brakeCode"),
     adrDetails: parseAdrDetails(image.getMap("adrDetails")),
-    adrCertificateDetails: parseAdrCertificateDetails(image.getMap("certificateDetails")),
+    adrCertificateDetails: parseAdrCertificateDetails(
+      image.getList("adrPassCertificateDetails")
+    ),
     createdByName: image.getString("createdByName"),
     createdById: image.getString("createdById"),
     lastUpdatedByName: image.getString("lastUpdatedByName"),
