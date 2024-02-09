@@ -645,7 +645,7 @@ export const techRecordDocumentConversion = () =>
         "brakeDeclarationIssuer_1"
       );
       expect(adrDetailsResultSet.rows[0].brakeEndurance).toEqual(0);
-      expect(adrDetailsResultSet.rows[0].weight).toEqual(6789);
+      expect(adrDetailsResultSet.rows[0].weight).toEqual("7.50");
       expect(adrDetailsResultSet.rows[0].compatibilityGroupJ).toEqual("I");
       expect(adrDetailsResultSet.rows[0].applicantDetailsName).toEqual(
         "applicantDetails_Name"
