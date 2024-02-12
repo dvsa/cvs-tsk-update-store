@@ -25,6 +25,26 @@
     "L": [
       {
         "M": {
+          "adrPassCertificateDetails": {
+            "L": [
+              {
+                "M": {
+                  "certificateId": {
+                    "S": "CERTIFICATE-ID-1"
+                  },
+                  "createdByName": {
+                    "S": "CREATED-BY-NAME-01"
+                  },
+                  "certificateType": {
+                    "S": "PASS"
+                  },
+                  "generatedTimestamp": {
+                    "S": "2023-04-01T01:49:00.055Z"
+                  }
+                }
+              }
+            ]
+          },
           "adrDetails": {
             "M": {
               "additionalExaminerNotes": {
