@@ -53,6 +53,11 @@ describe("parseTechRecordDocument()", () => {
     );
     expect(techRecordDocument.techRecord![0].axles![0].axleNumber).toEqual(1);
 
+    expect(techRecordDocument.techRecord![0].adrPassCertificateDetails![0].certificateId).toEqual("CERTIFICATE-ID-1");
+    expect(techRecordDocument.techRecord![0].adrPassCertificateDetails![0].createdByName).toEqual("CREATED-BY-NAME-01");
+    expect(techRecordDocument.techRecord![0].adrPassCertificateDetails![0].certificateType).toEqual("PASS");
+    expect(techRecordDocument.techRecord![0].adrPassCertificateDetails![0].generatedTimestamp).toEqual("2023-04-01 01:49:00.055");
+    
     // ADR Details attributes
     expect(techRecordDocument.techRecord![0].adrDetails?.additionalExaminerNotes![0].note).toEqual("additionalExaminerNotes_note_1");
     expect(techRecordDocument.techRecord![0].adrDetails?.additionalExaminerNotes![0].createdAtDate).toEqual("2023-05-30");
@@ -164,6 +169,11 @@ describe("parseTechRecordDocument()", () => {
     );
     expect(techRecordDocument.techRecord![0].axles![0].axleNumber).toEqual(1);
 
+    expect(techRecordDocument.techRecord![0].adrPassCertificateDetails![0].certificateId).toEqual("CERTIFICATE-ID-1");
+    expect(techRecordDocument.techRecord![0].adrPassCertificateDetails![0].createdByName).toEqual("CREATED-BY-NAME-01");
+    expect(techRecordDocument.techRecord![0].adrPassCertificateDetails![0].certificateType).toEqual("PASS");
+    expect(techRecordDocument.techRecord![0].adrPassCertificateDetails![0].generatedTimestamp).toEqual("2023-04-01 01:49:00.055");
+    
     // ADR Details attributes
     expect(techRecordDocument.techRecord![0].adrDetails?.additionalExaminerNotes![0].note).toEqual("additionalExaminerNotes_note_1");
     expect(techRecordDocument.techRecord![0].adrDetails?.additionalExaminerNotes![0].createdAtDate).toEqual("2023-05-30");
