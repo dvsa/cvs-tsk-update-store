@@ -33,7 +33,7 @@ export const parseAdrCertificateDetails = (
       certificateType: adrPassCertificateDetailsItemImage.getString(
         "certificateType"
       ) as AdrPassCertificateTypeEnum,
-      generatedTimestamp: adrPassCertificateDetailsItemImage.getString(
+      generatedTimestamp: adrPassCertificateDetailsItemImage.getDate(
         "generatedTimestamp"
       ),
       certificateId: adrPassCertificateDetailsItemImage.getString(
