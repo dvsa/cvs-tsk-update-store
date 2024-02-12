@@ -989,20 +989,20 @@ const upsertAdrPassCertificateDetails = async (
   techRecordId: string,
   techRecord: TechRecord
 ): Promise<void> => {
-  if (techRecord.adrCertificateDetails) {
+  if (techRecord.adrPassCertificateDetails) {
     debugLog(
       `upsertTechRecords: Upserting ADR Pass Certificate Details (tech-record-id: ${techRecordId})...`
     );
 
-    for (const adrCertificateDetails of techRecord.adrCertificateDetails) {
+    for (const adrPassCertificateDetails of techRecord.adrPassCertificateDetails) {
       const response = await executeFullUpsert(
         ADR_PASS_CERTIFICATE_DETAILS,
         [
           techRecordId,
-          adrCertificateDetails.createdByName,
-          adrCertificateDetails.certificateType,
-          adrCertificateDetails.generatedTimestamp,
-          adrCertificateDetails.certificateId,
+          adrPassCertificateDetails.createdByName,
+          adrPassCertificateDetails.certificateType,
+          adrPassCertificateDetails.generatedTimestamp,
+          adrPassCertificateDetails.certificateId,
         ],
         connection
       );
