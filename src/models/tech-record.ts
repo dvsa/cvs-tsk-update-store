@@ -118,7 +118,7 @@ export interface TechRecord {
   noOfAxles?: number;
   brakeCode?: string;
   adrDetails?: AdrDetails;
-  adrCertificateDetails?: AdrPassCertificateDetails;
+  adrPassCertificateDetails?: AdrPassCertificateDetails;
   createdByName?: string;
   createdById?: string;
   lastUpdatedByName?: string;
@@ -276,7 +276,7 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
     noOfAxles: image.getNumber("noOfAxles"),
     brakeCode: image.getString("brakeCode"),
     adrDetails: parseAdrDetails(image.getMap("adrDetails")),
-    adrCertificateDetails: parseAdrCertificateDetails(
+    adrPassCertificateDetails: parseAdrCertificateDetails(
       image.getList("adrPassCertificateDetails")
     ),
     createdByName: image.getString("createdByName"),
