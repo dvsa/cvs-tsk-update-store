@@ -1206,7 +1206,7 @@ export const techRecordDocumentConversion = () =>
           S: "different_tankManufacturer",
         };
         // update missing attribute to NULL
-        techRecordDocumentJsonNew.techRecord.L[0].M.adrDetailsM.tank.M.tankStatement.M.productListUnNo = { NULL: true };
+        techRecordDocumentJsonNew.techRecord.L[0].M.adrDetails.M.tank.M.tankStatement.M.productListUnNo = { NULL: true };
 
         const event = {
           Records: [
