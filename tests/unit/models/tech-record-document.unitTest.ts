@@ -108,13 +108,13 @@ describe("parseTechRecordDocument()", () => {
     expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tc3Details![0].tc3PeriodicNumber).toEqual("98765");
     expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tc3Details![0].tc3PeriodicExpiryDate).toEqual("2024-06-01");
     
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankStatement?.select).toEqual("Product list");
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankStatement?.statement).toEqual("statement_1");
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankStatement?.productListRefNo).toEqual("123456");
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankStatement?.productList).toEqual("productList_1");
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankStatement?.select).toEqual("Product list");
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankStatement?.statement).toEqual("statement_1");
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankStatement?.productListRefNo).toEqual("123456");
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankStatement?.productList).toEqual("productList_1");
     
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankStatement?.productListUnNo![0]).toEqual("123123");
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankStatement?.productListUnNo![1]).toEqual("987987");
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankStatement?.productListUnNo![0]).toEqual("123123");
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankStatement?.productListUnNo![1]).toEqual("987987");
     
     expect(techRecordDocument.techRecord![0].adrDetails?.vehicleDetails?.type).toEqual("Artic tractor");
     expect(techRecordDocument.techRecord![0].adrDetails?.vehicleDetails?.approvalDate).toEqual("2023-06-12");
@@ -224,13 +224,13 @@ describe("parseTechRecordDocument()", () => {
     expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tc3Details![0].tc3PeriodicNumber).toEqual("98765");
     expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tc3Details![0].tc3PeriodicExpiryDate).toEqual("2024-06-01");
     
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankStatement?.select).toEqual("Product list");
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankStatement?.statement).toEqual("statement_1");
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankStatement?.productListRefNo).toEqual("123456");
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankStatement?.productList).toEqual("productList_1");
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankStatement?.select).toEqual("Product list");
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankStatement?.statement).toEqual("statement_1");
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankStatement?.productListRefNo).toEqual("123456");
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankStatement?.productList).toEqual("productList_1");
     
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankStatement?.productListUnNo![0]).toEqual("123123");
-    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankStatement?.productListUnNo![1]).toEqual("987987");
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankStatement?.productListUnNo![0]).toEqual("123123");
+    expect(techRecordDocument.techRecord![0].adrDetails?.tank?.tankDetails?.tankStatement?.productListUnNo![1]).toEqual("987987");
     
     expect(techRecordDocument.techRecord![0].adrDetails?.vehicleDetails?.type).toEqual("Artic tractor");
     expect(techRecordDocument.techRecord![0].adrDetails?.vehicleDetails?.approvalDate).toEqual("2023-06-12");

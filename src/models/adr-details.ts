@@ -120,7 +120,6 @@ export interface AdditionalNotes {
 
 export interface Tank {
   tankDetails?: TankDetails;
-  tankStatement?: TankStatement;
 }
 
 export interface TankDetails {
@@ -132,6 +131,7 @@ export interface TankDetails {
   tankTypeAppNo?: string;
   tc2Details?: Tc2Details;
   tc3Details?: Tc3Details;
+  tankStatement?: TankStatement;
 }
 
 export interface TankStatement {
@@ -148,7 +148,6 @@ export interface Tc2Details {
   tc2IntermediateApprovalNo?: string;
   tc2IntermediateExpiryDate?: string;
 }
-
 
 export type Tc3Details = Tc3DetailsItem[];
 
@@ -170,7 +169,9 @@ export const parseAdrDetails = (
     "additionalNotes"
   )!;
   const additionalNotes: AdditionalNotes = {
-    number: parseStringArray(additionalNotesImage.getList("number")) as additionalNotesNumberEnum[],
+    number: parseStringArray(
+      additionalNotesImage.getList("number")!
+    ) as additionalNotesNumberEnum[],
     // guidanceNotes: parseStringArray(
     //   additionalNotesImage.getList("guidanceNotes")
     // ) as additionalNotesguidanceNotesEnum[],
@@ -180,19 +181,19 @@ export const parseAdrDetails = (
     "applicantDetails"
   )!;
   const applicantDetails: ApplicantDetails = {
-    name: applicantDetailsImage.getString("name"),
-    street: applicantDetailsImage.getString("street"),
-    town: applicantDetailsImage.getString("town"),
-    city: applicantDetailsImage.getString("city"),
-    postcode: applicantDetailsImage.getString("postcode"),
+    name: applicantDetailsImage.getString("name")!,
+    street: applicantDetailsImage.getString("street")!,
+    town: applicantDetailsImage.getString("town")!,
+    city: applicantDetailsImage.getString("city")!,
+    postcode: applicantDetailsImage.getString("postcode")!,
   };
 
   const vehicleDetailsImage: DynamoDbImage = adrDetails.getMap(
     "vehicleDetails"
   )!;
   const vehicleDetails: VehicleDetails = {
-    type: vehicleDetailsImage.getString("type") as VehicleDetailsTypeEnum,
-    approvalDate: vehicleDetailsImage.getString("approvalDate"),
+    type: vehicleDetailsImage.getString("type")! as VehicleDetailsTypeEnum,
+    approvalDate: vehicleDetailsImage.getString("approvalDate")!,
   };
 
   const tankImage: DynamoDbImage = adrDetails.getMap("tank")!;
@@ -201,13 +202,13 @@ export const parseAdrDetails = (
 
   const tc2DetailsImage: DynamoDbImage = tankDetailsImage.getMap("tc2Details")!;
   const tc2Details: Tc2Details = {
-    tc2Type: tc2DetailsImage.getString("tc2Type") as Tc2TypeEnum,
+    tc2Type: tc2DetailsImage.getString("tc2Type")! as Tc2TypeEnum,
     tc2IntermediateApprovalNo: tc2DetailsImage.getString(
       "tc2IntermediateApprovalNo"
-    ),
+    )!,
     tc2IntermediateExpiryDate: tc2DetailsImage.getString(
       "tc2IntermediateExpiryDate"
-    ),
+    )!,
   };
 
   const tc3DetailsImage: DynamoDbImage = tankDetailsImage.getList(
@@ -215,86 +216,108 @@ export const parseAdrDetails = (
   )!;
   const tc3Details: Tc3Details = [];
 
-  for (const key of tc3DetailsImage.getKeys()) {
-    const tc3DetailsItemImage = tc3DetailsImage.getMap(key)!;
-    tc3Details.push({
-      tc3Type: tc3DetailsItemImage.getString("tc3Type") as Tc3TypeEnum,
-      tc3PeriodicNumber: tc3DetailsItemImage.getString("tc3PeriodicNumber"),
-      tc3PeriodicExpiryDate: tc3DetailsItemImage.getString(
-        "tc3PeriodicExpiryDate"
-      ),
-    });
+  if (tc3DetailsImage) {
+    for (const key of tc3DetailsImage.getKeys()!) {
+      const tc3DetailsItemImage = tc3DetailsImage.getMap(key)!;
+      tc3Details.push({
+        tc3Type: tc3DetailsItemImage.getString("tc3Type")! as Tc3TypeEnum,
+        tc3PeriodicNumber: tc3DetailsItemImage.getString("tc3PeriodicNumber")!,
+        tc3PeriodicExpiryDate: tc3DetailsItemImage.getString(
+          "tc3PeriodicExpiryDate"
+        )!,
+      });
+    }
+  }
+
+  const tankStatementImage: DynamoDbImage = tankDetailsImage.getMap(
+    "tankStatement"
+  )!;
+  const tankStatement: TankStatement = {};
+
+  if (tankStatementImage) {
+    tankStatement.substancesPermitted = tankStatementImage.getString(
+      "substancesPermitted"
+    )! as substancesPermittedEnum;
+    tankStatement.select = tankStatementImage.getString(
+      "select"
+    )! as tankStatementSelectEnum;
+    tankStatement.statement = tankStatementImage.getString("statement")!;
+    tankStatement.productListRefNo = tankStatementImage.getString(
+      "productListRefNo"
+    )!;
+    tankStatement.productListUnNo = parseStringArray(
+      tankStatementImage.getList("productListUnNo")!
+    );
+    tankStatement.productList = tankStatementImage.getString("productList")!;
   }
 
   const tankDetails: TankDetails = {
-    tankManufacturer: tankDetailsImage.getString("tankManufacturer"),
-    yearOfManufacture: tankDetailsImage.getNumber("yearOfManufacture"),
-    tankCode: tankDetailsImage.getString("tankCode"),
-    specialProvisions: tankDetailsImage.getString("specialProvisions"),
+    tankManufacturer: tankDetailsImage.getString("tankManufacturer")!,
+    yearOfManufacture: tankDetailsImage.getNumber("yearOfManufacture")!,
+    tankCode: tankDetailsImage.getString("tankCode")!,
+    specialProvisions: tankDetailsImage.getString("specialProvisions")!,
     tankManufacturerSerialNo: tankDetailsImage.getString(
       "tankManufacturerSerialNo"
-    ),
-    tankTypeAppNo: tankDetailsImage.getString("tankTypeAppNo"),
+    )!,
+    tankTypeAppNo: tankDetailsImage.getString("tankTypeAppNo")!,
     tc2Details,
     tc3Details,
-  };
-
-  const tankStatementImage: DynamoDbImage = tankImage.getMap("tankStatement")!;
-  const tankStatement: TankStatement = {
-    substancesPermitted: tankStatementImage.getString("substancesPermitted") as substancesPermittedEnum,
-    select: tankStatementImage.getString("select") as tankStatementSelectEnum,
-    statement: tankStatementImage.getString("statement"),
-    productListRefNo: tankStatementImage.getString("productListRefNo"),
-    productListUnNo: parseStringArray(
-      tankStatementImage.getList("productListUnNo")
-    ),
-    productList: tankStatementImage.getString("productList"),
+    tankStatement,
   };
 
   const tank: Tank = {
     tankDetails,
-    tankStatement,
   };
-
 
   const additionalExaminerNotesImage: DynamoDbImage = adrDetails.getList(
     "additionalExaminerNotes"
   )!;
   const additionalExaminerNotes: AdditionalExaminerNotes = [];
 
-  for (const key of additionalExaminerNotesImage.getKeys()) {
-    const additionalExaminerNotesItemImage = additionalExaminerNotesImage.getMap(key)!;
-    additionalExaminerNotes.push({
-      note: additionalExaminerNotesItemImage.getString("note"),
-      createdAtDate: additionalExaminerNotesItemImage.getString("createdAtDate"),
-      lastUpdatedBy: additionalExaminerNotesItemImage.getString("lastUpdatedBy"),
-    });
+  if (additionalExaminerNotesImage) {
+    for (const key of additionalExaminerNotesImage.getKeys()) {
+      const additionalExaminerNotesItemImage = additionalExaminerNotesImage.getMap(
+        key
+      )!;
+      additionalExaminerNotes.push({
+        note: additionalExaminerNotesItemImage.getString("note")!,
+        createdAtDate: additionalExaminerNotesItemImage.getString(
+          "createdAtDate"
+        )!,
+        lastUpdatedBy: additionalExaminerNotesItemImage.getString(
+          "lastUpdatedBy"
+        )!,
+      });
+    }
   }
-
 
   return {
     vehicleDetails,
-    listStatementApplicable: adrDetails.getBoolean("listStatementApplicable"),
-    batteryListNumber: adrDetails.getString("batteryListNumber"),
-    declarationsSeen: adrDetails.getBoolean("declarationsSeen"),
-    brakeDeclarationsSeen: adrDetails.getBoolean("brakeDeclarationsSeen"),
-    brakeDeclarationIssuer: adrDetails.getString("brakeDeclarationIssuer"),
-    brakeEndurance: adrDetails.getBoolean("brakeEndurance"),
-    weight: adrDetails.getNumber("weight"),
-    newCertificateRequested: adrDetails.getBoolean("newCertificateRequested"),
-    compatibilityGroupJ: adrDetails.getString("compatibilityGroupJ") as compatibilityGroupJEnum,
-    documents: parseStringArray(adrDetails.getList("documents")),
+    listStatementApplicable: adrDetails.getBoolean("listStatementApplicable")!,
+    batteryListNumber: adrDetails.getString("batteryListNumber")!,
+    declarationsSeen: adrDetails.getBoolean("declarationsSeen")!,
+    brakeDeclarationsSeen: adrDetails.getBoolean("brakeDeclarationsSeen")!,
+    brakeDeclarationIssuer: adrDetails.getString("brakeDeclarationIssuer")!,
+    brakeEndurance: adrDetails.getBoolean("brakeEndurance")!,
+    weight: adrDetails.getNumber("weight")!,
+    newCertificateRequested: adrDetails.getBoolean("newCertificateRequested")!,
+    compatibilityGroupJ: adrDetails.getString(
+      "compatibilityGroupJ"
+    )! as compatibilityGroupJEnum,
+    documents: parseStringArray(adrDetails.getList("documents"))!,
     permittedDangerousGoods: parseStringArray(
-      adrDetails.getList("permittedDangerousGoods")
+      adrDetails.getList("permittedDangerousGoods")!
     ) as permittedDangerousGoodsEnum[],
     additionalExaminerNotes,
     applicantDetails,
-    dangerousGoods: adrDetails.getBoolean("dangerousGoods"),
-    memosApply: parseStringArray(adrDetails.getList("memosApply")) as memosApplyEnum[],
-    m145Statement: adrDetails.getBoolean("m145Statement"),
+    dangerousGoods: adrDetails.getBoolean("dangerousGoods")!,
+    memosApply: parseStringArray(
+      adrDetails.getList("memosApply")!
+    ) as memosApplyEnum[],
+    m145Statement: adrDetails.getBoolean("m145Statement")!,
     additionalNotes,
-    adrTypeApprovalNo: adrDetails.getString("adrTypeApprovalNo"),
-    adrCertificateNotes: adrDetails.getString("adrCertificateNotes"),
+    adrTypeApprovalNo: adrDetails.getString("adrTypeApprovalNo")!,
+    adrCertificateNotes: adrDetails.getString("adrCertificateNotes")!,
     tank,
   };
 };
