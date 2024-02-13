@@ -272,11 +272,11 @@ const upsertTechRecords = async (
               ?.tc2IntermediateApprovalNo,
             techRecord.adrDetails.tank?.tankDetails?.tc2Details
               ?.tc2IntermediateExpiryDate,
-            techRecord.adrDetails.tank?.tankStatement?.substancesPermitted,
-            // techRecord.adrDetails.tank?.tankStatement?.select,
-            techRecord.adrDetails.tank?.tankStatement?.statement,
-            techRecord.adrDetails.tank?.tankStatement?.productListRefNo,
-            techRecord.adrDetails.tank?.tankStatement?.productList,
+            techRecord.adrDetails.tank?.tankDetails?.tankStatement?.substancesPermitted,
+            // techRecord.adrDetails.tank?.tankDetails?.tankStatement?.select,
+            techRecord.adrDetails.tank?.tankDetails?.tankStatement?.statement,
+            techRecord.adrDetails.tank?.tankDetails?.tankStatement?.productListRefNo,
+            techRecord.adrDetails.tank?.tankDetails?.tankStatement?.productList,
             techRecord.adrDetails.m145Statement,
             // techRecord.adrDetails.newCertificateRequested,
           ],
@@ -845,12 +845,12 @@ const upsertAdrProductListUnNo = async (
   adrDetailsId: string,
   techRecord: TechRecord
 ): Promise<void> => {
-  if (techRecord.adrDetails?.tank?.tankStatement?.productListUnNo) {
+  if (techRecord.adrDetails?.tank?.tankDetails?.tankStatement?.productListUnNo) {
     debugLog(
       `upsertTechRecords: Upserting ADR tankStatement productListUnNo (adr-details-id: ${adrDetailsId})...`
     );
 
-    for (const productListUnNo of techRecord.adrDetails?.tank?.tankStatement
+    for (const productListUnNo of techRecord.adrDetails?.tank?.tankDetails?.tankStatement
       ?.productListUnNo) {
       const productListUnNoId = await upsertAdrProductListUnNoList(
         connection,
