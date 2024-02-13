@@ -1106,7 +1106,7 @@ export const techRecordDocumentConversion = () =>
 
         // productListUnNo removed from payload
         delete techRecordDocumentJsonNew.techRecord.L[0].M.adrDetails.M
-          .tank.M.tankStatement.M.productListUnNo;
+          .tank.M.tankDetails.M.tankStatement.M.productListUnNo;
 
         const event = {
           Records: [
@@ -1206,7 +1206,7 @@ export const techRecordDocumentConversion = () =>
           S: "different_tankManufacturer",
         };
         // update missing attribute to NULL
-        techRecordDocumentJsonNew.techRecord.L[0].M.adrDetails.M.tank.M.tankStatement.M.productListUnNo = { NULL: true };
+        techRecordDocumentJsonNew.techRecord.L[0].M.adrDetails.M.tank.M.tankDetails.M.tankStatement.M.productListUnNo = { NULL: true };
 
         const event = {
           Records: [
