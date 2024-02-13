@@ -68,8 +68,12 @@
                 "M": {
                   "number": {
                     "L": [
-                      {"S": "1"},
-                      {"S": "T1B"}
+                      {
+                        "S": "1"
+                      },
+                      {
+                        "S": "T1B"
+                      }
                     ]
                   }
                 }
@@ -127,7 +131,7 @@
                   },
                   {
                     "S": "documents_2"
-                  }, 
+                  },
                   {
                     "S": "documents_3"
                   }
@@ -142,7 +146,6 @@
               "newCertificateRequested": {
                 "BOOL": false
               },
-
               "memosApply": {
                 "L": [
                   {
@@ -157,7 +160,7 @@
                   },
                   {
                     "S": "Carbon Disulphide"
-                  }, 
+                  },
                   {
                     "S": "Hydrogen"
                   }
@@ -214,41 +217,41 @@
                             }
                           }
                         ]
-                      }
-                    }
-                  },
-                  "tankStatement": {
-                    "M": {
-                      "select":{
-                        "S": "Product list"
                       },
-                      "substancesPermitted": {
-                        "S": "Substances permitted under the tank code and any special provisions specified in 9 may be carried"
-                      },
-                      "statement": {
-                        "S": "statement_1"
-                      },
-                      "productListRefNo": {
-                        "S": "123456"
-                      },
-                      "productListUnNo": {
-                        "L": [
-                          {
-                            "S": "123123"
+                      "tankStatement": {
+                        "M": {
+                          "select": {
+                            "S": "Product list"
                           },
-                          {
-                            "S": "987987"
+                          "substancesPermitted": {
+                            "S": "Substances permitted under the tank code and any special provisions specified in 9 may be carried"
                           },
-                          {
-                            "S": "135790"
+                          "statement": {
+                            "S": "statement_1"
+                          },
+                          "productListRefNo": {
+                            "S": "123456"
+                          },
+                          "productListUnNo": {
+                            "L": [
+                              {
+                                "S": "123123"
+                              },
+                              {
+                                "S": "987987"
+                              },
+                              {
+                                "S": "135790"
+                              }
+                            ]
+                          },
+                          "productList": {
+                            "S": "productList_1"
                           }
-                        ]
-                      },
-                      "productList": {
-                        "S": "productList_1"
+                        }
                       }
                     }
-                  } 
+                  }
                 }
               },
               "vehicleDetails": {
@@ -265,7 +268,7 @@
                 "N": "7.50"
               }
             }
-          },  
+          },
           "recordCompleteness": {
             "S": "88888888"
           },
