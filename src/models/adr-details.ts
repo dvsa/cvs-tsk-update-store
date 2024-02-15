@@ -168,106 +168,135 @@ export const parseAdrDetails = (
   const additionalNotesImage: DynamoDbImage = adrDetails.getMap(
     "additionalNotes"
   )!;
-  const additionalNotes: AdditionalNotes = {
-    number: parseStringArray(
+  const additionalNotes: AdditionalNotes = {};
+  if (additionalNotesImage) {
+    additionalNotes.number = parseStringArray(
       additionalNotesImage.getList("number")!
-    ) as additionalNotesNumberEnum[],
+    ) as additionalNotesNumberEnum[];
     // guidanceNotes: parseStringArray(
     //   additionalNotesImage.getList("guidanceNotes")
     // ) as additionalNotesguidanceNotesEnum[],
-  };
+  }
 
   const applicantDetailsImage: DynamoDbImage = adrDetails.getMap(
     "applicantDetails"
   )!;
-  const applicantDetails: ApplicantDetails = {
-    name: applicantDetailsImage.getString("name")!,
-    street: applicantDetailsImage.getString("street")!,
-    town: applicantDetailsImage.getString("town")!,
-    city: applicantDetailsImage.getString("city")!,
-    postcode: applicantDetailsImage.getString("postcode")!,
-  };
+
+  const applicantDetails: ApplicantDetails = {};
+  if (applicantDetailsImage) {
+    applicantDetails.name = applicantDetailsImage.getString("name")!;
+    applicantDetails.street = applicantDetailsImage.getString("street")!;
+    applicantDetails.town = applicantDetailsImage.getString("town")!;
+    applicantDetails.city = applicantDetailsImage.getString("city")!;
+    applicantDetails.postcode = applicantDetailsImage.getString("postcode")!;
+  }
 
   const vehicleDetailsImage: DynamoDbImage = adrDetails.getMap(
     "vehicleDetails"
   )!;
-  const vehicleDetails: VehicleDetails = {
-    type: vehicleDetailsImage.getString("type")! as VehicleDetailsTypeEnum,
-    approvalDate: vehicleDetailsImage.getString("approvalDate")!,
-  };
+  const vehicleDetails: VehicleDetails = {};
+
+  if (vehicleDetailsImage) {
+    vehicleDetails.type = vehicleDetailsImage.getString(
+      "type"
+    )! as VehicleDetailsTypeEnum;
+    vehicleDetails.approvalDate = vehicleDetailsImage.getString(
+      "approvalDate"
+    )!;
+  }
 
   const tankImage: DynamoDbImage = adrDetails.getMap("tank")!;
+  const tank: Tank = {};
 
-  const tankDetailsImage = tankImage.getMap("tankDetails")!;
+  if (tankImage) {
+    const tankDetailsImage = tankImage.getMap("tankDetails")!;
+    const tankDetails: TankDetails = {};
 
-  const tc2DetailsImage: DynamoDbImage = tankDetailsImage.getMap("tc2Details")!;
-  const tc2Details: Tc2Details = {
-    tc2Type: tc2DetailsImage.getString("tc2Type")! as Tc2TypeEnum,
-    tc2IntermediateApprovalNo: tc2DetailsImage.getString(
-      "tc2IntermediateApprovalNo"
-    )!,
-    tc2IntermediateExpiryDate: tc2DetailsImage.getString(
-      "tc2IntermediateExpiryDate"
-    )!,
-  };
+    if (tankDetailsImage) {
+      const tc2Details: Tc2Details = {};
+      const tc2DetailsImage: DynamoDbImage = tankDetailsImage.getMap(
+        "tc2Details"
+      )!;
 
-  const tc3DetailsImage: DynamoDbImage = tankDetailsImage.getList(
-    "tc3Details"
-  )!;
-  const tc3Details: Tc3Details = [];
+      if (tc2DetailsImage) {
+        tc2Details.tc2Type = tc2DetailsImage.getString(
+          "tc2Type"
+        )! as Tc2TypeEnum;
+        tc2Details.tc2IntermediateApprovalNo = tc2DetailsImage.getString(
+          "tc2IntermediateApprovalNo"
+        )!;
+        tc2Details.tc2IntermediateExpiryDate = tc2DetailsImage.getString(
+          "tc2IntermediateExpiryDate"
+        )!;
 
-  if (tc3DetailsImage) {
-    for (const key of tc3DetailsImage.getKeys()!) {
-      const tc3DetailsItemImage = tc3DetailsImage.getMap(key)!;
-      tc3Details.push({
-        tc3Type: tc3DetailsItemImage.getString("tc3Type")! as Tc3TypeEnum,
-        tc3PeriodicNumber: tc3DetailsItemImage.getString("tc3PeriodicNumber")!,
-        tc3PeriodicExpiryDate: tc3DetailsItemImage.getString(
-          "tc3PeriodicExpiryDate"
-        )!,
-      });
+        tankDetails.tc2Details = tc2Details;
+      }
+
+      const tc3DetailsImage: DynamoDbImage = tankDetailsImage.getList(
+        "tc3Details"
+      )!;
+      const tc3Details: Tc3Details = [];
+
+      if (tc3DetailsImage) {
+        for (const key of tc3DetailsImage.getKeys()!) {
+          const tc3DetailsItemImage = tc3DetailsImage.getMap(key)!;
+          tc3Details.push({
+            tc3Type: tc3DetailsItemImage.getString("tc3Type")! as Tc3TypeEnum,
+            tc3PeriodicNumber: tc3DetailsItemImage.getString(
+              "tc3PeriodicNumber"
+            )!,
+            tc3PeriodicExpiryDate: tc3DetailsItemImage.getString(
+              "tc3PeriodicExpiryDate"
+            )!,
+          });
+        }
+        tankDetails.tc3Details = tc3Details;
+      }
+
+      const tankStatementImage: DynamoDbImage = tankDetailsImage.getMap(
+        "tankStatement"
+      )!;
+      const tankStatement: TankStatement = {};
+
+      if (tankStatementImage) {
+        tankStatement.substancesPermitted = tankStatementImage.getString(
+          "substancesPermitted"
+        )! as substancesPermittedEnum;
+        tankStatement.select = tankStatementImage.getString(
+          "select"
+        )! as tankStatementSelectEnum;
+        tankStatement.statement = tankStatementImage.getString("statement")!;
+        tankStatement.productListRefNo = tankStatementImage.getString(
+          "productListRefNo"
+        )!;
+        tankStatement.productListUnNo = parseStringArray(
+          tankStatementImage.getList("productListUnNo")!
+        );
+        tankStatement.productList = tankStatementImage.getString(
+          "productList"
+        )!;
+
+        tankDetails.tankStatement = tankStatement;
+      }
+
+      tankDetails.tankManufacturer = tankDetailsImage.getString(
+        "tankManufacturer"
+      )!;
+      tankDetails.yearOfManufacture = tankDetailsImage.getNumber(
+        "yearOfManufacture"
+      )!;
+      tankDetails.tankCode = tankDetailsImage.getString("tankCode")!;
+      tankDetails.specialProvisions = tankDetailsImage.getString(
+        "specialProvisions"
+      )!;
+      tankDetails.tankManufacturerSerialNo = tankDetailsImage.getString(
+        "tankManufacturerSerialNo"
+      )!;
+      tankDetails.tankTypeAppNo = tankDetailsImage.getString("tankTypeAppNo")!;
+
+      tank.tankDetails = tankDetails;
     }
   }
-
-  const tankStatementImage: DynamoDbImage = tankDetailsImage.getMap(
-    "tankStatement"
-  )!;
-  const tankStatement: TankStatement = {};
-
-  if (tankStatementImage) {
-    tankStatement.substancesPermitted = tankStatementImage.getString(
-      "substancesPermitted"
-    )! as substancesPermittedEnum;
-    tankStatement.select = tankStatementImage.getString(
-      "select"
-    )! as tankStatementSelectEnum;
-    tankStatement.statement = tankStatementImage.getString("statement")!;
-    tankStatement.productListRefNo = tankStatementImage.getString(
-      "productListRefNo"
-    )!;
-    tankStatement.productListUnNo = parseStringArray(
-      tankStatementImage.getList("productListUnNo")!
-    );
-    tankStatement.productList = tankStatementImage.getString("productList")!;
-  }
-
-  const tankDetails: TankDetails = {
-    tankManufacturer: tankDetailsImage.getString("tankManufacturer")!,
-    yearOfManufacture: tankDetailsImage.getNumber("yearOfManufacture")!,
-    tankCode: tankDetailsImage.getString("tankCode")!,
-    specialProvisions: tankDetailsImage.getString("specialProvisions")!,
-    tankManufacturerSerialNo: tankDetailsImage.getString(
-      "tankManufacturerSerialNo"
-    )!,
-    tankTypeAppNo: tankDetailsImage.getString("tankTypeAppNo")!,
-    tc2Details,
-    tc3Details,
-    tankStatement,
-  };
-
-  const tank: Tank = {
-    tankDetails,
-  };
 
   const additionalExaminerNotesImage: DynamoDbImage = adrDetails.getList(
     "additionalExaminerNotes"
