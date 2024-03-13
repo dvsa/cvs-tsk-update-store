@@ -116,3 +116,37 @@ export async function selectRecordIds(
     connection
   );
 }
+
+/**
+ * Execute a "select or partial upsert" for a key value condition attribute:
+ * - if a matching record exists (run SELECT first), return the existing entity's ID
+ * - if a matching record does not exist, insert a new record and return its ID
+ *
+ * @param tableDetails
+ * @param conditionAttributes
+ * @param connection
+ */
+export const executePartialUpsertIfNotExistsWithCondition = async (
+  tableDetails: TableDetails,
+  conditionAttributes: { [key: string]: any },
+  connection: Connection
+): Promise<QueryResponse> => {
+  // select record if exists
+  const selectResultSet = await executeSql(
+    generateSelectRecordIds(tableDetails.tableName, conditionAttributes),
+    Object.values(conditionAttributes),
+    connection
+  );
+
+  // insert into data base if record not exists
+  if (selectResultSet.rows.length === 0) {
+    return executePartialUpsert(tableDetails,
+      Object.values(conditionAttributes),
+      connection
+    );
+
+  } else {
+    selectResultSet.rows[0].insertId = selectResultSet.rows[0].id;
+    return { rows: selectResultSet.rows[0], fields: selectResultSet.fields };
+  }
+};

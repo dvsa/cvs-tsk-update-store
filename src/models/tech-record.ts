@@ -14,7 +14,11 @@ import { Microfilm, parseMicrofilm } from "./microfilm";
 import { parsePlates, Plates } from "./plates";
 import { BodyType, parseBodyType } from "./body-type";
 import { Dimensions, parseDimensions } from "./dimensions";
-import { AdrDetails } from "./adr-details";
+import { AdrDetails, parseAdrDetails } from "./adr-details";
+import {
+  AdrPassCertificateDetails,
+  parseAdrCertificateDetails,
+} from "./adr-certificate-details";
 import { parseVehicleClass, VehicleClass } from "./vehicle-class";
 import { Brakes, parseBrakes } from "./brakes";
 import { Axles, parseAxles } from "./axles";
@@ -114,6 +118,7 @@ export interface TechRecord {
   noOfAxles?: number;
   brakeCode?: string;
   adrDetails?: AdrDetails;
+  adrPassCertificateDetails?: AdrPassCertificateDetails;
   createdByName?: string;
   createdById?: string;
   lastUpdatedByName?: string;
@@ -270,7 +275,10 @@ const parseTechRecord = (image: DynamoDbImage): TechRecord => {
     notes: image.getString("notes"),
     noOfAxles: image.getNumber("noOfAxles"),
     brakeCode: image.getString("brakeCode"),
-    adrDetails: undefined, // intentional - not implemented. parseAdrDetails(image.getMap("adrDetails"))
+    adrDetails: parseAdrDetails(image.getMap("adrDetails")),
+    adrPassCertificateDetails: parseAdrCertificateDetails(
+      image.getList("adrPassCertificateDetails")
+    ),
     createdByName: image.getString("createdByName"),
     createdById: image.getString("createdById"),
     lastUpdatedByName: image.getString("lastUpdatedByName"),

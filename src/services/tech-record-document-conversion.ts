@@ -18,11 +18,23 @@ import {
   VEHICLE_SUBCLASS_TABLE,
   VEHICLE_TABLE,
   AUTH_INTO_SERVICE_TABLE,
+  ADR_ADDITIONAL_EXAMINER_NOTES_TABLE,
+  ADR_ADDITIONAL_NOTES_NUMBER_TABLE,
+  ADR_DANGEROUS_GOODS_LIST_TABLE,
+  ADR_DETAILS_TABLE,
+  ADR_MEMOS_APPLY_TABLE,
+  ADR_PERMITTED_DANGEROUS_GOODS_TABLE,
+  ADR_PRODUCTLISTUNNO_LIST_TABLE,
+  ADR_PRODUCTLISTUNNO_TABLE,
+  ADR_TC3DETAILS_TABLE,
+  ADR_TANK_DOCUMENTS_TABLE,
+  ADR_PASS_CERTIFICATE_DETAILS,
 } from "./table-details";
 import {
   deleteBasedOnWhereIn,
   executeFullUpsert,
   executePartialUpsertIfNotExists,
+  executePartialUpsertIfNotExistsWithCondition,
 } from "./sql-execution";
 import { getConnectionPool } from "./connection-pool";
 import { Connection } from "mysql2/promise";
@@ -218,6 +230,103 @@ const upsertTechRecords = async (
         techRecordId,
         techRecord
       );
+      await upsertAdrPassCertificateDetails(
+        techRecordConnection,
+        techRecordId,
+        techRecord
+      );
+
+      // upsert adr-details
+      if (techRecord.adrDetails) {
+        debugLog(`upsertTechRecords: Upserting ADR Details...`);
+        const adrResponse = await executeFullUpsert(
+          ADR_DETAILS_TABLE,
+          [
+            techRecordId,
+            techRecord.adrDetails.vehicleDetails?.type,
+            techRecord.adrDetails.vehicleDetails?.approvalDate,
+            techRecord.adrDetails.listStatementApplicable,
+            techRecord.adrDetails.batteryListNumber,
+            techRecord.adrDetails.declarationsSeen,
+            techRecord.adrDetails.brakeDeclarationsSeen,
+            techRecord.adrDetails.brakeDeclarationIssuer,
+            techRecord.adrDetails.brakeEndurance,
+            techRecord.adrDetails.weight,
+            techRecord.adrDetails.compatibilityGroupJ,
+            // techRecord.adrDetails.dangerousGoods,
+            techRecord.adrDetails.applicantDetails?.name,
+            techRecord.adrDetails.applicantDetails?.street,
+            techRecord.adrDetails.applicantDetails?.town,
+            techRecord.adrDetails.applicantDetails?.city,
+            techRecord.adrDetails.applicantDetails?.postcode,
+            techRecord.adrDetails.adrTypeApprovalNo,
+            techRecord.adrDetails.adrCertificateNotes,
+            techRecord.adrDetails.tank?.tankDetails?.tankManufacturer,
+            techRecord.adrDetails.tank?.tankDetails?.yearOfManufacture,
+            techRecord.adrDetails.tank?.tankDetails?.tankCode,
+            techRecord.adrDetails.tank?.tankDetails?.specialProvisions,
+            techRecord.adrDetails.tank?.tankDetails?.tankManufacturerSerialNo,
+            techRecord.adrDetails.tank?.tankDetails?.tankTypeAppNo,
+            techRecord.adrDetails.tank?.tankDetails?.tc2Details?.tc2Type,
+            techRecord.adrDetails.tank?.tankDetails?.tc2Details
+              ?.tc2IntermediateApprovalNo,
+            techRecord.adrDetails.tank?.tankDetails?.tc2Details
+              ?.tc2IntermediateExpiryDate,
+            techRecord.adrDetails.tank?.tankDetails?.tankStatement?.substancesPermitted,
+            // techRecord.adrDetails.tank?.tankDetails?.tankStatement?.select,
+            techRecord.adrDetails.tank?.tankDetails?.tankStatement?.statement,
+            techRecord.adrDetails.tank?.tankDetails?.tankStatement?.productListRefNo,
+            techRecord.adrDetails.tank?.tankDetails?.tankStatement?.productList,
+            techRecord.adrDetails.m145Statement,
+            // techRecord.adrDetails.newCertificateRequested,
+          ],
+          techRecordConnection
+        );
+
+        const adrDetailsId = adrResponse.rows.insertId;
+
+        debugLog(
+          `upsertTechRecords: Upserted ADR Details (ID: ${adrDetailsId})`
+        );
+
+        await upsertAdrMemosApply(
+          techRecordConnection,
+          adrDetailsId,
+          techRecord
+        );
+        await upsertAdrPermittedDangerousGoods(
+          techRecordConnection,
+          adrDetailsId,
+          techRecord
+        );
+        await upsertAdrProductListUnNo(
+          techRecordConnection,
+          adrDetailsId,
+          techRecord
+        );
+        await upsertAdrTc3Details(
+          techRecordConnection,
+          adrDetailsId,
+          techRecord
+        );
+        await upsertAdrAdditionalExaminerNotes(
+          techRecordConnection,
+          adrDetailsId,
+          techRecord
+        );
+        await upsertAdrAdditionalNotesNumber(
+          techRecordConnection,
+          adrDetailsId,
+          techRecord
+        );
+        // await upsertAdrTankDocuments(
+        //   techRecordConnection,
+        //   adrDetailsId,
+        //   techRecord
+        // );
+
+        debugLog(`upsertTechRecords: Upsert ADR Details END`);
+      }
 
       await techRecordConnection.commit();
     } catch (err) {
@@ -633,4 +742,275 @@ const upsertAuthIntoService = async (
   debugLog(
     `upsertTechRecords: Upserted authIntoService (tech-record-id: ${techRecordId}, ID: ${response.rows.insertId})`
   );
+};
+
+const upsertAdrMemosApply = async (
+  connection: Connection,
+  adrDetailsId: string,
+  techRecord: TechRecord
+): Promise<void> => {
+  if (techRecord.adrDetails?.memosApply) {
+    debugLog(
+      `upsertTechRecords: Upserting ADR memos_apply (adr-details-id: ${adrDetailsId})...`
+    );
+
+    for (const memo of techRecord.adrDetails?.memosApply) {
+      const response = await executeFullUpsert(
+        ADR_MEMOS_APPLY_TABLE,
+        [adrDetailsId, memo],
+        connection
+      );
+
+      debugLog(
+        `upsertTechRecords: Upserted ADR memos-apply (adr-details-id: ${adrDetailsId}, ID: ${response.rows.insertId})`
+      );
+    }
+  }
+  return;
+};
+
+const upsertAdrDangerousGoodsList = async (
+  connection: Connection,
+  dangerousGoodsName: string
+): Promise<number> => {
+  debugLog(
+    `upsertTechRecords: Selecting/Upserting adr_dangerous_goods_list...`
+  );
+
+  const response = await executePartialUpsertIfNotExistsWithCondition(
+    ADR_DANGEROUS_GOODS_LIST_TABLE,
+    { name: dangerousGoodsName },
+    connection
+  );
+
+  debugLog(
+    `upsertTechRecords: Selected adr_dangerous_goods_list (ID ${response.rows.insertId})`
+  );
+
+  return response.rows.insertId;
+};
+
+const upsertAdrPermittedDangerousGoods = async (
+  connection: Connection,
+  adrDetailsId: string,
+  techRecord: TechRecord
+): Promise<void> => {
+  if (techRecord.adrDetails?.permittedDangerousGoods) {
+    debugLog(
+      `upsertTechRecords: Upserting ADR permitted_dangerous_goods (adr-details-id: ${adrDetailsId})...`
+    );
+
+    for (const permittedDangerousGoods of techRecord.adrDetails
+      ?.permittedDangerousGoods) {
+      const permittedDangerousGoodsId = await upsertAdrDangerousGoodsList(
+        connection,
+        permittedDangerousGoods
+      );
+
+      const response = await executeFullUpsert(
+        ADR_PERMITTED_DANGEROUS_GOODS_TABLE,
+        [adrDetailsId, permittedDangerousGoodsId],
+        connection
+      );
+
+      debugLog(
+        `upsertTechRecords: Upserted ADR permitted_dangerous_goods (adr-details-id: ${adrDetailsId}, ID: ${response.rows.insertId})`
+      );
+    }
+  }
+  return;
+};
+
+const upsertAdrProductListUnNoList = async (
+  connection: Connection,
+  productListUnNo: string
+): Promise<number> => {
+  debugLog(`upsertTechRecords: Upserting adr_productListUnNo_list...`);
+
+  const response = await executePartialUpsertIfNotExistsWithCondition(
+    ADR_PRODUCTLISTUNNO_LIST_TABLE,
+    { name: productListUnNo },
+    connection
+  );
+
+  debugLog(
+    `upsertTechRecords: Upserted adr_productListUnNo_list (ID ${response.rows.insertId})`
+  );
+
+  return response.rows.insertId;
+};
+
+const upsertAdrProductListUnNo = async (
+  connection: Connection,
+  adrDetailsId: string,
+  techRecord: TechRecord
+): Promise<void> => {
+  if (techRecord.adrDetails?.tank?.tankDetails?.tankStatement?.productListUnNo) {
+    debugLog(
+      `upsertTechRecords: Upserting ADR tankStatement productListUnNo (adr-details-id: ${adrDetailsId})...`
+    );
+
+    for (const productListUnNo of techRecord.adrDetails?.tank?.tankDetails?.tankStatement
+      ?.productListUnNo) {
+      const productListUnNoId = await upsertAdrProductListUnNoList(
+        connection,
+        productListUnNo
+      );
+
+      const response = await executeFullUpsert(
+        ADR_PRODUCTLISTUNNO_TABLE,
+        [adrDetailsId, productListUnNoId],
+        connection
+      );
+
+      debugLog(
+        `upsertTechRecords: Upserted ADR tankStatement productListUnNo (adr-details-id: ${adrDetailsId}, ID: ${response.rows.insertId})`
+      );
+    }
+  }
+  return;
+};
+
+const upsertAdrTc3Details = async (
+  connection: Connection,
+  adrDetailsId: string,
+  techRecord: TechRecord
+): Promise<void> => {
+  if (techRecord.adrDetails?.tank?.tankDetails?.tc3Details) {
+    debugLog(
+      `upsertTechRecords: Upserting ADR tc3Details (adr-details-id: ${adrDetailsId})...`
+    );
+
+    for (const tc3Details of techRecord.adrDetails?.tank?.tankDetails
+      ?.tc3Details) {
+      const response = await executeFullUpsert(
+        ADR_TC3DETAILS_TABLE,
+        [
+          adrDetailsId,
+          tc3Details.tc3Type,
+          tc3Details.tc3PeriodicNumber,
+          tc3Details.tc3PeriodicExpiryDate,
+        ],
+        connection
+      );
+
+      debugLog(
+        `upsertTechRecords: Upserted ADR tc3Details (adr-details-id: ${adrDetailsId}, ID: ${response.rows.insertId})`
+      );
+    }
+  }
+  return;
+};
+
+const upsertAdrAdditionalExaminerNotes = async (
+  connection: Connection,
+  adrDetailsId: string,
+  techRecord: TechRecord
+): Promise<void> => {
+  if (techRecord.adrDetails?.additionalExaminerNotes) {
+    debugLog(
+      `upsertTechRecords: Upserting ADR additionalExaminerNotes (adr-details-id: ${adrDetailsId})...`
+    );
+
+    for (const additionalExaminerNotes of techRecord.adrDetails
+      ?.additionalExaminerNotes) {
+      const response = await executeFullUpsert(
+        ADR_ADDITIONAL_EXAMINER_NOTES_TABLE,
+        [
+          adrDetailsId,
+          additionalExaminerNotes.note,
+          additionalExaminerNotes.createdAtDate,
+          additionalExaminerNotes.lastUpdatedBy,
+        ],
+        connection
+      );
+
+      debugLog(
+        `upsertTechRecords: Upserted ADR additionalExaminerNotes (adr-details-id: ${adrDetailsId}, ID: ${response.rows.insertId})`
+      );
+    }
+  }
+  return;
+};
+
+const upsertAdrAdditionalNotesNumber = async (
+  connection: Connection,
+  adrDetailsId: string,
+  techRecord: TechRecord
+): Promise<void> => {
+  if (techRecord.adrDetails?.additionalNotes?.number) {
+    debugLog(
+      `upsertTechRecords: Upserting ADR additional_notes_number (adr-details-id: ${adrDetailsId})...`
+    );
+
+    for (const additionalNotesNumber of techRecord.adrDetails?.additionalNotes
+      ?.number) {
+      const response = await executeFullUpsert(
+        ADR_ADDITIONAL_NOTES_NUMBER_TABLE,
+        [additionalNotesNumber, adrDetailsId],
+        connection
+      );
+
+      debugLog(
+        `upsertTechRecords: Upserted ADR additional_notes_number (adr-details-id: ${adrDetailsId}, ID: ${response.rows.insertId})`
+      );
+    }
+  }
+  return;
+};
+
+const upsertAdrTankDocuments = async (
+  connection: Connection,
+  adrDetailsId: string,
+  techRecord: TechRecord
+): Promise<void> => {
+  if (techRecord.adrDetails?.documents) {
+    debugLog(
+      `upsertTechRecords: Upserting ADR tank documents (adr-details-id: ${adrDetailsId})...`
+    );
+
+    for (const documents of techRecord.adrDetails?.documents) {
+      const response = await executeFullUpsert(
+        ADR_TANK_DOCUMENTS_TABLE,
+        [adrDetailsId, documents],
+        connection
+      );
+
+      debugLog(
+        `upsertTechRecords: Upserted ADR tank documents (adr-details-id: ${adrDetailsId}, ID: ${response.rows.insertId})`
+      );
+    }
+  }
+  return;
+};
+
+const upsertAdrPassCertificateDetails = async (
+  connection: Connection,
+  techRecordId: string,
+  techRecord: TechRecord
+): Promise<void> => {
+  if (techRecord.adrPassCertificateDetails) {
+    debugLog(
+      `upsertTechRecords: Upserting ADR Pass Certificate Details (tech-record-id: ${techRecordId})...`
+    );
+
+    for (const adrPassCertificateDetails of techRecord.adrPassCertificateDetails) {
+      const response = await executeFullUpsert(
+        ADR_PASS_CERTIFICATE_DETAILS,
+        [
+          techRecordId,
+          adrPassCertificateDetails.createdByName,
+          adrPassCertificateDetails.certificateType,
+          adrPassCertificateDetails.generatedTimestamp,
+          adrPassCertificateDetails.certificateId,
+        ],
+        connection
+      );
+
+      debugLog(
+        `upsertTechRecords: Upserted ADR Pass Certificate Details (tech-record-id: ${techRecordId}, ID: ${response.rows.insertId})`
+      );
+    }
+  }
+  return;
 };
