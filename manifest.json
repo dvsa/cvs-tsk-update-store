@@ -6,5 +6,6 @@
   "language": "node",
   "terraform": false,
   "monorepo": false,
-  "dynamo_tables": []
+  "dynamo_tables": [],
+  "liquibase": true
 }
