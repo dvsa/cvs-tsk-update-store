@@ -1,10 +1,11 @@
 {
-  "name": "store",
+  "name": "update-store",
   "description": "",
   "team": "",
   "documentation": "",
   "language": "node",
   "terraform": false,
   "monorepo": false,
-  "dynamo_tables": []
+  "dynamo_tables": [],
+  "liquibase": true
 }
