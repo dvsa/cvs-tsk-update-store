@@ -1,0 +1,151 @@
+name: 🧱 Build and Test
+run-name: 🧱 Build and Test ${{ github.repository }}@${{ github.ref_name }}
+env:
+  bucket-name: cvs-services
+on:
+  workflow_dispatch:
+    inputs:
+      ignore-test-failures:
+        type: boolean
+        description: Ignore Test Failures
+        default: false
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  environment:
+    name: 🧹 Prepare Environment
+    runs-on: ubuntu-latest
+    outputs: 
+      version-number: ${{ steps.version.outputs.version }}
+      environment-name: ${{ steps.environment.outputs.environment-name }}
+      environment-type: ${{ steps.environment.outputs.environment-type }}
+
+    steps:
+      - name: 🪪 Get Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.CVS_MGMT_AWS_ROLE }}
+          aws-region: ${{ vars.DVSA_AWS_REGION}}
+          role-session-name: GHA_TagDevelop
+
+      - name: 📥 Get Codebase
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: ↕️ Get Environment Details
+        id: environment
+        uses: dvsa/cvs-github-actions/environment@develop
+        with:
+          environment: ${{ github.ref_name }}
+
+  build-services:
+    name: 🧱 Build ${{ github.ref_name }}
+    runs-on: [self-hosted, X64]
+    needs: environment
+
+    steps:
+      - name: 🪪 Get Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.CVS_MGMT_AWS_ROLE }}
+          aws-region: ${{ vars.DVSA_AWS_REGION }}
+          role-session-name: GHA_BuildServices
+
+      - name: 📥 Get Codebase
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          ref: ${{ github.ref_name }}
+
+      - name: Get Commit SHA
+        id: commit
+        run: |
+          # Get the branch Commit ID
+          commit_id=$(git rev-parse HEAD)
+          echo "commit=${commit_id}"
+          echo "commit=${commit_id}" >> $GITHUB_OUTPUT
+          echo "Commit ID: ${commit_id}" >> $GITHUB_STEP_SUMMARY
+
+      - name: 🗒️ Process Manifest Data
+        id: manifest
+        run: |
+          # Generate Manifest Outputs & Identify Build Requirements
+          echo "package-name=$(jq -r '.name' manifest.json)" >> $GITHUB_OUTPUT
+          echo "language=$(jq -r '.language' manifest.json)" >> $GITHUB_OUTPUT
+          echo "liquibase=$(jq -r '.liquibase' manifest.json)" >> $GITHUB_OUTPUT
+
+          # Generate Output File
+          jq -c '. += {"sha":"${{ steps.commit.outputs.commit }}","repository":"${{ github.repository }}"' manifest.json > outputs.json
+
+      - name: 🏗️ Build Node Function
+        uses: dvsa/cvs-github-actions/build-node-function@develop
+        if: ${{ steps.manifest.outputs.language == 'node' }}
+        with:
+          commit-sha: ${{ steps.commit.outputs.commit }}
+          branch: ${{ github.ref_name }}
+          mysql_liquibase: ${{ steps.manifest.outputs.liquibase }}
+          mysql_user: ${{ secrets.MYSQL_USER }}
+          mysql_password: ${{ secrets.MYSQL_PASS }}
+          continue-on-error: ${{ inputs.ignore-test-failures }}
+
+      - name: 🏗️ Build Java Function
+        uses: dvsa/cvs-github-actions/build-java-function@develop
+        if: ${{ steps.manifest.outputs.language == 'java' }}
+
+      - name: 📤 Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          path: |
+            outputs.json
+            ${{ steps.commit.outputs.commit }}*.zip
+
+  upload-functions:
+    # Runs as a separate job because we don't want to push anything if any one of the services fails to build
+    name: 🎯 Upload ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    needs: [environment, build-services]
+    steps:
+      - name: 🪪 Get Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.CVS_MGMT_AWS_ROLE }}
+          aws-region: ${{ vars.DVSA_AWS_REGION }}
+          role-session-name: GHA_BuildServices
+
+      - name: 📥 Download Artifact
+        uses: actions/download-artifact@v4
+
+      - name: 🗒️ Get Manifest Data
+        id: manifest
+        run: |
+          # Get information from Manifest File
+          echo "package-name=$(jq -r '.name' outputs.json)" >> $GITHUB_OUTPUT
+          echo "mono-repo=$(jq -r '.monorepo' outputs.json)" >> $GITHUB_OUTPUT
+          echo "sha=$(jq -r '.sha' outputs.json)" >> $GITHUB_OUTPUT
+          echo "build-package=$(jq -r '.build' outputs.json)" >> $GITHUB_OUTPUT
+          echo "hash-files=$(jq -r '.hash_files' outputs.json)" >> $GITHUB_OUTPUT
+
+          echo "package-name=$(jq -r '.name' outputs.json)" >> $GITHUB_STEP_SUMMARY
+          echo "mono-repo=$(jq -r '.monorepo' outputs.json)" >> $GITHUB_STEP_SUMMARY
+          echo "sha=$(jq -r '.sha' outputs.json)" >> $GITHUB_STEP_SUMMARY
+          echo "build-package=$(jq -r '.build' outputs.json)" >> $GITHUB_STEP_SUMMARY
+          echo "hash-files=$(jq -r '.hash_files' outputs.json)" >> $GITHUB_STEP_SUMMARY
+  
+      - name: Create Hash Files
+        uses: dvsa/cvs-github-actions/hash-create@develop
+        with:
+          commit-id: ${{ steps.manifest.outputs.sha }}
+          environment-name: ${{ needs.environment.outputs.environment-name }}
+          hash-files: ${{ steps.manifest.outputs.hash-files }}
+
+      - name: 📤 Upload hash zip to S3
+        uses: dvsa/cvs-github-actions/hash-upload@develop
+        with:
+          commit-id: ${{ steps.manifest.outputs.sha }}
+          package-name: ${{ steps.manifest.outputs.package-name }}
+          environment-name: ${{ needs.environment.outputs.environment-name }}
+          version-number: ${{ needs.environment.outputs.version-number  }}
