@@ -1,0 +1,851 @@
+{
+  "systemNumber": {
+    "S": "SYSTEM-NUMBER-1"
+  },
+  "partialVin": {
+    "S": "PARTIAL-VIN"
+  },
+  "primaryVrm": {
+    "S": "VRM-1"
+  },
+  "secondaryVrms": {
+    "L": [
+      {
+        "S": "SECONDARY-VRM"
+      }
+    ]
+  },
+  "vin": {
+    "S": "VIN-1"
+  },
+  "trailerId": {
+    "S": "TRL-1"
+  },
+  "techRecord": {
+    "L": [
+      {
+        "M": {
+            "adrDetails": {
+                "M": {
+                  "additionalExaminerNotes": {
+                    "L": [
+                        {
+                            "M": {
+                                "note": {
+                                    "S": "additionalExaminerNotes_note_1"
+                                },
+                                "createdAtDate": {
+                                    "S": "2023-05-30"
+                                },
+                                "lastUpdatedBy": {
+                                    "S": "additionalExaminerNotes_lastUpdatedBy_1"
+                                }
+                            }
+                        }
+                    ]
+                  },
+                  "additionalNotes": {
+                    "M": {
+                        "number": {
+                            "L": [
+                                {"S": "1"},
+                                {"S": "T1B"}
+                            ]
+                        }
+                    }
+                  },
+                  "adrCertificateNotes": {
+                    "S": "adrCertificateNotes_1"
+                  },
+                  "adrTypeApprovalNo": {
+                    "S": "adrTypeApprovalNo_1"
+                  },
+                  "applicantDetails": {
+                    "M": {
+                      "name": {
+                            "S": "adrDetails_applicantDetails_name_1"
+                          },
+                      "street": {
+                            "S": "adrDetails_applicantDetails_street_1"
+                          },
+                      "town": {
+                            "S": "adrDetails_applicantDetails_town_1"
+                          },
+                      "city": {
+                            "S": "adrDetails_applicantDetails_city_1"
+                          },
+                      "postcode": {
+                            "S": "adrDetails_applicantDetails_postcode_1"
+                          }
+                    }
+                  },
+                  "batteryListNumber": {
+                    "S": "batteryListNumber_1"
+                  },
+                  "brakeDeclarationIssuer": {
+                    "S": "brakeDeclarationIssuer_1"
+                  },
+                  "brakeDeclarationsSeen": {
+                    "BOOL": true
+                  },
+                  "brakeEndurance": {
+                    "BOOL": false
+                  },
+                  "compatibilityGroupJ": {
+                    "S": "I"
+                  },
+                  "dangerousGoods": {
+                    "BOOL": false
+                  },
+                  "declarationsSeen": {
+                    "BOOL": false
+                  },
+                  "documents": {
+                    "L": [
+                      {
+                        "S": "documents_1"
+                      },
+                      {
+                        "S": "documents_2"
+                      }, 
+                      {
+                        "S": "documents_3"
+                      }
+                    ]
+                  },
+                  "listStatementApplicable": {
+                    "BOOL": true
+                  },
+                  "m145Statement": {
+                    "BOOL": true
+                  },
+                  "newCertificateRequested": {
+                    "BOOL": false
+                  },
+
+                  "memosApply": {
+                    "L": [
+                      {
+                        "S": "07/09 3mth leak ext"
+                      }
+                    ]
+                  },
+                  "permittedDangerousGoods": {
+                    "L": [
+                      {
+                        "S": "FP <61 (FL)"
+                      },
+                      {
+                        "S": "Carbon Disulphide"
+                      }, 
+                      {
+                        "S": "Hydrogen"
+                      }
+                    ]
+                  },
+                  "tank": {
+                    "M": {
+                      "tankDetails": {
+                        "M": {
+                          "tankManufacturer": {
+                            "S": "tankManufacturer_1"
+                          },
+                          "yearOfManufacture": {
+                            "N": "1234"
+                          },
+                          "tankCode": {
+                            "S": "tankCode_1"
+                          },
+                          "specialProvisions": {
+                            "S": "specialProvisions_1"
+                          },
+                          "tankManufacturerSerialNo": {
+                            "S": "1234"
+                          },
+                          "tankTypeAppNo": {
+                            "S": "9876"
+                          },
+                          "tc2Details": {
+                            "M": {
+                              "tc2Type": {
+                                "S": "initial"
+                              },
+                              "tc2IntermediateApprovalNo": {
+                                "S": "12345"
+                              },
+                              "tc2IntermediateExpiryDate": {
+                                "S": "2024-06-01"
+                              }
+                            }
+                          },
+                          "tc3Details": {
+                            "L": [
+                              {
+                                "M": {
+                                  "tc3Type": {
+                                    "S": "intermediate"
+                                  },
+                                  "tc3PeriodicNumber": {
+                                    "S": "98765"
+                                  },
+                                  "tc3PeriodicExpiryDate": {
+                                    "S": "2024-06-01"
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "tankStatement": {
+                        "M": {
+                          "select":{
+                            "S": "Product list"
+                          },
+                          "substancesPermitted": {
+                            "S": "Substances permitted under the tank code and any special provisions specified in 9 may be carried"
+                          },
+                          "statement": {
+                            "S": "statement_1"
+                          },
+                          "productListRefNo": {
+                            "S": "123456"
+                          },
+                          "productListUnNo": {
+                            "L": [
+                              {
+                                "S": "123123"
+                              },
+                              {
+                                "S": "987987"
+                              },
+                              {
+                                "S": "135790"
+                              }
+                            ]
+                          },
+                          "productList": {
+                            "S": "productList_1"
+                          }
+                        }
+                      } 
+                    }
+                  },
+                  "vehicleDetails": {
+                    "M": {
+                      "type": {
+                        "S": "Artic tractor"
+                      },
+                      "approvalDate": {
+                        "S": "2023-06-12"
+                      }
+                    }
+                  },
+                  "weight": {
+                    "N": "6789"
+                  }
+                }
+              },  
+          "recordCompleteness": {
+            "S": "88888888"
+          },
+          "createdAt": {
+            "S": "2020-01-01T00:00:00.055Z"
+          },
+          "lastUpdatedAt": {
+            "S": "2020-01-01T00:00:00.000000Z"
+          },
+          "make": {
+            "S": "MAKE"
+          },
+          "model": {
+            "S": "MODEL"
+          },
+          "functionCode": {
+            "S": "1"
+          },
+          "fuelPropulsionSystem": {
+            "S": "DieselPetrol"
+          },
+          "offRoad": {
+            "BOOL": true
+          },
+          "numberOfWheelsDriven": {
+            "N": "1"
+          },
+          "euVehicleCategory": {
+            "S": "m1"
+          },
+          "emissionsLimit": {
+            "N": "1"
+          },
+          "departmentalVehicleMarker": {
+            "BOOL": true
+          },
+          "authIntoService": {
+            "M": {
+              "cocIssueDate": {
+                "S": "2020-01-01"
+              },
+              "dateAuthorised": {
+                "S": "2020-02-02"
+              },
+              "datePending": {
+                "S": "2020-03-03"
+              },
+              "dateReceived": {
+                "S": "2020-04-04"
+              },
+              "dateRejected": {
+                "S": "2020-05-05"
+              }
+            }
+          },
+          "lettersOfAuth": {
+            "M": {
+              "letterType": {
+                "S": "Trailer authorization"
+              },
+              "letterDateRequested": {
+                "S": "2020-01-01"
+              },
+              "letterContents": {
+                "S": "LETTER-CONTENTS"
+              }
+            }
+          },
+          "alterationMarker": {
+            "BOOL": true
+          },
+          "approvalType": {
+            "S": "NTA"
+          },
+          "approvalTypeNumber": {
+            "S": "1"
+          },
+          "variantNumber": {
+            "S": "1"
+          },
+          "variantVersionNumber": {
+            "S": "1"
+          },
+          "grossEecWeight": {
+            "N": "1"
+          },
+          "trainEecWeight": {
+            "N": "1"
+          },
+          "maxTrainEecWeight": {
+            "N": "1"
+          },
+          "applicantDetails": {
+            "M": {
+              "name": {
+                "S": "NAME"
+              },
+              "address1": {
+                "S": "ADDRESS-1"
+              },
+              "address2": {
+                "S": "ADDRESS-2"
+              },
+              "postTown": {
+                "S": "POST-TOWN"
+              },
+              "address3": {
+                "S": "ADDRESS-3"
+              },
+              "postCode": {
+                "S": "POST-CODE"
+              },
+              "emailAddress": {
+                "S": "EMAIL-ADDRESS"
+              },
+              "telephoneNumber": {
+                "S": "TELEPHONE-NUMBER"
+              }
+            }
+          },
+          "purchaserDetails": {
+            "M": {
+              "name": {
+                "S": "NAME"
+              },
+              "address1": {
+                "S": "ADDRESS-1"
+              },
+              "address2": {
+                "S": "ADDRESS-2"
+              },
+              "postTown": {
+                "S": "POST-TOWN"
+              },
+              "address3": {
+                "S": "ADDRESS-3"
+              },
+              "postCode": {
+                "S": "POST-CODE"
+              },
+              "emailAddress": {
+                "S": "EMAIL-ADDRESS"
+              },
+              "telephoneNumber": {
+                "S": "TELEPHONE-NUMBER"
+              },
+              "faxNumber": {
+                "S": "FAX-NUMBER"
+              },
+              "purchaserNotes": {
+                "S": "PURCHASER-NOTES"
+              }
+            }
+          },
+          "manufacturerDetails": {
+            "M": {
+              "name": {
+                "S": "NAME"
+              },
+              "address1": {
+                "S": "ADDRESS-1"
+              },
+              "address2": {
+                "S": "ADDRESS-2"
+              },
+              "postTown": {
+                "S": "POST-TOWN"
+              },
+              "address3": {
+                "S": "ADDRESS-3"
+              },
+              "postCode": {
+                "S": "POST-CODE"
+              },
+              "emailAddress": {
+                "S": "EMAIL-ADDRESS"
+              },
+              "telephoneNumber": {
+                "S": "TELEPHONE-NUMBER"
+              },
+              "faxNumber": {
+                "S": "FAX-NUMBER"
+              },
+              "manufacturerNotes": {
+                "S": "MANUFACTURER-NOTES"
+              }
+            }
+          },
+          "microfilm": {
+            "M": {
+              "microfilmDocumentType": {
+                "S": "PSV Miscellaneous"
+              },
+              "microfilmRollNumber": {
+                "S": "1"
+              },
+              "microfilmSerialNumber": {
+                "S": "1"
+              }
+            }
+          },
+          "plates": {
+            "L": [
+              {
+                "M": {
+                  "plateSerialNumber": {
+                    "S": "1"
+                  },
+                  "plateIssueDate": {
+                    "S": "2020-01-01"
+                  },
+                  "plateReasonForIssue": {
+                    "S": "Free replacement"
+                  },
+                  "plateIssuer": {
+                    "S": "PLATE-ISSUER"
+                  },
+                  "toEmailAddress": {
+                    "S": "TO-EMAIL-ADDRESS"
+                  }
+                }
+              }
+            ]
+          },
+          "chassisMake": {
+            "S": "CHASSIS-MAKE"
+          },
+          "chassisModel": {
+            "S": "CHASSIS-MODEL"
+          },
+          "bodyMake": {
+            "S": "BODY-MAKE"
+          },
+          "bodyModel": {
+            "S": "BODY-MODEL"
+          },
+          "modelLiteral": {
+            "S": "MODEL-LITERAL"
+          },
+          "bodyType": {
+            "M": {
+              "code": {
+                "S": "a"
+              },
+              "description": {
+                "S": "articulated"
+              }
+            }
+          },
+          "manufactureYear": {
+            "N": "2020"
+          },
+          "regnDate": {
+            "S": "2020-01-01"
+          },
+          "firstUseDate": {
+            "S": "2020-01-01"
+          },
+          "coifDate": {
+            "S": "2020-01-01"
+          },
+          "ntaNumber": {
+            "S": "NTA-NUMBER"
+          },
+          "coifSerialNumber": {
+            "S": "88888888"
+          },
+          "coifCertifierName": {
+            "S": "COIF-CERTIFIER-NAME"
+          },
+          "conversionRefNo": {
+            "S": "1010101010"
+          },
+          "seatsLowerDeck": {
+            "N": "1"
+          },
+          "seatsUpperDeck": {
+            "N": "1"
+          },
+          "standingCapacity": {
+            "N": "1"
+          },
+          "speedRestriction": {
+            "N": "1"
+          },
+          "speedLimiterMrk": {
+            "BOOL": true
+          },
+          "tachoExemptMrk": {
+            "BOOL": true
+          },
+          "dispensations": {
+            "S": "DISPENSATIONS"
+          },
+          "remarks": {
+            "S": "REMARKS"
+          },
+          "reasonForCreation": {
+            "S": "REASON-FOR-CREATION"
+          },
+          "statusCode": {
+            "S": "STATUS-CODE"
+          },
+          "unladenWeight": {
+            "N": "1"
+          },
+          "grossKerbWeight": {
+            "N": "1"
+          },
+          "grossLadenWeight": {
+            "N": "1"
+          },
+          "grossGbWeight": {
+            "N": "1"
+          },
+          "grossDesignWeight": {
+            "N": "1"
+          },
+          "trainGbWeight": {
+            "N": "1"
+          },
+          "trainDesignWeight": {
+            "N": "1"
+          },
+          "maxTrainGbWeight": {
+            "N": "1"
+          },
+          "maxTrainDesignWeight": {
+            "N": "1"
+          },
+          "maxLoadOnCoupling": {
+            "N": "1"
+          },
+          "frameDescription": {
+            "S": "Channel section"
+          },
+          "tyreUseCode": {
+            "S": "22"
+          },
+          "roadFriendly": {
+            "BOOL": true
+          },
+          "drawbarCouplingFitted": {
+            "BOOL": true
+          },
+          "euroStandard": {
+            "S": "euroStd"
+          },
+          "suspensionType": {
+            "S": "1"
+          },
+          "couplingType": {
+            "S": "1"
+          },
+          "dimensions": {
+            "M": {
+              "axleSpacing": {
+                "L": [
+                  {
+                    "M": {
+                      "axles": {
+                        "S": "1-2"
+                      },
+                      "value": {
+                        "N": "1"
+                      }
+                    }
+                  }
+                ]
+              },
+              "length": {
+                "N": "1"
+              },
+              "height": {
+                "N": "1"
+              },
+              "width": {
+                "N": "1"
+              }
+            }
+          },
+          "frontAxleTo5thWheelMin": {
+            "N": "1"
+          },
+          "frontAxleTo5thWheelMax": {
+            "N": "1"
+          },
+          "frontVehicleTo5thWheelCouplingMin": {
+            "N": "1"
+          },
+          "frontVehicleTo5thWheelCouplingMax": {
+            "N": "1"
+          },
+          "frontAxleToRearAxle": {
+            "N": "1"
+          },
+          "rearAxleToRearTrl": {
+            "N": "1"
+          },
+          "couplingCenterToRearAxleMin": {
+            "N": "1"
+          },
+          "couplingCenterToRearAxleMax": {
+            "N": "1"
+          },
+          "couplingCenterToRearTrlMin": {
+            "N": "1"
+          },
+          "couplingCenterToRearTrlMax": {
+            "N": "1"
+          },
+          "centreOfRearmostAxleToRearOfTrl": {
+            "N": "1"
+          },
+          "notes": {
+            "S": "NOTES"
+          },
+          "noOfAxles": {
+            "N": "1"
+          },
+          "brakeCode": {
+            "S": "1"
+          },
+          "createdByName": {
+            "S": "CREATED-BY-NAME-2"
+          },
+          "createdById": {
+            "S": "CREATED-BY-ID-2"
+          },
+          "lastUpdatedByName": {
+            "S": "LAST-UPDATED-BY-NAME-2"
+          },
+          "lastUpdatedById": {
+            "S": "LAST-UPDATED-BY-ID-2"
+          },
+          "updateType": {
+            "S": "adrUpdate"
+          },
+          "vehicleClass": {
+            "M": {
+              "code": {
+                "S": "2"
+              },
+              "description": {
+                "S": "motorbikes over 200cc or with a sidecar"
+              }
+            }
+          },
+          "vehicleSubclass": {
+            "L": [
+              {
+                "S": "1"
+              }
+            ]
+          },
+          "vehicleType": {
+            "S": "psv"
+          },
+          "vehicleSize": {
+            "S": "small"
+          },
+          "numberOfSeatbelts": {
+            "S": "NUMBER-OF-SEATBELTS"
+          },
+          "seatbeltInstallationApprovalDate": {
+            "S": "2020-01-01"
+          },
+          "vehicleConfiguration": {
+            "S": "rigid"
+          },
+          "brakes": {
+            "M": {
+              "brakeCodeOriginal": {
+                "S": "333"
+              },
+              "brakeCode": {
+                "S": "666666"
+              },
+              "dataTrBrakeOne": {
+                "S": "DATA-TR-BRAKE-ONE"
+              },
+              "dataTrBrakeTwo": {
+                "S": "DATA-TR-BRAKE-TWO"
+              },
+              "dataTrBrakeThree": {
+                "S": "DATA-TR-BRAKE-THREE"
+              },
+              "retarderBrakeOne": {
+                "S": "electric"
+              },
+              "retarderBrakeTwo": {
+                "S": "electric"
+              },
+              "dtpNumber": {
+                "S": "666666"
+              },
+              "brakeForceWheelsNotLocked": {
+                "M": {
+                  "serviceBrakeForceA": {
+                    "N": "1"
+                  },
+                  "secondaryBrakeForceA": {
+                    "N": "1"
+                  },
+                  "parkingBrakeForceA": {
+                    "N": "1"
+                  }
+                }
+              },
+              "brakeForceWheelsUpToHalfLocked": {
+                "M": {
+                  "serviceBrakeForceB": {
+                    "N": "1"
+                  },
+                  "secondaryBrakeForceB": {
+                    "N": "1"
+                  },
+                  "parkingBrakeForceB": {
+                    "N": "1"
+                  }
+                }
+              },
+              "loadSensingValve": {
+                "BOOL": true
+              },
+              "antilockBrakingSystem": {
+                "BOOL": true
+              }
+            }
+          },
+          "axles": {
+            "L": [
+              {
+                "M": {
+                  "axleNumber": {
+                    "N": "1"
+                  },
+                  "parkingBrakeMrk": {
+                    "BOOL": true
+                  },
+                  "weights": {
+                    "M": {
+                      "kerbWeight": {
+                        "N": "1"
+                      },
+                      "ladenWeight": {
+                        "N": "1"
+                      },
+                      "gbWeight": {
+                        "N": "1"
+                      },
+                      "eecWeight": {
+                        "N": "1"
+                      },
+                      "designWeight": {
+                        "N": "1"
+                      }
+                    }
+                  },
+                  "tyres": {
+                    "M": {
+                      "tyreSize": {
+                        "S": "TYRE-SIZE"
+                      },
+                      "plyRating": {
+                        "S": "22"
+                      },
+                      "fitmentCode": {
+                        "S": "double"
+                      },
+                      "dataTrAxles": {
+                        "N": "1"
+                      },
+                      "speedCategorySymbol": {
+                        "S": "a7"
+                      },
+                      "tyreCode": {
+                        "N": "1"
+                      }
+                    }
+                  },
+                  "brakes": {
+                    "M": {
+                      "brakeActuator": {
+                        "N": "1"
+                      },
+                      "leverLength": {
+                        "N": "1"
+                      },
+                      "springBrakeParking": {
+                        "BOOL": true
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

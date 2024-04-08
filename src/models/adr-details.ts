@@ -1,6 +1,7 @@
 import { DynamoDbImage, parseStringArray } from "../services/dynamodb-images";
 import { Maybe } from "./optionals";
 
+// define AdrDetails' high-level attributes data types
 export interface AdrDetails {
   vehicleDetails?: VehicleDetails;
   listStatementApplicable?: boolean;
@@ -9,22 +10,99 @@ export interface AdrDetails {
   brakeDeclarationsSeen?: boolean;
   brakeDeclarationIssuer?: string;
   brakeEndurance?: boolean;
-  weight?: string;
-  compatibilityGroupJ?: boolean;
+  weight?: number;
+  newCertificateRequested?: boolean;
+  compatibilityGroupJ?: compatibilityGroupJEnum;
   documents?: string[];
-  permittedDangerousGoods?: string[];
-  additionalExaminerNotes?: string;
+  permittedDangerousGoods?: permittedDangerousGoodsEnum[];
+  additionalExaminerNotes?: AdditionalExaminerNotes;
   applicantDetails?: ApplicantDetails;
-  memosApply?: string[];
+  dangerousGoods?: boolean;
+  memosApply?: memosApplyEnum[];
+  m145Statement?: boolean;
   additionalNotes?: AdditionalNotes;
   adrTypeApprovalNo?: string;
   adrCertificateNotes?: string;
   tank?: Tank;
 }
 
+// define Enums
+export type VehicleDetailsTypeEnum =
+  | "Artic tractor"
+  | "Rigid box body"
+  | "Rigid sheeted load"
+  | "Rigid tank"
+  | "Rigid skeletal"
+  | "Rigid battery"
+  | "Full drawbar box body"
+  | "Full drawbar sheeted load"
+  | "Full drawbar tank"
+  | "Full drawbar skeletal"
+  | "Full drawbar battery"
+  | "Centre axle box body"
+  | "Centre axle sheeted load"
+  | "Centre axle tank"
+  | "Centre axle skeletal"
+  | "Centre axle battery"
+  | "Semi trailer box body"
+  | "Semi trailer sheeted load"
+  | "Semi trailer tank"
+  | "Semi trailer skeletal"
+  | "Semi trailer battery";
+
+export type Tc2TypeEnum = "initial";
+
+export type Tc3TypeEnum =
+  | "intermediate"
+  | "periodic"
+  | "exceptional";
+
+export type permittedDangerousGoodsEnum =
+  | "FP <61 (FL)"
+  | "AT"
+  | "Class 5.1 Hydrogen Peroxide (OX)"
+  | "MEMU"
+  | "Carbon Disulphide"
+  | "Hydrogen"
+  | "Explosives (type 2)"
+  | "Explosives (type 3)";
+
+export type compatibilityGroupJEnum =
+  | "I"
+  | "E";
+
+export type additionalNotesNumberEnum =
+  | "1"
+  | "1A"
+  | "2"
+  | "3"
+  | "V1B"
+  | "T1B";
+
+// export type additionalNotesguidanceNotesEnum =  "New certificate requested" | "M145 Statement"
+
+export type substancesPermittedEnum =
+  | "Substances permitted under the tank code and any special provisions specified in 9 may be carried"
+  | "Substances (Class UN number and if necessary packing group and proper shipping name) may be carried";
+
+export type memosApplyEnum = "07/09 3mth leak ext ";
+
+export type tankStatementSelectEnum =
+  | "Statement"
+  | "Product list";
+
+// define AdrDetails' sub-attributes data types
 export interface VehicleDetails {
-  type?: string;
+  type?: VehicleDetailsTypeEnum;
   approvalDate?: string;
+}
+
+export type AdditionalExaminerNotes = AdditionalExaminerNotesItems[];
+
+export interface AdditionalExaminerNotesItems {
+  note?: string;
+  createdAtDate?: string;
+  lastUpdatedBy?: string;
 }
 
 export interface ApplicantDetails {
@@ -36,8 +114,8 @@ export interface ApplicantDetails {
 }
 
 export interface AdditionalNotes {
-  number?: string[];
-  guidanceNotes?: string[];
+  number?: additionalNotesNumberEnum[];
+  // guidanceNotes?: additionalNotesguidanceNotesEnum[];
 }
 
 export interface Tank {
@@ -57,7 +135,8 @@ export interface TankDetails {
 }
 
 export interface TankStatement {
-  substancesPermitted?: string;
+  select?: tankStatementSelectEnum;
+  substancesPermitted?: substancesPermittedEnum;
   statement?: string;
   productListRefNo?: string;
   productListUnNo?: string[];
@@ -65,23 +144,21 @@ export interface TankStatement {
 }
 
 export interface Tc2Details {
-  tc2Type?: Tc2Type;
+  tc2Type?: Tc2TypeEnum;
   tc2IntermediateApprovalNo?: string;
   tc2IntermediateExpiryDate?: string;
 }
 
-export type Tc2Type = "initial";
 
 export type Tc3Details = Tc3DetailsItem[];
 
 export interface Tc3DetailsItem {
-  tc3Type?: Tc3Type;
+  tc3Type?: Tc3TypeEnum;
   tc3PeriodicNumber?: string;
   tc3PeriodicExpiryDate?: string;
 }
 
-export type Tc3Type = "intermediate" | "periodic" | "exceptional";
-
+// function to parse AdrDetails' high-level and sub attributes + return AdrDetails object
 export const parseAdrDetails = (
   adrDetails?: DynamoDbImage
 ): Maybe<AdrDetails> => {
@@ -93,10 +170,10 @@ export const parseAdrDetails = (
     "additionalNotes"
   )!;
   const additionalNotes: AdditionalNotes = {
-    number: parseStringArray(additionalNotesImage.getList("number")),
-    guidanceNotes: parseStringArray(
-      additionalNotesImage.getList("guidanceNotes")
-    ),
+    number: parseStringArray(additionalNotesImage.getList("number")) as additionalNotesNumberEnum[],
+    // guidanceNotes: parseStringArray(
+    //   additionalNotesImage.getList("guidanceNotes")
+    // ) as additionalNotesguidanceNotesEnum[],
   };
 
   const applicantDetailsImage: DynamoDbImage = adrDetails.getMap(
@@ -114,7 +191,7 @@ export const parseAdrDetails = (
     "vehicleDetails"
   )!;
   const vehicleDetails: VehicleDetails = {
-    type: vehicleDetailsImage.getString("type"),
+    type: vehicleDetailsImage.getString("type") as VehicleDetailsTypeEnum,
     approvalDate: vehicleDetailsImage.getString("approvalDate"),
   };
 
@@ -124,7 +201,7 @@ export const parseAdrDetails = (
 
   const tc2DetailsImage: DynamoDbImage = tankDetailsImage.getMap("tc2Details")!;
   const tc2Details: Tc2Details = {
-    tc2Type: tc2DetailsImage.getString("tc2Type") as Tc2Type,
+    tc2Type: tc2DetailsImage.getString("tc2Type") as Tc2TypeEnum,
     tc2IntermediateApprovalNo: tc2DetailsImage.getString(
       "tc2IntermediateApprovalNo"
     ),
@@ -141,7 +218,7 @@ export const parseAdrDetails = (
   for (const key of tc3DetailsImage.getKeys()) {
     const tc3DetailsItemImage = tc3DetailsImage.getMap(key)!;
     tc3Details.push({
-      tc3Type: tc3DetailsItemImage.getString("tc3Type") as Tc3Type,
+      tc3Type: tc3DetailsItemImage.getString("tc3Type") as Tc3TypeEnum,
       tc3PeriodicNumber: tc3DetailsItemImage.getString("tc3PeriodicNumber"),
       tc3PeriodicExpiryDate: tc3DetailsItemImage.getString(
         "tc3PeriodicExpiryDate"
@@ -151,7 +228,7 @@ export const parseAdrDetails = (
 
   const tankDetails: TankDetails = {
     tankManufacturer: tankDetailsImage.getString("tankManufacturer"),
-    yearOfManufacture: 0,
+    yearOfManufacture: tankDetailsImage.getNumber("yearOfManufacture"),
     tankCode: tankDetailsImage.getString("tankCode"),
     specialProvisions: tankDetailsImage.getString("specialProvisions"),
     tankManufacturerSerialNo: tankDetailsImage.getString(
@@ -164,7 +241,8 @@ export const parseAdrDetails = (
 
   const tankStatementImage: DynamoDbImage = tankImage.getMap("tankStatement")!;
   const tankStatement: TankStatement = {
-    substancesPermitted: tankStatementImage.getString("substancesPermitted"),
+    substancesPermitted: tankStatementImage.getString("substancesPermitted") as substancesPermittedEnum,
+    select: tankStatementImage.getString("select") as tankStatementSelectEnum,
     statement: tankStatementImage.getString("statement"),
     productListRefNo: tankStatementImage.getString("productListRefNo"),
     productListUnNo: parseStringArray(
@@ -178,6 +256,22 @@ export const parseAdrDetails = (
     tankStatement,
   };
 
+
+  const additionalExaminerNotesImage: DynamoDbImage = adrDetails.getList(
+    "additionalExaminerNotes"
+  )!;
+  const additionalExaminerNotes: AdditionalExaminerNotes = [];
+
+  for (const key of additionalExaminerNotesImage.getKeys()) {
+    const additionalExaminerNotesItemImage = additionalExaminerNotesImage.getMap(key)!;
+    additionalExaminerNotes.push({
+      note: additionalExaminerNotesItemImage.getString("note"),
+      createdAtDate: additionalExaminerNotesItemImage.getString("createdAtDate"),
+      lastUpdatedBy: additionalExaminerNotesItemImage.getString("lastUpdatedBy"),
+    });
+  }
+
+
   return {
     vehicleDetails,
     listStatementApplicable: adrDetails.getBoolean("listStatementApplicable"),
@@ -186,15 +280,18 @@ export const parseAdrDetails = (
     brakeDeclarationsSeen: adrDetails.getBoolean("brakeDeclarationsSeen"),
     brakeDeclarationIssuer: adrDetails.getString("brakeDeclarationIssuer"),
     brakeEndurance: adrDetails.getBoolean("brakeEndurance"),
-    weight: adrDetails.getString("weight"),
-    compatibilityGroupJ: adrDetails.getBoolean("compatibilityGroupJ"),
+    weight: adrDetails.getNumber("weight"),
+    newCertificateRequested: adrDetails.getBoolean("newCertificateRequested"),
+    compatibilityGroupJ: adrDetails.getString("compatibilityGroupJ") as compatibilityGroupJEnum,
     documents: parseStringArray(adrDetails.getList("documents")),
     permittedDangerousGoods: parseStringArray(
       adrDetails.getList("permittedDangerousGoods")
-    ),
-    additionalExaminerNotes: adrDetails.getString("additionalExaminerNotes"),
+    ) as permittedDangerousGoodsEnum[],
+    additionalExaminerNotes,
     applicantDetails,
-    memosApply: parseStringArray(adrDetails.getList("memosApply")),
+    dangerousGoods: adrDetails.getBoolean("dangerousGoods"),
+    memosApply: parseStringArray(adrDetails.getList("memosApply")) as memosApplyEnum[],
+    m145Statement: adrDetails.getBoolean("m145Statement"),
     additionalNotes,
     adrTypeApprovalNo: adrDetails.getString("adrTypeApprovalNo"),
     adrCertificateNotes: adrDetails.getString("adrCertificateNotes"),
