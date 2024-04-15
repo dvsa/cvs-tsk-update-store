@@ -58,6 +58,12 @@ This will cause numerous debug logs to fire. Messages will include event informa
 ```shell
 npm run test
 ```
+Runs all the tests (Unit and Integration)
+
+```shell
+npm run test-unit
+```
+Runs all unit tests
 
 ### Integration tests
 Integration tests depend on:
