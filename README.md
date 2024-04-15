@@ -120,6 +120,13 @@ For the full field-to-column mapping, see `tech-record-document-conversion.ts`.
   * `microfilm`
   * `plate`
   * `axle`
+  * `adr_details`
+  * `adr_memos_apply`
+  * `adr_permitted_dangerous_goods`
+  * `adr_productListUnNo`
+  * `adr_additional_examiner_notes`
+  * `adr_additional_notes_number`
+
 
 ## Test Result conversion
 For the full field-to-column mapping, see `test-result-record-conversion.ts`.
