@@ -63,7 +63,6 @@
     "mysql2": "3.9.4",
     "prettier": "2.2.1",
     "reflect-metadata": "0.1.13",
-    "testcontainers": "7.6.2",
     "ts-node-register": "1.0.0",
     "uuid": "8.3.2"
   },
@@ -97,7 +96,8 @@
     "ts-jest": "26.5.1",
     "tslint": "5.20.0",
     "tslint-no-unused-expression-chai": "0.1.4",
-    "typescript": "3.9.9"
+    "typescript": "3.9.9",
+    "testcontainers": "7.6.2"
   },
   "jestSonar": {
     "reportPath": ".reports",
