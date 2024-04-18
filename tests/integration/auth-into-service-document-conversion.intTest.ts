@@ -9,6 +9,7 @@ import { getContainerizedDatabase } from "./cvsbnop-container";
 import { processStreamEvent } from "../../src/functions/process-stream-event";
 import { getConnectionPoolOptions } from "../../src/services/connection-pool-options";
 
+console.log("1\n", process.memoryUsage());
 if (process.env.USE_CONTAINERIZED_DATABASE === "1") {
   useLocalDb();
 }

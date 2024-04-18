@@ -9,6 +9,7 @@ import { processStreamEvent } from "../../src/functions/process-stream-event";
 import { getConnectionPoolOptions } from "../../src/services/connection-pool-options";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
+console.log("2\n", process.memoryUsage());
 if (process.env.USE_CONTAINERIZED_DATABASE === "1") {
   useLocalDb();
 }
