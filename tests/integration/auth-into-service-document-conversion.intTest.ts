@@ -9,8 +9,9 @@ import { getContainerizedDatabase } from "./cvsbnop-container";
 import { processStreamEvent } from "../../src/functions/process-stream-event";
 import { getConnectionPoolOptions } from "../../src/services/connection-pool-options";
 
-useLocalDb();
-
+if (process.env.USE_CONTAINERIZED_DATABASE === "1") {
+  useLocalDb();
+}
 describe("convertTechRecordDocument() integration tests", () => {
   let container: StartedTestContainer;
 

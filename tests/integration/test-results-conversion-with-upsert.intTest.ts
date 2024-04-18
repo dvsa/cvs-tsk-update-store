@@ -9,8 +9,9 @@ import { processStreamEvent } from "../../src/functions/process-stream-event";
 import { getConnectionPoolOptions } from "../../src/services/connection-pool-options";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
-useLocalDb();
-
+if (process.env.USE_CONTAINERIZED_DATABASE === "1") {
+  useLocalDb();
+}
 describe("convertTestResults() integration tests with upsert", () => {
   let container: StartedTestContainer;
   const testResultsJson = JSON.parse(
