@@ -27,6 +27,7 @@ module.exports = {
         "^.+\\.tsx?$": "ts-jest",
       },
       runner: "jest-serial-runner",
+      ignoreCoveragePathPatterns: ['/opt/']
     }
     ],
   };
