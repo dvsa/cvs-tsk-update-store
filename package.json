@@ -21,7 +21,7 @@
     "test-all": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local USE_CONTAINERIZED_DATABASE=1 AWS_XRAY_CONTEXT_MISSING=LOG_ERROR jest --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/!(*conversion).{js,ts}\"",
     "test": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local AWS_XRAY_CONTEXT_MISSING=LOG_ERROR jest --selectProjects UNIT --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/!(*conversion).{js,ts}\"",
     "test-i": "cross-env SQS_BUCKET=local AWS_REGION=local USE_CONTAINERIZED_DATABASE=0 BRANCH=local jest --selectProjects INTEGRATION --runInBand",
-    "test-local-i": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local USE_CONTAINERIZED_DATABASE=1 jest --selectProjects INTEGRATION --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/*conversion.{js,ts}\"",
+    "test-local-i": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local USE_CONTAINERIZED_DATABASE=1 jest --selectProjects INTEGRATION --runInBand",
     "lint": "tslint src/**/*.ts tests/**/*.ts -q",
     "prettier": "prettier --write ./**/*.{js,ts}",
     "prepush": "npm test && npm run build && npm run test-local-i",
