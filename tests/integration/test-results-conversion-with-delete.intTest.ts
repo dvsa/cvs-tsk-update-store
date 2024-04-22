@@ -11,7 +11,7 @@ import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 useLocalDb();
 
-describe("convertTestResults() integration tests with delete", async () => {
+describe("convertTestResults() integration tests with delete", () => {
   let container: StartedTestContainer;
   const testResultsJson = JSON.parse(
     JSON.stringify(require("../resources/dynamodb-image-test-results.json"))
