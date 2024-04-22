@@ -24,7 +24,7 @@
     "test-local-i": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local USE_CONTAINERIZED_DATABASE=1 jest --selectProjects INTEGRATION --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/!(*conversion).{js,ts}\"",
     "lint": "tslint src/**/*.ts tests/**/*.ts -q",
     "prettier": "prettier --write ./**/*.{js,ts}",
-    "prepush": "npm test && npm run build && npm run test-local-i",
+    "prepush": "npm run build && npm run test-local-i",
     "sonar-scanner": "sonar-scanner",
     "audit": "npm audit --omit=dev",
     "package": "mkdir -p ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME}/ && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
@@ -114,7 +114,7 @@
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "npm run security-checks && npm run audit && npm run lint && npm run prettier",
+      "pre-commit": "npm test && npm run security-checks && npm run audit && npm run lint && npm run prettier",
       "pre-push": "npm run prepush"
     }
   }
