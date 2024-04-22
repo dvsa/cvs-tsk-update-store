@@ -59,7 +59,7 @@
     "date-fns": "2.21.2",
     "liquibase": "1.0.1",
     "moment": "2.29.4",
-    "mysql2": "2.2.5",
+    "mysql2": "3.9.7",
     "prettier": "2.2.1",
     "reflect-metadata": "0.1.13",
     "testcontainers": "7.6.2",
