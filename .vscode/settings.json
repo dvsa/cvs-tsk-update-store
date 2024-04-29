@@ -1,4 +1,0 @@
-{
-    "jest.jestCommandLine": "npm run test-all --",
-    "jest.runMode": "on-demand"
-}

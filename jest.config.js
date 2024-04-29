@@ -11,7 +11,7 @@ module.exports = {
       moduleFileExtensions: ["js", "ts"],
       testResultsProcessor: "jest-sonar-reporter",
       transform: {
-        "^.+\\.tsx?$": "ts-jest",
+        "^.+\\.ts?$": "ts-jest",
       },
     },
     {
@@ -24,7 +24,7 @@ module.exports = {
       moduleFileExtensions: ["js", "ts"],
       testResultsProcessor: "jest-sonar-reporter",
       transform: {
-        "^.+\\.tsx?$": "ts-jest",
+        "^.+\\.ts?$": "ts-jest",
       },
       runner: "jest-serial-runner",
     }
