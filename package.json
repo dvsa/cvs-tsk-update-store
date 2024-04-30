@@ -62,13 +62,13 @@
     "mysql2": "3.9.7",
     "prettier": "2.2.1",
     "reflect-metadata": "0.1.13",
-    "testcontainers": "7.6.2",
     "ts-node-register": "1.0.0",
     "uuid": "8.3.2"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "3.266.0",
     "@aws-sdk/util-dynamodb": "3.266.0",
+    "testcontainers": "7.6.2",
     "@commitlint/cli": "12.1.4",
     "@commitlint/config-conventional": "12.1.4",
     "@types/aws-lambda": "8.10.34",
