@@ -1,4 +1,7 @@
-import { PutSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
+import {
+  PutSecretValueCommand,
+  SecretsManagerClient,
+} from "@aws-sdk/client-secrets-manager";
 import { processStreamEvent } from "./functions/process-stream-event";
 
 const isOffline: boolean =
@@ -11,11 +14,11 @@ if (isOffline) {
     SecretId: "secretid1",
     SecretString: JSON.stringify({
       accessKeyId: "accessKey1",
-      secretAccessKey: "verySecretKey1"
+      secretAccessKey: "verySecretKey1",
     }),
   });
 
-  SMC.send(command)
+  SMC.send(command);
 }
 
 export { processStreamEvent as handler };
