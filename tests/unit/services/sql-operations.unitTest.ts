@@ -1,3 +1,4 @@
+import { OperationType } from "@aws-sdk/client-dynamodb-streams";
 import { deriveSqlOperation } from "../../../src/services/sql-operations";
 
 describe("deriveSqlOperation()", () => {
@@ -14,6 +15,6 @@ describe("deriveSqlOperation()", () => {
   });
 
   it("should throw error on unrecognized operation", () => {
-    expect(() => deriveSqlOperation("any-unknown")).toThrowError();
+    expect(() => deriveSqlOperation("any-unknown" as unknown as OperationType)).toThrowError();
   });
 });
