@@ -1,4 +1,4 @@
-import { AttributeValue } from "aws-sdk/clients/dynamodbstreams";
+import { NativeAttributeValue } from "@aws-sdk/util-dynamodb";
 import { parseISO } from "date-fns";
 import { Maybe } from "../models/optionals";
 import { padWithZeros } from "../utils/padwithzeros";
@@ -38,7 +38,7 @@ export class DynamoDbImage {
    * This is the only way to instantiate this class.
    * @param image
    */
-  public static parse(image: { [key: string]: AttributeValue }): DynamoDbImage {
+  public static parse(image: { [key: string]: NativeAttributeValue }): DynamoDbImage {
     const fields: DynamoDbField[] = [];
     const fieldKeys = Object.keys(image);
 
@@ -176,7 +176,7 @@ export class DynamoDbImage {
       let index = 0;
       return new DynamoDbImage(
         v
-          .map((e: AttributeValue) => typeValuePair(e))
+          .map((e: NativeAttributeValue) => typeValuePair(e))
           .map(([type, value]: [DynamoDbType, any]) => {
             return {
               key: "" + index++,
@@ -276,7 +276,7 @@ const verifyType = (
   }
 };
 
-const typeValuePair = (value: AttributeValue): [DynamoDbType, any] => {
+const typeValuePair = (value: NativeAttributeValue): [DynamoDbType, any] => {
   const typeKeys = Object.keys(value);
 
   if (typeKeys.length !== 1) {

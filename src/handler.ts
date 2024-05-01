@@ -1,14 +1,21 @@
+import { PutSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
 import { processStreamEvent } from "./functions/process-stream-event";
-import { config as AWSConfig } from "aws-sdk";
 
 const isOffline: boolean =
   !process.env.BRANCH || process.env.BRANCH === "local";
 
 if (isOffline) {
-  AWSConfig.credentials = {
-    accessKeyId: "accessKey1",
-    secretAccessKey: "verySecretKey1",
-  };
+  const SMC = new SecretsManagerClient({});
+
+  const command = new PutSecretValueCommand({
+    SecretId: "secretid1",
+    SecretString: JSON.stringify({
+      accessKeyId: "accessKey1",
+      secretAccessKey: "verySecretKey1"
+    }),
+  });
+
+  SMC.send(command)
 }
 
 export { processStreamEvent as handler };
