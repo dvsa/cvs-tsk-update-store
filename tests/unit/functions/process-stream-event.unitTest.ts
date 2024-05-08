@@ -4,7 +4,7 @@ import {
 } from "../../../src/functions/process-stream-event";
 import { convert } from "../../../src/services/entity-conversion";
 import { exampleContext } from "../../utils";
-import { mocked } from "ts-jest";
+import { mocked } from 'ts-jest/utils'
 
 jest.mock("../../../src/services/entity-conversion", () => ({
   convert: jest.fn(),
