@@ -1,4 +1,4 @@
-import { OperationType } from "@aws-sdk/client-dynamodb-streams";
+import { OperationType } from "aws-sdk/clients/dynamodbstreams";
 
 export type SqlOperation = "INSERT" | "UPDATE" | "DELETE";
 

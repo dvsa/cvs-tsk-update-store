@@ -1,20 +1,12 @@
 import { getSecretValue } from "../../../src/services/secrets-manager";
-import { GetSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
-import { mockClient } from "aws-sdk-client-mock";
+import { SecretsManager } from "aws-sdk";
 
-const mockSecretsManager = mockClient(SecretsManagerClient)
-const mockSecretValue = (expectedSecretKey: string, secretValue: any) => {
-  mockSecretsManager.on(GetSecretValueCommand).callsFake((actualSecretKey) => {
-    if (expectedSecretKey === actualSecretKey?.SecretId) {
-      return Promise.resolve(secretValue);
-    }
-    return Promise.resolve(undefined);
-  });
-};
+jest.mock("aws-sdk");
+
 describe("getSecretValue()", () => {
   beforeEach(() => {
     // @ts-ignore
-    mockSecretsManager.reset();
+    SecretsManager.mockClear();
   });
 
   it("should fail on non-existent secret", async () => {
@@ -51,5 +43,19 @@ describe("getSecretValue()", () => {
     mockSecretValue(expectedSecretKey, {
       SecretBinary: Buffer.from(secretValue, "utf-8"),
     });
+  };
+
+  const mockSecretValue = (expectedSecretKey: string, secretValue: any) => {
+    // @ts-ignore
+    SecretsManager.mockImplementation(() => ({
+      getSecretValue: jest.fn().mockImplementation((actualSecretKey) => ({
+        promise: jest.fn().mockImplementation(() => {
+          if (expectedSecretKey === actualSecretKey?.SecretId) {
+            return Promise.resolve(secretValue);
+          }
+          return Promise.resolve(undefined);
+        }),
+      })),
+    }));
   };
 });
