@@ -36,7 +36,7 @@ export const getContainerizedDatabase = async (): Promise<StartedTestContainer> 
     "--password",
     "12345",
     "--url",
-    `jdbc:mysql://localhost:${hostPort}/${databaseName}`,
+    `jdbc:mysql://127.0.0.1:${hostPort}/${databaseName}`,
     "--classpath",
     `${pathToResources()}/mysql-connector-java-8.0.23.jar`,
     "update",

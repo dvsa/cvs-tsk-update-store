@@ -111,7 +111,7 @@
     "testResultsProcessor": "jest-sonar-reporter",
     "testURL": "http://localhost"
   },
-  "husky": {
+  "husky": {127.0.0.1
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
       "pre-commit": "npm test && npm run security-checks && npm run audit && npm run lint && npm run prettier",

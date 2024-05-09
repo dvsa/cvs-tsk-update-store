@@ -23,7 +23,7 @@ describe("convertTechRecordDocument() integration tests", () => {
       container = await getContainerizedDatabase();
     } else {
       (getConnectionPoolOptions as jest.Mock) = jest.fn().mockResolvedValue({
-        host: "localhost",
+        host: "127.0.0.1",
         port: "3306",
         user: "root",
         password: "12345",
