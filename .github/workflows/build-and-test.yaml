@@ -36,8 +36,7 @@ jobs:
         run: |
           repo=${{ github.repository }}
           echo "package-name=${repo#dvsa/}" >> $GITHUB_OUTPUT
-          echo "package-name=${repo#dvsa/}" >> $GITHUB_STEP_SUMMARY
-
+          echo "Package Name: ${repo#dvsa/}" >> $GITHUB_STEP_SUMMARY
 
       - name: 🪪 Get Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -83,15 +82,6 @@ jobs:
       - name: 📥 Get Codebase
         uses: actions/checkout@v4
 
-      - name: Get Commit SHA
-        id: commit
-        run: |
-          # Get the branch Commit ID
-          commit_id=$(git rev-parse HEAD)
-          echo "commit=${commit_id}"
-          echo "commit=${commit_id}" >> $GITHUB_OUTPUT
-          echo "Commit ID: ${commit_id}" >> $GITHUB_STEP_SUMMARY
-
       - name: 🗒️ Process Manifest Data
         id: manifest
         run: |
@@ -102,34 +92,15 @@ jobs:
             echo "package=$(jq -r '.name' manifest.json)" >> $GITHUB_OUTPUT
             echo "language=$(jq -r '.language' manifest.json)" >> $GITHUB_OUTPUT
             echo "liquibase=$(jq -r '.liquibase' manifest.json)" >> $GITHUB_OUTPUT
-
-            # Check for existing Hash
-            hashes=$(aws s3api list-objects-v2 --bucket ${{ env.bucket-name }} --query "Contents[?Key.contains(@,'${{ steps.commit.outputs.commit }}.zip') && Key.contains(@,'$package')].Key" | jq -rc)            
-            if [[ $(awk '{print index($0,"${{ steps.commit.outputs.commit }}")}' <<< $hashes) == 0 ]]; then
-              echo "Current Hash does not exist"
-              build_package=true
-
-            else
-              echo "Current Hash exists"
-              hash_files=$hashes
-              build_package=false 
-            fi
-
-          else
-            build_package=false
           fi
-
-          # Add flag to build or skip
-          echo "build-package=${build_package}" >> $GITHUB_OUTPUT
-          echo "Build Package: ${build_package}" >> $GITHUB_STEP_SUMMARY 
 
       - name: 🏗️ Build Node Function
         uses: dvsa/cvs-github-actions/build-node-function@develop
-        if: ${{ steps.manifest.outputs.build-package == 'true' && steps.manifest.outputs.language == 'node' }}
+        if: ${{ steps.manifest.outputs.language == 'node' }}
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          commit-sha: ${{ steps.commit.outputs.commit }}
+          commit-sha: ${{ needs.environment.outputs.commit }}
           branch: ${{needs.environment.outputs.github-branch }}
           mysql_liquibase: ${{ steps.manifest.outputs.liquibase }}
           mysql_user: ${{ secrets.MYSQL_USER }}
@@ -138,11 +109,11 @@ jobs:
 
       - name: 🏗️ Build Java Function
         uses: dvsa/cvs-github-actions/build-java-function@develop
-        if: ${{ steps.manifest.outputs.build-package == 'true' && steps.manifest.outputs.language == 'java' }}
+        if: ${{ steps.manifest.outputs.language == 'java' }}
 
       - name: 📤 Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ needs.environment.outputs.package-name }}
           path: |
-            ${{ steps.commit.outputs.commit }}*.zip
+            ${{ needs.environment.outputs.commit }}*.zip
