@@ -25,7 +25,7 @@ export const useLocalDb = (): void => {
     username: "root",
     password: "12345",
     engine: "",
-    host: "localhost",
+    host: "127.0.0.1",
     port: 3306,
     dbname: "",
     dbClusterIdentifier: "",
