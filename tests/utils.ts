@@ -1,4 +1,4 @@
-import { AttributeValue } from "aws-sdk/clients/dynamodbstreams";
+import { NativeAttributeValue } from "@aws-sdk/util-dynamodb";
 import path from "path";
 import { getSecretValue } from "../src/services/secrets-manager";
 import { SecretsManagerConfig } from "../src/models/aws-sm-config";
@@ -13,7 +13,7 @@ export const pathToResources = (): string => {
 
 export const castToImageShape = (
   json: any
-): { [key: string]: AttributeValue } => {
+): { [key: string]: NativeAttributeValue } => {
   return json as any;
 };
 
@@ -25,7 +25,7 @@ export const useLocalDb = (): void => {
     username: "root",
     password: "12345",
     engine: "",
-    host: "localhost",
+    host: "127.0.0.1",
     port: 3306,
     dbname: "",
     dbClusterIdentifier: "",
