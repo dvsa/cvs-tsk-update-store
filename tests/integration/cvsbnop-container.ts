@@ -1,45 +1,43 @@
-import { spawnSync } from "child_process";
-import { pathToResources } from "../utils";
-import { GenericContainer, StartedTestContainer } from "testcontainers";
-import { Port } from "testcontainers/dist/port";
-import { PoolOptions } from "mysql2";
-import { getConnectionPoolOptions } from "../../src/services/connection-pool-options";
+import { spawnSync } from 'child_process';
+import { GenericContainer, StartedTestContainer } from 'testcontainers';
+import { PoolOptions } from 'mysql2';
+import { pathToResources } from '../utils';
+import { getConnectionPoolOptions } from '../../src/services/connection-pool-options';
 
-export const containerMySqlPort: Port = 3306;
+export const containerMySqlPort = 3306;
 
-const databaseName: string = "CVSBNOP"; // match `${pathToResources()}/Dockerfile`
+const databaseName: string = 'CVSBNOP'; // match `${pathToResources()}/Dockerfile`
 
 export const getContainerizedDatabase = async (): Promise<StartedTestContainer> => {
   const containerDefinition = (
     await GenericContainer.fromDockerfile(
       pathToResources(),
-      "Dockerfile"
+      'Dockerfile',
     ).build()
   ).withExposedPorts(containerMySqlPort);
 
   const container: StartedTestContainer = await containerDefinition.start();
 
-  const hostPort: Port = container.getMappedPort(containerMySqlPort);
+  const hostPort = container.getMappedPort(containerMySqlPort);
 
   console.log(
-    `MySQL container '${container.getName()}' started on port ${hostPort} (ID: ${container.getId()})`
+    `MySQL container '${container.getName()}' started on port ${hostPort} (ID: ${container.getId()})`,
   );
 
-  const liquibaseExecutable =
-    process.platform === "win32" ? "liquibase.bat" : "liquibase";
+  const liquibaseExecutable = process.platform === 'win32' ? 'liquibase.bat' : 'liquibase';
 
   const liquibaseProcess = spawnSync(liquibaseExecutable, [
-    "--changeLogFile",
-    "cvs-nop/changelog-master.xml",
-    "--username",
-    "root",
-    "--password",
-    "12345",
-    "--url",
+    '--changeLogFile',
+    'cvs-nop/changelog-master.xml',
+    '--username',
+    'root',
+    '--password',
+    '12345',
+    '--url',
     `jdbc:mysql://127.0.0.1:${hostPort}/${databaseName}`,
-    "--classpath",
+    '--classpath',
     `${pathToResources()}/mysql-connector-java-8.0.23.jar`,
-    "update",
+    'update',
   ]);
 
   console.log(`Liquibase process started with PID ${liquibaseProcess.pid}`);
@@ -51,7 +49,7 @@ export const getContainerizedDatabase = async (): Promise<StartedTestContainer> 
 };
 
 const mockPoolOptions = async (
-  container: StartedTestContainer
+  container: StartedTestContainer,
 ): Promise<void> => {
   const poolOptions: PoolOptions = await getConnectionPoolOptions();
 

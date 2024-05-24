@@ -1,4 +1,4 @@
-import { DynamoDbImage } from "../services/dynamodb-images";
+import { DynamoDbImage } from '../services/dynamodb-images';
 
 export type Plates = Plate[];
 
@@ -11,12 +11,12 @@ export interface Plate {
 }
 
 export type PlateReasonForIssue =
-  | "Free replacement"
-  | "Replacement"
-  | "Destroyed"
-  | "Provisional"
-  | "Original"
-  | "Manual";
+  | 'Free replacement'
+  | 'Replacement'
+  | 'Destroyed'
+  | 'Provisional'
+  | 'Original'
+  | 'Manual';
 
 export const parsePlates = (platesImage?: DynamoDbImage): Plates => {
   if (!platesImage) {
@@ -29,13 +29,13 @@ export const parsePlates = (platesImage?: DynamoDbImage): Plates => {
     const plateImage = platesImage.getMap(key)!;
 
     plates.push({
-      plateSerialNumber: plateImage.getString("plateSerialNumber"),
-      plateIssueDate: plateImage.getDate("plateIssueDate"),
+      plateSerialNumber: plateImage.getString('plateSerialNumber'),
+      plateIssueDate: plateImage.getDate('plateIssueDate'),
       plateReasonForIssue: plateImage.getString(
-        "plateReasonForIssue"
+        'plateReasonForIssue',
       ) as PlateReasonForIssue,
-      plateIssuer: plateImage.getString("plateIssuer"),
-      toEmailAddress: plateImage.getString("toEmailAddress"),
+      plateIssuer: plateImage.getString('plateIssuer'),
+      toEmailAddress: plateImage.getString('toEmailAddress'),
     });
   }
 

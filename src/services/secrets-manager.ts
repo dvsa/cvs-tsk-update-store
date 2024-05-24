@@ -1,5 +1,5 @@
-import { GetSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
-import { debugLog } from "./logger";
+import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
+import { debugLog } from './logger';
 
 export const getSecretValue = async (secretName: string): Promise<string> => {
   // This constructor is inside the function for testability (Jest hoisting is a pain).
@@ -21,11 +21,11 @@ export const getSecretValue = async (secretName: string): Promise<string> => {
 
   if (secretValue.SecretString) {
     return secretValue.SecretString;
-  } else if (secretValue.SecretBinary) {
+  } if (secretValue.SecretBinary) {
     return secretValue.SecretBinary.toString();
   }
 
   throw new Error(
-    `secret '${secretName}' must contain one of ['SecretString', 'SecretBinary']`
+    `secret '${secretName}' must contain one of ['SecretString', 'SecretBinary']`,
   );
 };

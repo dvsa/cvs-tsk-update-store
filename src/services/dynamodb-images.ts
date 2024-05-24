@@ -1,10 +1,10 @@
-import { NativeAttributeValue } from "@aws-sdk/util-dynamodb";
-import { parseISO } from "date-fns";
-import { Maybe } from "../models/optionals";
-import { padWithZeros } from "../utils/padwithzeros";
+import { NativeAttributeValue } from '@aws-sdk/util-dynamodb';
+import { parseISO } from 'date-fns';
+import { Maybe } from '../models/optionals';
+import { padWithZeros } from '../utils/padwithzeros';
 
-export type DynamoDbItemType = "NULL" | "BOOL" | "S" | "N" | "B" | "M" | "L";
-export type DynamoDbArrayType = "SS" | "NS" | "BS";
+export type DynamoDbItemType = 'NULL' | 'BOOL' | 'S' | 'N' | 'B' | 'M' | 'L';
+export type DynamoDbArrayType = 'SS' | 'NS' | 'BS';
 export type DynamoDbType = DynamoDbItemType | DynamoDbArrayType;
 
 export interface DynamoDbField {
@@ -23,12 +23,12 @@ export class DynamoDbImage {
     this.fields = list.reduce(
       (
         map: Map<string, DynamoDbField>,
-        field: DynamoDbField
+        field: DynamoDbField,
       ): Map<string, DynamoDbField> => {
-        map.set(field.key!, field);
+        map.set(field.key, field);
         return map;
       },
-      new Map()
+      new Map(),
     );
   }
 
@@ -71,7 +71,7 @@ export class DynamoDbImage {
    * @param key
    */
   public getBoolean(key: string): boolean {
-    return this.parse(key, "BOOL", (v: any) => v as boolean, false);
+    return this.parse(key, 'BOOL', (v: any) => v as boolean, false);
   }
 
   /**
@@ -79,7 +79,7 @@ export class DynamoDbImage {
    * @param key
    */
   public getString(key: string): Maybe<string> {
-    return this.parseItem(key, "S", (v: any) => v as string);
+    return this.parseItem(key, 'S', (v: any) => v as string);
   }
 
   /**
@@ -87,7 +87,7 @@ export class DynamoDbImage {
    * @param key
    */
   public getDate(key: string): Maybe<string> {
-    return this.parseItem(key, "S", (v: any) => {
+    return this.parseItem(key, 'S', (v: any) => {
       const parsedDate = parseISO(v);
       const year = parsedDate.getUTCFullYear();
       const month = padToTwo(parsedDate.getUTCMonth() + 1);
@@ -106,7 +106,7 @@ export class DynamoDbImage {
    * @param key
    */
   public getStrings(key: string): string[] {
-    return this.parseArray(key, "SS", (arr: any) => arr as string[]);
+    return this.parseArray(key, 'SS', (arr: any) => arr as string[]);
   }
 
   /**
@@ -114,7 +114,7 @@ export class DynamoDbImage {
    * @param key
    */
   public getNumber(key: string): Maybe<number> {
-    return this.parseItem(key, "N", (v: any) => parseFloat(v));
+    return this.parseItem(key, 'N', (v: any) => parseFloat(v));
   }
 
   /**
@@ -124,8 +124,8 @@ export class DynamoDbImage {
   public getNumbers(key: string): number[] {
     return this.parseArray(
       key,
-      "NS",
-      (arr: any) => arr.map((e: any) => parseFloat(e)) as number[]
+      'NS',
+      (arr: any) => arr.map((e: any) => parseFloat(e)) as number[],
     );
   }
 
@@ -136,8 +136,8 @@ export class DynamoDbImage {
   public getBinary(key: string): Maybe<Buffer> {
     return this.parseItem(
       key,
-      "B",
-      (v: any) => Buffer.from(v, "base64") as Buffer
+      'B',
+      (v: any) => Buffer.from(v, 'base64'),
     );
   }
 
@@ -148,8 +148,8 @@ export class DynamoDbImage {
   public getBinaries(key: string): Buffer[] {
     return this.parseArray(
       key,
-      "BS",
-      (arr: any) => arr.map((e: string) => Buffer.from(e, "base64")) as Buffer[]
+      'BS',
+      (arr: any) => arr.map((e: string) => Buffer.from(e, 'base64')) as Buffer[],
     );
   }
 
@@ -160,8 +160,8 @@ export class DynamoDbImage {
   public getMap(key: string): Maybe<DynamoDbImage> {
     return this.parseItem(
       key,
-      "M",
-      (v: any) => DynamoDbImage.parse(v) as DynamoDbImage
+      'M',
+      (v: any) => DynamoDbImage.parse(v),
     );
   }
 
@@ -172,18 +172,16 @@ export class DynamoDbImage {
    * @param key
    */
   public getList(key: string): Maybe<DynamoDbImage> {
-    return this.parseItem(key, "L", (v: any) => {
+    return this.parseItem(key, 'L', (v: any) => {
       let index = 0;
       return new DynamoDbImage(
         v
           .map((e: NativeAttributeValue) => typeValuePair(e))
-          .map(([type, value]: [DynamoDbType, any]) => {
-            return {
-              key: "" + index++,
-              type,
-              value,
-            } as DynamoDbField;
-          })
+          .map(([type, value]: [DynamoDbType, any]) => ({
+            key: `${index++}`,
+            type,
+            value,
+          } as DynamoDbField)),
       );
     });
   }
@@ -207,7 +205,7 @@ export class DynamoDbImage {
   private parseItem<T>(
     key: string,
     expectedType: DynamoDbItemType,
-    parser: (value: any) => T
+    parser: (value: any) => T,
   ): Maybe<T> {
     return this.parse(key, expectedType, parser, undefined);
   }
@@ -222,7 +220,7 @@ export class DynamoDbImage {
   private parseArray<E>(
     key: string,
     expectedType: DynamoDbArrayType,
-    parser: (value: any) => E[]
+    parser: (value: any) => E[],
   ): E[] {
     return this.parse(key, expectedType, parser, []);
   }
@@ -231,7 +229,7 @@ export class DynamoDbImage {
     key: string,
     expectedType: DynamoDbType,
     parser: (value: any) => ANY,
-    defaultValue: ANY
+    defaultValue: ANY,
   ): ANY {
     const field: Maybe<DynamoDbField> = this.fields.get(key);
 
@@ -240,7 +238,7 @@ export class DynamoDbImage {
     }
 
     switch (field.type) {
-      case "NULL": {
+      case 'NULL': {
         // account for explicit nulls in source data
         return defaultValue;
       }
@@ -252,26 +250,24 @@ export class DynamoDbImage {
   }
 }
 
-const padToTwo = (digit: number): string => {
-  return digit > 9 ? digit.toString() : "0" + digit;
-};
+const padToTwo = (digit: number): string => (digit > 9 ? digit.toString() : `0${digit}`);
 
 const verifyType = (
   expectedType: DynamoDbType,
   field: DynamoDbField,
-  value: any
+  value: any,
 ) => {
   if (expectedType !== field.type) {
     if (
-      expectedType === "N" &&
-      field.type === "S" &&
-      !isNaN(value) &&
-      !isNaN(parseFloat(value))
+      expectedType === 'N'
+      && field.type === 'S'
+      && !Number.isNaN(value)
+      && !Number.isNaN(parseFloat(value))
     ) {
       return;
     }
     throw new Error(
-      `field ${field.key} is not of type "${expectedType}" (actual: "${field.type}")`
+      `field ${field.key} is not of type "${expectedType}" (actual: "${field.type}")`,
     );
   }
 };
@@ -281,7 +277,8 @@ const typeValuePair = (value: NativeAttributeValue): [DynamoDbType, any] => {
 
   if (typeKeys.length !== 1) {
     throw new Error(
-      `expected exactly 1 type key, found ${typeKeys.length} (${typeKeys})`
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      `expected exactly 1 type key, found ${typeKeys.length} (${typeKeys})`,
     );
   }
 

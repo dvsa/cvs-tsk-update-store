@@ -11,18 +11,17 @@ declare global {
 }
 
 if (!Array.prototype.fingerprintCleanser) {
-  Object.defineProperty(Array.prototype, "fingerprintCleanser", {
+  // eslint-disable-next-line no-extend-native
+  Object.defineProperty(Array.prototype, 'fingerprintCleanser', {
     enumerable: false,
     writable: false,
     configurable: false,
     value: function fingerprintCleanser(this: any[]): any[] {
-      return this.map((i) => (typeof i === "string" ? i?.trim() : i)).map((i) =>
-        i === "" ? null : i
-      );
+      return this.map((i) => (typeof i === 'string' ? i?.trim() : i)).map((i) => (i === '' ? null : i));
     },
   });
 }
 
 export function vinCleanser(vin: string | undefined): string {
-  return vin ? vin.replace(/[^a-zA-Z0-9]/g, "") : "";
+  return vin ? vin.replace(/[^a-zA-Z0-9]/g, '') : '';
 }
