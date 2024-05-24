@@ -12,6 +12,7 @@ import { deriveSqlOperation, SqlOperation } from "../services/sql-operations";
 import { destroyConnectionPool } from "../services/connection-pool";
 import { debugLog } from "../services/logger";
 import { BatchItemFailuresResponse } from "../models/batch-item-failure-response";
+import { transformTechRecord } from "../utils/transform-tech-record";
 
 /**
  * λ function: convert a DynamoDB document to Aurora RDS rows
@@ -60,6 +61,11 @@ export const processStreamEvent: Handler = async (
         dynamoRecord.eventName!
       );
 
+      if(tableName.includes('flat-tech-records')) {
+        transformTechRecord(dynamoRecord);
+        debugLog(`Dynamo Record after transformation: ${dynamoRecord}`);
+      }
+
       // parse native DynamoDB format to usable TS map
       const image: DynamoDbImage = selectImage(
         operationType,
@@ -72,7 +78,7 @@ export const processStreamEvent: Handler = async (
         debugLog(
           `DynamoDB ---> Aurora | START (event ID: ${dynamoRecord.eventID})`
         );
-
+        
         await convert(tableName, operationType, image);
 
         debugLog(
