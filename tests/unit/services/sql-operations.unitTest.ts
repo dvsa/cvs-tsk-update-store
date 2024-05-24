@@ -15,6 +15,6 @@ describe('deriveSqlOperation()', () => {
   });
 
   it('should throw error on unrecognized operation', () => {
-    expect(() => deriveSqlOperation('any-unknown' as unknown as OperationType)).toThrowError();
+    expect(() => deriveSqlOperation('any-unknown' as unknown as OperationType)).toThrow();
   });
 });

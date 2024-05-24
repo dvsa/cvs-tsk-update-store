@@ -80,7 +80,7 @@ describe('parse()', () => {
 
   it('should fail on request for incorrect type', () => {
     const image = DynamoDbImage.parse(castToImageShape(primitivesJson));
-    expect(() => image.getString('NumberField')).toThrowError('not of type');
+    expect(() => image.getString('NumberField')).toThrow('not of type');
   });
 
   it('should handle a number when presented as a null', () => {

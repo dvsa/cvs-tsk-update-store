@@ -38,7 +38,7 @@ describe('processStreamEvent()', () => {
 
         },
       ),
-    ).resolves.not.toThrowError();
+    ).resolves.not.toThrow();
     expect(convert).toHaveBeenCalledTimes(1);
   });
 

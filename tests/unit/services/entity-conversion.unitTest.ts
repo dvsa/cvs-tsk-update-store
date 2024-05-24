@@ -41,7 +41,7 @@ describe('convert()', () => {
   });
 
   it('should fail on non-existent table', async () => {
-    await expect(() => convert('any-unknown', 'INSERT', exampleImage())).rejects.toThrowError();
+    await expect(() => convert('any-unknown', 'INSERT', exampleImage())).rejects.toThrow();
   });
 
   const exampleImage = (): DynamoDbImage => DynamoDbImage.parse({

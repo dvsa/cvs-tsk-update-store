@@ -37,7 +37,7 @@ describe('getSecretValue()', () => {
 
   it('should fail on secret with no recognizable value format', async () => {
     mockSecretValue('MY-SECRET-KEY', { SecretFoo: 'MY-SECRET-VALUE' });
-    await expect(getSecretValue('MY-SECRET-KEY')).rejects.toThrowError(
+    await expect(getSecretValue('MY-SECRET-KEY')).rejects.toThrow(
       'one of',
     );
   });

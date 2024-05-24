@@ -362,7 +362,7 @@ describe('convertTestResults() integration tests with upsert', () => {
 
     });
 
-    expect(consoleSpy).toBeCalledTimes(0);
+    expect(consoleSpy).toHaveBeenCalledTimes(0);
 
     const vehicleResultSet = await executeSql(
       `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`, \`id\`
@@ -1548,7 +1548,7 @@ describe('convertTestResults() integration tests with upsert', () => {
     };
 
     expect(returnValue).toEqual(expectedValue);
-    expect(consoleSpy).nthCalledWith(
+    expect(consoleSpy).toHaveBeenNthCalledWith(
       1,
       "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
       [
