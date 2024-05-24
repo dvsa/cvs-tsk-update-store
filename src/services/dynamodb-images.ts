@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import { NativeAttributeValue } from '@aws-sdk/util-dynamodb';
 import { parseISO } from 'date-fns';
 import { Maybe } from '../models/optionals';
@@ -261,8 +262,8 @@ const verifyType = (
     if (
       expectedType === 'N'
       && field.type === 'S'
-      && !Number.isNaN(value)
-      && !Number.isNaN(parseFloat(value))
+      && !isNaN(value)
+      && !isNaN(parseFloat(value))
     ) {
       return;
     }

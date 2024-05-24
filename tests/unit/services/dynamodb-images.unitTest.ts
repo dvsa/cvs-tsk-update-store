@@ -112,37 +112,37 @@ describe('parse()', () => {
     let image = DynamoDbImage.parse(
       castToImageShape({ NumberField: { S: ' ' } }),
     );
-    expect(() => image.getNumber('NumberField')).toThrowError('not of type');
+    expect(() => image.getNumber('NumberField')).toThrow('not of type');
 
     image = DynamoDbImage.parse(castToImageShape({ NumberField: { S: '' } }));
-    expect(() => image.getNumber('NumberField')).toThrowError('not of type');
+    expect(() => image.getNumber('NumberField')).toThrow('not of type');
 
     image = DynamoDbImage.parse(castToImageShape({ NumberField: { S: '.' } }));
-    expect(() => image.getNumber('NumberField')).toThrowError('not of type');
+    expect(() => image.getNumber('NumberField')).toThrow('not of type');
 
     image = DynamoDbImage.parse(
       castToImageShape({ NumberField: { S: '1..' } }),
     );
-    expect(() => image.getNumber('NumberField')).toThrowError('not of type');
+    expect(() => image.getNumber('NumberField')).toThrow('not of type');
 
     image = DynamoDbImage.parse(
       castToImageShape({ NumberField: { S: '..1' } }),
     );
-    expect(() => image.getNumber('NumberField')).toThrowError('not of type');
+    expect(() => image.getNumber('NumberField')).toThrow('not of type');
 
     image = DynamoDbImage.parse(
       castToImageShape({ NumberField: { S: '1aa' } }),
     );
-    expect(() => image.getNumber('NumberField')).toThrowError('not of type');
+    expect(() => image.getNumber('NumberField')).toThrow('not of type');
 
     image = DynamoDbImage.parse(
       castToImageShape({ NumberField: { S: 'aa1' } }),
     );
-    expect(() => image.getNumber('NumberField')).toThrowError('not of type');
+    expect(() => image.getNumber('NumberField')).toThrow('not of type');
 
     image = DynamoDbImage.parse(
       castToImageShape({ NumberField: { S: 'string' } }),
     );
-    expect(() => image.getNumber('NumberField')).toThrowError('not of type');
+    expect(() => image.getNumber('NumberField')).toThrow('not of type');
   });
 });
