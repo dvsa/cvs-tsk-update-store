@@ -43,9 +43,7 @@ export const processStreamEvent: Handler = async (
 
     for await (const record of event.Records) {
       const id = record.messageId;
-      const dynamoRecord: DynamoDBRecord = JSON.parse(
-        record.body
-      ) as DynamoDBRecord;
+      const dynamoRecord: DynamoDBRecord = JSON.parse(JSON.parse(record.body).Message) as DynamoDBRecord;
 
       debugLog("Original DynamoDB stream event body (parsed): ", dynamoRecord);
 
@@ -56,15 +54,15 @@ export const processStreamEvent: Handler = async (
         dynamoRecord.eventSourceARN!
       );
 
-      // is this an INSERT, UPDATE, or DELETE?
-      const operationType: SqlOperation = deriveSqlOperation(
-        dynamoRecord.eventName!
-      );
-
       if(tableName.includes('flat-tech-records')) {
         transformTechRecord(dynamoRecord);
         debugLog(`Dynamo Record after transformation: ${dynamoRecord}`);
       }
+
+      // is this an INSERT, UPDATE, or DELETE?
+      const operationType: SqlOperation = deriveSqlOperation(
+        dynamoRecord.eventName!
+      );
 
       // parse native DynamoDB format to usable TS map
       const image: DynamoDbImage = selectImage(
@@ -144,7 +142,6 @@ const validateEvent = (event: DynamoDBStreamEvent): void => {
 };
 
 const validateRecord = (record: DynamoDBRecord): void => {
-  console.log(`validated record was ${record}`);
   if (!record) {
     throw new Error("record is null or undefined");
   }
