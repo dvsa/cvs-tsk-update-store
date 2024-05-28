@@ -30,7 +30,8 @@
     "audit": "npm audit --omit=dev",
     "package": "mkdir -p ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME}/ && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
     "security-checks": "git secrets --register-aws && git secrets --scan",
-    "tools-setup": "liquibase --changeLogFile ../cvs-nop/changelog-master.xml --username root --password 12345 --url jdbc:mysql://127.0.0.1:3306/CVSBNOP?createDatabaseIfNotExist=true --classpath /liquibase/lib/mysql.jar update"
+    "tools-setup": "liquibase --changeLogFile ../cvs-nop/changelog-master.xml --username root --password 12345 --url jdbc:mysql://127.0.0.1:3306/CVSBNOP?createDatabaseIfNotExist=true --classpath /liquibase/lib/mysql.jar update",
+    "prepare": "husky install"
   },
   "nyc": {
     "include": [
@@ -109,12 +110,5 @@
     "reportPath": ".reports",
     "reportFile": "test-report.xml",
     "indent": 4
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "npm test && npm run security-checks && npm run audit && npm run lint && npm run prettier",
-      "pre-push": "npm run prepush"
-    }
   }
 }
