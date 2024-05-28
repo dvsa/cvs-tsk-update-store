@@ -142,7 +142,6 @@ const validateEvent = (event: DynamoDBStreamEvent): void => {
 };
 
 const validateRecord = (record: DynamoDBRecord): void => {
-  console.log(`validated record was ${record}`);
   if (!record) {
     throw new Error("record is null or undefined");
   }
