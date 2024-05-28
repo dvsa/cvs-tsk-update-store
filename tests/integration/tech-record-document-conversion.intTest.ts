@@ -44,12 +44,14 @@ describe("convertTechRecordDocument() integration tests", () => {
       Records: [
         {
           body: JSON.stringify({
-            eventSourceARN:
+            Message: JSON.stringify({
+              eventSourceARN:
               "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
-            dynamodb: {
-              NewImage: techRecordDocumentJson,
-            },
+              eventName: "INSERT",
+              dynamodb: {
+                NewImage: techRecordDocumentJson,
+              },
+            })
           }),
         },
       ],
@@ -605,12 +607,14 @@ describe("convertTechRecordDocument() integration tests", () => {
         Records: [
           {
             body: JSON.stringify({
-              eventSourceARN:
+              Message: JSON.stringify({
+                eventSourceARN:
                 "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-              eventName: "INSERT",
-              dynamodb: {
-                NewImage: techRecordDocumentJsonNew,
-              },
+                eventName: "INSERT",
+                dynamodb: {
+                  NewImage: techRecordDocumentJsonNew,
+                },
+              })
             }),
           },
         ],
@@ -651,12 +655,14 @@ describe("convertTechRecordDocument() integration tests", () => {
         Records: [
           {
             body: JSON.stringify({
-              eventSourceARN:
+              Message: JSON.stringify({
+                eventSourceARN:
                 "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-              eventName: "INSERT",
-              dynamodb: {
-                NewImage: techRecordDocumentJsonNew,
-              },
+                eventName: "INSERT",
+                dynamodb: {
+                  NewImage: techRecordDocumentJsonNew,
+                },
+              })
             }),
           },
         ],
