@@ -1,11 +1,10 @@
-import {
+import type {
   Context,
   DynamoDBRecord,
   DynamoDBStreamEvent,
   Handler,
   SQSEvent,
   StreamRecord,
-// eslint-disable-next-line import/no-unresolved
 } from 'aws-lambda';
 import { convert } from '../services/entity-conversion';
 import { DynamoDbImage } from '../services/dynamodb-images';
