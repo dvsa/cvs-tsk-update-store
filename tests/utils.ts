@@ -1,6 +1,6 @@
 import { NativeAttributeValue } from '@aws-sdk/util-dynamodb';
 import path from 'path';
-import { Context } from 'aws-lambda';
+import type { Context } from 'aws-lambda';
 import { getSecretValue } from '../src/services/secrets-manager';
 import { SecretsManagerConfig } from '../src/models/aws-sm-config';
 
