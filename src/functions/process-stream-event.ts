@@ -12,6 +12,7 @@ import { deriveSqlOperation, SqlOperation } from '../services/sql-operations';
 import { destroyConnectionPool } from '../services/connection-pool';
 import { debugLog } from '../services/logger';
 import { BatchItemFailuresResponse } from '../models/batch-item-failure-response';
+import { transformTechRecord } from '../utils/transform-tech-record';
 
 /**
  * λ function: convert a DynamoDB document to Aurora RDS rows

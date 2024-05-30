@@ -945,8 +945,9 @@ describe('convertTestResults() integration tests with delete', () => {
               dynamodb: {
                 NewImage: serializedJSONb,
               },
+            }),
           }),
-        },
+        }
       ],
     };
 
