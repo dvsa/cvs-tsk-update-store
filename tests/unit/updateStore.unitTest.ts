@@ -1,5 +1,5 @@
-describe("UpdateStore function", () => {
-  it("should return true", () => {
+describe('UpdateStore function', () => {
+  it('should return true', () => {
     expect(true).toBe(true);
   });
 });

@@ -1,12 +1,12 @@
-import { DynamoDbImage } from "../services/dynamodb-images";
-import { Maybe } from "./optionals";
+import { DynamoDbImage } from '../services/dynamodb-images';
+import { Maybe } from './optionals';
 
-export type ModTypeCode = "p" | "m" | "g";
+export type ModTypeCode = 'p' | 'm' | 'g';
 
 export type ModTypeDescription =
-  | "particulate trap"
-  | "modification or change of engine"
-  | "gas engine";
+  | 'particulate trap'
+  | 'modification or change of engine'
+  | 'gas engine';
 
 export interface ModType {
   code?: ModTypeCode;
@@ -19,7 +19,7 @@ export const parseModType = (image?: DynamoDbImage): Maybe<ModType> => {
   }
 
   return {
-    code: image.getString("code") as ModTypeCode,
-    description: image.getString("description") as ModTypeDescription,
+    code: image.getString('code') as ModTypeCode,
+    description: image.getString('description') as ModTypeDescription,
   };
 };

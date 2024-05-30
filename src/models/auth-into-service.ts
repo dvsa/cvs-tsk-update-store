@@ -1,5 +1,5 @@
-import { DynamoDbImage } from "../services/dynamodb-images";
-import { Maybe } from "./optionals";
+import { DynamoDbImage } from '../services/dynamodb-images';
+import { Maybe } from './optionals';
 
 export interface AuthIntoService {
   cocIssueDate?: string;
@@ -10,14 +10,14 @@ export interface AuthIntoService {
 }
 
 export const parseAuthIntoService = (
-  authIntoServiceImage?: DynamoDbImage
+  authIntoServiceImage?: DynamoDbImage,
 ): Maybe<AuthIntoService> => {
   const authIntoService = {
-    cocIssueDate: authIntoServiceImage?.getString("cocIssueDate"),
-    dateAuthorised: authIntoServiceImage?.getString("dateAuthorised"),
-    datePending: authIntoServiceImage?.getString("datePending"),
-    dateReceived: authIntoServiceImage?.getString("dateReceived"),
-    dateRejected: authIntoServiceImage?.getString("dateRejected"),
+    cocIssueDate: authIntoServiceImage?.getString('cocIssueDate'),
+    dateAuthorised: authIntoServiceImage?.getString('dateAuthorised'),
+    datePending: authIntoServiceImage?.getString('datePending'),
+    dateReceived: authIntoServiceImage?.getString('dateReceived'),
+    dateRejected: authIntoServiceImage?.getString('dateRejected'),
   };
 
   for (const value of Object.values(authIntoService)) {

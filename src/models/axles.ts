@@ -1,5 +1,5 @@
-import { DynamoDbImage } from "../services/dynamodb-images";
-import { Maybe } from "./optionals";
+import { DynamoDbImage } from '../services/dynamodb-images';
+import { Maybe } from './optionals';
 
 export type Axles = Axle[];
 
@@ -28,24 +28,24 @@ export interface AxleTyreProperties {
   tyreCode?: number;
 }
 
-export type FitmentCode = "double" | "single";
+export type FitmentCode = 'double' | 'single';
 
 export type SpeedCategorySymbol =
-  | "a7"
-  | "a8"
-  | "b"
-  | "c"
-  | "d"
-  | "e"
-  | "f"
-  | "g"
-  | "j"
-  | "k"
-  | "l"
-  | "m"
-  | "n"
-  | "p"
-  | "q";
+  | 'a7'
+  | 'a8'
+  | 'b'
+  | 'c'
+  | 'd'
+  | 'e'
+  | 'f'
+  | 'g'
+  | 'j'
+  | 'k'
+  | 'l'
+  | 'm'
+  | 'n'
+  | 'p'
+  | 'q';
 
 export interface AxleBrakeProperties {
   brakeActuator?: number;
@@ -63,13 +63,13 @@ export const parseAxles = (axlesImage?: DynamoDbImage): Axles => {
   for (const key of axlesImage.getKeys()) {
     const axleImage = axlesImage.getMap(key)!;
 
-    const weights = parseAxleWeightProperties(axleImage.getMap("weights"));
-    const tyres = parseAxleTyreProperties(axleImage.getMap("tyres"));
-    const brakes = parseAxleBrakeProperties(axleImage.getMap("brakes"));
+    const weights = parseAxleWeightProperties(axleImage.getMap('weights'));
+    const tyres = parseAxleTyreProperties(axleImage.getMap('tyres'));
+    const brakes = parseAxleBrakeProperties(axleImage.getMap('brakes'));
 
     axles.push({
-      axleNumber: axleImage.getNumber("axleNumber"),
-      parkingBrakeMrk: axleImage.getBoolean("parkingBrakeMrk"),
+      axleNumber: axleImage.getNumber('axleNumber'),
+      parkingBrakeMrk: axleImage.getBoolean('parkingBrakeMrk'),
       weights,
       brakes,
       tyres,
@@ -80,54 +80,54 @@ export const parseAxles = (axlesImage?: DynamoDbImage): Axles => {
 };
 
 const parseAxleWeightProperties = (
-  axleWeightPropertiesImage?: DynamoDbImage
+  axleWeightPropertiesImage?: DynamoDbImage,
 ): Maybe<AxleWeightProperties> => {
   if (!axleWeightPropertiesImage) {
     return undefined;
   }
 
   return {
-    kerbWeight: axleWeightPropertiesImage.getNumber("kerbWeight"),
-    ladenWeight: axleWeightPropertiesImage.getNumber("ladenWeight"),
-    gbWeight: axleWeightPropertiesImage.getNumber("gbWeight"),
-    eecWeight: axleWeightPropertiesImage.getNumber("eecWeight"),
-    designWeight: axleWeightPropertiesImage.getNumber("designWeight"),
+    kerbWeight: axleWeightPropertiesImage.getNumber('kerbWeight'),
+    ladenWeight: axleWeightPropertiesImage.getNumber('ladenWeight'),
+    gbWeight: axleWeightPropertiesImage.getNumber('gbWeight'),
+    eecWeight: axleWeightPropertiesImage.getNumber('eecWeight'),
+    designWeight: axleWeightPropertiesImage.getNumber('designWeight'),
   };
 };
 
 const parseAxleTyreProperties = (
-  axleTyrePropertiesImage?: DynamoDbImage
+  axleTyrePropertiesImage?: DynamoDbImage,
 ): Maybe<AxleTyreProperties> => {
   if (!axleTyrePropertiesImage) {
     return undefined;
   }
 
   return {
-    tyreSize: axleTyrePropertiesImage.getString("tyreSize"),
-    plyRating: axleTyrePropertiesImage.getString("plyRating"),
+    tyreSize: axleTyrePropertiesImage.getString('tyreSize'),
+    plyRating: axleTyrePropertiesImage.getString('plyRating'),
     fitmentCode: axleTyrePropertiesImage.getString(
-      "fitmentCode"
+      'fitmentCode',
     ) as FitmentCode,
-    dataTrAxles: axleTyrePropertiesImage.getNumber("dataTrAxles"),
+    dataTrAxles: axleTyrePropertiesImage.getNumber('dataTrAxles'),
     speedCategorySymbol: axleTyrePropertiesImage.getString(
-      "speedCategorySymbol"
+      'speedCategorySymbol',
     ) as SpeedCategorySymbol,
-    tyreCode: axleTyrePropertiesImage.getNumber("tyreCode"),
+    tyreCode: axleTyrePropertiesImage.getNumber('tyreCode'),
   };
 };
 
 const parseAxleBrakeProperties = (
-  axleBrakePropertiesImage?: DynamoDbImage
+  axleBrakePropertiesImage?: DynamoDbImage,
 ): Maybe<AxleBrakeProperties> => {
   if (!axleBrakePropertiesImage) {
     return undefined;
   }
 
   return {
-    brakeActuator: axleBrakePropertiesImage.getNumber("brakeActuator"),
-    leverLength: axleBrakePropertiesImage.getNumber("leverLength"),
+    brakeActuator: axleBrakePropertiesImage.getNumber('brakeActuator'),
+    leverLength: axleBrakePropertiesImage.getNumber('leverLength'),
     springBrakeParking: axleBrakePropertiesImage.getBoolean(
-      "springBrakeParking"
+      'springBrakeParking',
     ),
   };
 };
