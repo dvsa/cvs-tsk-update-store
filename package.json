@@ -57,7 +57,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.577.0",
     "@aws-sdk/client-dynamodb-streams": "3.577.0",
-    "@aws-sdk/client-secrets-manager": "3.565.0",
+    "@aws-sdk/client-secrets-manager": "3.572.0",
     "@aws-sdk/util-dynamodb": "3.577.0",
     "@types/lambda-tester": "4.0.3",
     "aws-xray-sdk": "3.6.0",
