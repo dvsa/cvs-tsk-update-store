@@ -1,5 +1,5 @@
-import { DynamoDBRecord, AttributeValue } from 'aws-lambda';
-import { DynamoDB } from 'aws-sdk';
+import { _Record } from '@aws-sdk/client-dynamodb-streams';
+import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { debugLog } from '../services/logger';
 
 interface LegacyKeyStructure {
@@ -54,19 +54,19 @@ const transformImage = (image: NewKeyStructure) => {
 
   vehicle.techRecord.push(legacyRecord.techRecord as LegacyKeyStructure);
 
-  return (DynamoDB.Converter.marshall(vehicle) as { [key: string]: AttributeValue; });
+  return (marshall(vehicle));
 };
 
-export const transformTechRecord = (record: DynamoDBRecord) => {
+export const transformTechRecord = (record: _Record) => {
   if (record.dynamodb?.OldImage) {
     debugLog('Transforming old image of flat-tech-record');
-    const OldImage: NewKeyStructure = DynamoDB.Converter.unmarshall(record.dynamodb.OldImage);
+    const OldImage: NewKeyStructure = unmarshall(record.dynamodb.OldImage);
     record.dynamodb.OldImage = transformImage(OldImage);
   }
 
   if (record.dynamodb?.NewImage) {
     debugLog('Transforming new image of flat-tech-record');
-    const NewImage: NewKeyStructure = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage);
+    const NewImage: NewKeyStructure = unmarshall(record.dynamodb.NewImage);
     record.dynamodb.NewImage = transformImage(NewImage);
   }
   debugLog('Succesfully transformed flat-tech-record stream record');
