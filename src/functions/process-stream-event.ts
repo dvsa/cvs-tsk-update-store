@@ -1,3 +1,4 @@
+import { _Record } from '@aws-sdk/client-dynamodb-streams';
 import type {
   Context,
   DynamoDBRecord,
@@ -6,12 +7,12 @@ import type {
   SQSEvent,
   StreamRecord,
 } from 'aws-lambda';
-import { convert } from '../services/entity-conversion';
-import { DynamoDbImage } from '../services/dynamodb-images';
-import { deriveSqlOperation, SqlOperation } from '../services/sql-operations';
-import { destroyConnectionPool } from '../services/connection-pool';
-import { debugLog } from '../services/logger';
 import { BatchItemFailuresResponse } from '../models/batch-item-failure-response';
+import { destroyConnectionPool } from '../services/connection-pool';
+import { DynamoDbImage } from '../services/dynamodb-images';
+import { convert } from '../services/entity-conversion';
+import { debugLog } from '../services/logger';
+import { SqlOperation, deriveSqlOperation } from '../services/sql-operations';
 import { transformTechRecord } from '../utils/transform-tech-record';
 
 /**
@@ -54,8 +55,8 @@ export const processStreamEvent: Handler = async (
         dynamoRecord.eventSourceARN!,
       );
 
-      if(tableName.includes('flat-tech-records')) {
-        transformTechRecord(dynamoRecord);
+      if (tableName.includes('flat-tech-records')) {
+        transformTechRecord(dynamoRecord as _Record);
         debugLog(`Dynamo Record after transformation: ${dynamoRecord}`);
       }
 
@@ -76,7 +77,7 @@ export const processStreamEvent: Handler = async (
         debugLog(
           `DynamoDB ---> Aurora | START (event ID: ${dynamoRecord.eventID})`,
         );
-        
+
         await convert(tableName, operationType, image);
 
         debugLog(
