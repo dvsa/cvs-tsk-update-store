@@ -1,4 +1,3 @@
-import { _Record } from '@aws-sdk/client-dynamodb-streams';
 import type {
   Context,
   DynamoDBRecord,
@@ -7,13 +6,12 @@ import type {
   SQSEvent,
   StreamRecord,
 } from 'aws-lambda';
-import { BatchItemFailuresResponse } from '../models/batch-item-failure-response';
-import { destroyConnectionPool } from '../services/connection-pool';
-import { DynamoDbImage } from '../services/dynamodb-images';
 import { convert } from '../services/entity-conversion';
+import { DynamoDbImage } from '../services/dynamodb-images';
+import { deriveSqlOperation, SqlOperation } from '../services/sql-operations';
+import { destroyConnectionPool } from '../services/connection-pool';
 import { debugLog } from '../services/logger';
-import { SqlOperation, deriveSqlOperation } from '../services/sql-operations';
-import { transformTechRecord } from '../utils/transform-tech-record';
+import { BatchItemFailuresResponse } from '../models/batch-item-failure-response';
 
 /**
  * λ function: convert a DynamoDB document to Aurora RDS rows
@@ -44,7 +42,9 @@ export const processStreamEvent: Handler = async (
 
     for await (const record of event.Records) {
       const id = record.messageId;
-      const dynamoRecord: DynamoDBRecord = JSON.parse(JSON.parse(record.body).Message) as DynamoDBRecord;
+      const dynamoRecord: DynamoDBRecord = JSON.parse(
+        record.body,
+      ) as DynamoDBRecord;
 
       debugLog('Original DynamoDB stream event body (parsed): ', dynamoRecord);
 
@@ -54,11 +54,6 @@ export const processStreamEvent: Handler = async (
       const tableName: string = getTableNameFromArn(
         dynamoRecord.eventSourceARN!,
       );
-
-      if (tableName.includes('flat-tech-records')) {
-        transformTechRecord(dynamoRecord as _Record);
-        debugLog(`Dynamo Record after transformation: ${dynamoRecord}`);
-      }
 
       // is this an INSERT, UPDATE, or DELETE?
       const operationType: SqlOperation = deriveSqlOperation(
