@@ -44,7 +44,7 @@ export const processStreamEvent: Handler = async (
 
     for await (const record of event.Records) {
       const id = record.messageId;
-      const dynamoRecord: DynamoDBRecord = JSON.parse(JSON.parse(record.body).Message) as DynamoDBRecord;
+      const dynamoRecord: DynamoDBRecord = JSON.parse(record.body) as DynamoDBRecord;
 
       debugLog('Original DynamoDB stream event body (parsed): ', dynamoRecord);
 
