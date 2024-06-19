@@ -14,9 +14,9 @@ export const parseAuthIntoService = (
 ): Maybe<AuthIntoService> => {
   const authIntoService = {
     cocIssueDate: authIntoServiceImage?.getString('cocIssueDate'),
-    dateAuthorised: authIntoServiceImage?.getString('dateAuthorised'),
-    datePending: authIntoServiceImage?.getString('datePending'),
     dateReceived: authIntoServiceImage?.getString('dateReceived'),
+    datePending: authIntoServiceImage?.getString('datePending'),
+    dateAuthorised: authIntoServiceImage?.getString('dateAuthorised'),
     dateRejected: authIntoServiceImage?.getString('dateRejected'),
   };
 
