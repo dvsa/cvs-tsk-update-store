@@ -72,8 +72,8 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-              eventName: "INSERT",
+              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
               },
@@ -145,13 +145,13 @@ describe('convertTechRecordDocument() integration tests', () => {
           cocIssueDate: {
             NULL: true,
           },
-          dateAuthorised: {
+          dateReceived: {
             S: '2020-02-02',
           },
           datePending: {
             NULL: true,
           },
-          dateReceived: {
+          dateAuthorised: {
             S: '2020-04-04',
           },
           dateRejected: {
@@ -165,8 +165,8 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-              eventName: "INSERT",
+              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
               },
@@ -241,8 +241,8 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-              eventName: "INSERT",
+              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
               },
@@ -296,8 +296,8 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-              eventName: "INSERT",
+              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
               },
@@ -375,12 +375,12 @@ describe('convertTechRecordDocument() integration tests', () => {
         Records: [
           {
             body: JSON.stringify({
-                eventSourceARN:
-                "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-                eventName: "INSERT",
-                dynamodb: {
-                  NewImage: techRecordDocumentJsonNew,
-                },
+              eventSourceARN:
+                'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+              eventName: 'INSERT',
+              dynamodb: {
+                NewImage: techRecordDocumentJsonNew,
+              },
             }),
           },
         ],
@@ -434,8 +434,8 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-              eventName: "INSERT",
+              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
               },
@@ -494,8 +494,8 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-              eventName: "INSERT",
+              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
               },
@@ -572,14 +572,14 @@ describe('convertTechRecordDocument() integration tests', () => {
       const event = {
         Records: [
           {
-            body: JSON.stringify( {
+            body: JSON.stringify({
               eventSourceARN:
-              "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-              eventName: "INSERT",
+              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
-              },   
-           })
+              },
+            }),
           },
         ],
       };

@@ -72,8 +72,8 @@ describe('convertTestResults() integration tests with upsert', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: testResultsJson,
             },
@@ -345,8 +345,8 @@ describe('convertTestResults() integration tests with upsert', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: testResultsJson,
             },
@@ -643,8 +643,8 @@ describe('convertTestResults() integration tests with upsert', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: serializedJSONb,
             },
@@ -933,8 +933,8 @@ describe('convertTestResults() integration tests with upsert', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: serializedJSONb,
             },
@@ -1202,8 +1202,8 @@ describe('convertTestResults() integration tests with upsert', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: testResultsJsonWithTestTypes,
             },
@@ -1520,8 +1520,8 @@ describe('convertTestResults() integration tests with upsert', () => {
           messageId: 'faf41ab1-5b42-462c-b242-c4450e15c724',
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: testResultsJsonWithNoSystemNumber,
             },
@@ -1564,8 +1564,8 @@ describe('convertTestResults() integration tests with upsert', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: testResultsJsonWithoutTestTypes,
             },
