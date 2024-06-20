@@ -60,13 +60,11 @@
     "@aws-sdk/client-secrets-manager": "3.565.0",
     "@aws-sdk/util-dynamodb": "3.577.0",
     "@types/lambda-tester": "4.0.3",
-    "aws-sdk": "2.1643.0",
     "aws-xray-sdk": "3.6.0",
     "date-fns": "3.6.0",
     "moment": "2.30.1",
     "mysql2": "3.9.8",
     "reflect-metadata": "0.2.2",
-    "semver": "7.6.2",
     "ts-node-register": "1.0.0",
     "uuid": "9.0.1"
   },
