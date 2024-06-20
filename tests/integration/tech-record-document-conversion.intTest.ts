@@ -1,41 +1,31 @@
-import { StartedTestContainer } from 'testcontainers';
 import {
   destroyConnectionPool,
   executeSql,
 } from '../../src/services/connection-pool';
 import { exampleContext, useLocalDb } from '../utils';
 import techRecordDocumentJson from '../resources/dynamodb-image-technical-record.json';
-import { getContainerizedDatabase } from './cvsbnop-container';
 import { processStreamEvent } from '../../src/functions/process-stream-event';
 import { getConnectionPoolOptions } from '../../src/services/connection-pool-options';
+import { databaseTearDown } from './database-teardown';
 
 useLocalDb();
 jest.setTimeout(60_000);
 describe('convertTechRecordDocument() integration tests', () => {
-  let container: StartedTestContainer;
-
   beforeAll(async () => {
     jest.restoreAllMocks();
 
-    // see README for why this environment variable exists
-    if (process.env.USE_CONTAINERIZED_DATABASE === '1') {
-      container = await getContainerizedDatabase();
-    } else {
-      (getConnectionPoolOptions as jest.Mock) = jest.fn().mockResolvedValue({
-        host: '127.0.0.1',
-        port: '3306',
-        user: 'root',
-        password: '12345',
-        database: 'CVSBNOP',
-      });
-    }
+    (getConnectionPoolOptions as jest.Mock) = jest.fn().mockResolvedValue({
+      host: '127.0.0.1',
+      port: '3306',
+      user: 'root',
+      password: '12345',
+      database: 'CVSBNOP',
+    });
+    await databaseTearDown();
   });
 
   afterAll(async () => {
     await destroyConnectionPool();
-    if (process.env.USE_CONTAINERIZED_DATABASE === '1') {
-      await container.stop();
-    }
   });
 
   it('should correctly convert a DynamoDB event into Aurora rows', async () => {
@@ -44,8 +34,8 @@ describe('convertTechRecordDocument() integration tests', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: techRecordDocumentJson,
             },
@@ -605,8 +595,8 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-              eventName: "INSERT",
+              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
               },
@@ -651,8 +641,8 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-              eventName: "INSERT",
+              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
               },

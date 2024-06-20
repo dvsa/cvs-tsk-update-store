@@ -18,10 +18,10 @@
     "build:dev": "node_modules/typescript/bin/tsc && npm run build:copy",
     "build:copy": "find src -type f \\( -name \"*.yml\" -or -name \"*.json\" \\) | cpio -pdm .build && find tests -type f \\( -name \"*.yml\" -or -name \"*.json\" -or -name \"*.base64\" \\)  | cpio -pdm .build",
     "build:docker": "docker-compose -f docker-compose.yml up -d --build",
-    "test-all": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local USE_CONTAINERIZED_DATABASE=1 AWS_XRAY_CONTEXT_MISSING=LOG_ERROR jest --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/!(*conversion).{js,ts}\"",
+    "test-all": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local AWS_XRAY_CONTEXT_MISSING=LOG_ERROR jest --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/!(*conversion).{js,ts}\"",
     "test": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local AWS_XRAY_CONTEXT_MISSING=LOG_ERROR jest --selectProjects UNIT --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/!(*conversion).{js,ts}\"",
-    "test-i": "cross-env SQS_BUCKET=local AWS_REGION=local USE_CONTAINERIZED_DATABASE=0 BRANCH=local jest --selectProjects INTEGRATION --runInBand",
-    "test-local-i": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local USE_CONTAINERIZED_DATABASE=1 jest --selectProjects INTEGRATION --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/!(*conversion).{js,ts}\"",
+    "test-i": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local jest --selectProjects INTEGRATION --runInBand",
+    "test-local-i": "cross-env SQS_BUCKET=local AWS_REGION=local BRANCH=local jest --selectProjects INTEGRATION --runInBand --coverage --collectCoverageFrom=\"src/!(models)/**/!(*conversion).{js,ts}\"",
     "lint:fix": "eslint '*/**/*.ts' --quiet --fix",
     "lint": "eslint '*/**/*.ts'",
     "prettier": "prettier --write ./**/*.{js,ts}",
@@ -31,7 +31,8 @@
     "package": "mkdir -p ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME}/ && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
     "security-checks": "git secrets --register-aws && git secrets --scan",
     "tools-setup": "liquibase --changeLogFile ../cvs-nop/changelog-master.xml --username root --password 12345 --url jdbc:mysql://127.0.0.1:3306/CVSBNOP?createDatabaseIfNotExist=true --classpath /liquibase/lib/mysql.jar update",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "start-db": "docker compose -f 'docker-compose.yaml' up -d --build --wait && liquibase --url=jdbc:mysql://127.0.0.1:3306/CVSBNOP --driver=com.mysql.cj.jdbc.Driver --classpath=./tests/resources/mysql-connector-java-8.0.23.jar --username=root --password=12345 --changeLogFile ./cvs-nop/changelog-master.xml update"
   },
   "nyc": {
     "include": [
@@ -100,7 +101,6 @@
     "serverless-plugin-typescript": "2.1.5",
     "sinon": "18.0.0",
     "sonar-scanner": "3.1.0",
-    "testcontainers": "10.9.0",
     "ts-jest": "29.1.4",
     "typescript": "5.4.5"
   },

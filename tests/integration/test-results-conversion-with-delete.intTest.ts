@@ -1,20 +1,18 @@
 /* eslint-disable global-require */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { StartedTestContainer } from 'testcontainers';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import {
   destroyConnectionPool,
   executeSql,
 } from '../../src/services/connection-pool';
 import { exampleContext, useLocalDb } from '../utils';
-import { getContainerizedDatabase } from './cvsbnop-container';
 import { processStreamEvent } from '../../src/functions/process-stream-event';
 import { getConnectionPoolOptions } from '../../src/services/connection-pool-options';
+import { databaseTearDown } from './database-teardown';
 
 useLocalDb();
 jest.setTimeout(60_000);
 describe('convertTestResults() integration tests with delete', () => {
-  let container: StartedTestContainer;
   const testResultsJson = JSON.parse(
     JSON.stringify(require('../resources/dynamodb-image-test-results.json')),
   );
@@ -45,25 +43,18 @@ describe('convertTestResults() integration tests with delete', () => {
     delete process.env.DISABLE_DELETE_ON_UPDATE;
     jest.restoreAllMocks();
 
-    // see README for why this environment variable exists
-    if (process.env.USE_CONTAINERIZED_DATABASE === '1') {
-      container = await getContainerizedDatabase();
-    } else {
-      (getConnectionPoolOptions as jest.Mock) = jest.fn().mockResolvedValue({
-        host: '127.0.0.1',
-        port: '3306',
-        user: 'root',
-        password: '12345',
-        database: 'CVSBNOP',
-      });
-    }
+    (getConnectionPoolOptions as jest.Mock) = jest.fn().mockResolvedValue({
+      host: '127.0.0.1',
+      port: '3306',
+      user: 'root',
+      password: '12345',
+      database: 'CVSBNOP',
+    });
+    await databaseTearDown();
   });
 
   afterAll(async () => {
     await destroyConnectionPool();
-    if (process.env.USE_CONTAINERIZED_DATABASE === '1') {
-      await container.stop();
-    }
   });
 
   it('should correctly convert a DynamoDB event into Aurora rows', async () => {
@@ -72,8 +63,8 @@ describe('convertTestResults() integration tests with delete', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: testResultsJson,
             },
@@ -345,8 +336,8 @@ describe('convertTestResults() integration tests with delete', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: testResultsJson,
             },
@@ -643,8 +634,8 @@ describe('convertTestResults() integration tests with delete', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: serializedJSONb,
             },
@@ -933,13 +924,13 @@ describe('convertTestResults() integration tests with delete', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: serializedJSONb,
             },
           }),
-        }
+        },
       ],
     };
 
@@ -1202,8 +1193,8 @@ describe('convertTestResults() integration tests with delete', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: testResultsJsonWithTestTypes,
             },
@@ -1520,8 +1511,8 @@ describe('convertTestResults() integration tests with delete', () => {
           messageId: 'faf41ab1-5b42-462c-b242-c4450e15c724',
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: testResultsJsonWithNoSystemNumber,
             },
@@ -1564,8 +1555,8 @@ describe('convertTestResults() integration tests with delete', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: testResultsJsonWithoutTestTypes,
             },
