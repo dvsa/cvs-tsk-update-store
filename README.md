@@ -55,22 +55,23 @@ To change this, set the environment variable `DEBUG` to any non-null value, e.g.
 This will cause numerous debug logs to fire. Messages will include event information, SQL, template variables, procedure entries and exits and more.
 
 ### Tests
+
+#### Unit tests
+Run all unit tests:
 ```shell
 npm run test
 ```
-Runs all unit tests
 
-```shell
-npm run test-all
-```
-Runs all the tests (Unit and Integration)
-
-### Integration tests
+#### Integration tests
 Integration tests depend on:
 * a local Docker installation, with `docker` on the system's path
 * a local Liquibase installation, with `liquibase` or `liquibase.bat` (on Windows) on the system's path
 
-They work by:
+##### Prerequisites
+Local database container should be spinned up before running any integration tests  
+```shell
+npm run start-local-db
+```
 1. Creating a MySQL container
 2. Spawning a Liquibase executable
 3. Applying a Liquibase changelog to the running container
@@ -81,19 +82,15 @@ Run them using:
 npm run test-local-i
 ```
 
-On Windows, you will need to manually run:
-* `SET USE_CONTAINERIZED_DATABASE=1`
-* Confirm: `echo %USE_CONTAINERIZED_DATABASE%` should return `1`before the above, or run these tests with an IntelliJ configuration which sets the right environment variable for you.
-
-On Tanio Artino's advice, there is a distinction between running integration tests locally, and running them on Jenkins.
-* `USE_CONTAINERIZED_DATABASE=0` will attempt to talk to `127.0.0.1:3306`. This only works if you manually start a DB or, in the case of Jenkins, if there is a pre-existing DB running on port `3306`.
-* `USE_CONTAINERIZED_DATABASE=1` will spin up a TC container as described above.
-
 To run the "Jenkins" version, e.g. `USE_CONTAINERIZED_DATABASE=0`, use:
 ```shell
 npm run test-i
 ```
 
+Run all the tests (Unit and Integration):
+```shell
+npm run test-all
+```
 ## Full conversion procedure
 Rough ordering - may not follow code exactly.
 
