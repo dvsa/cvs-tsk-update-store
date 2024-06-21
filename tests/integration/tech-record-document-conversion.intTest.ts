@@ -4,7 +4,7 @@ import {
   executeSql,
 } from '../../src/services/connection-pool';
 import { exampleContext, useLocalDb } from '../utils';
-import techRecordDocumentJson from '../resources/dynamodb-image-technical-record.json';
+import techRecordDocumentJson from '../resources/dynamodb-image-technical-record-V3.json';
 import { getContainerizedDatabase } from './cvsbnop-container';
 import { processStreamEvent } from '../../src/functions/process-stream-event';
 import { getConnectionPoolOptions } from '../../src/services/connection-pool-options';
@@ -44,8 +44,8 @@ describe('convertTechRecordDocument() integration tests', () => {
         {
           body: JSON.stringify({
             eventSourceARN:
-            "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-            eventName: "INSERT",
+              'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
             dynamodb: {
               NewImage: techRecordDocumentJson,
             },
@@ -605,8 +605,8 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-              eventName: "INSERT",
+                'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
               },
@@ -651,8 +651,8 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
-              eventName: "INSERT",
+                'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
               },

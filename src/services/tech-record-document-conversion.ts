@@ -607,9 +607,9 @@ const upsertAuthIntoService = async (
     [
       techRecordId,
       techRecord.authIntoService?.cocIssueDate,
-      techRecord.authIntoService?.dateAuthorised,
-      techRecord.authIntoService?.datePending,
       techRecord.authIntoService?.dateReceived,
+      techRecord.authIntoService?.datePending,
+      techRecord.authIntoService?.dateAuthorised,
       techRecord.authIntoService?.dateRejected,
     ],
     connection,
