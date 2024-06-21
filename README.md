@@ -72,24 +72,25 @@ Local database container should be spinned up before running any integration tes
 ```shell
 npm run start-local-db
 ```
-1. Creating a MySQL container
-2. Spawning a Liquibase executable
-3. Applying a Liquibase changelog to the running container
-4. Overriding connection pool configuration to connect to container
+This will:
+1. Create a MySQL container
+2. Spawn a Liquibase executable
+3. Apply a Liquibase changelog to the running container
 
-Run them using:
+Test setup will override connection pool configuration to connect to the container. Each test file will clear the database before running tests.
+
+Run the test using:
 ```shell
 npm run test-local-i
-```
-
-To run the "Jenkins" version, e.g. `USE_CONTAINERIZED_DATABASE=0`, use:
-```shell
-npm run test-i
 ```
 
 Run all the tests (Unit and Integration):
 ```shell
 npm run test-all
+```
+Local container can be removed with:
+```shell
+npm run stop-local-db
 ```
 ## Full conversion procedure
 Rough ordering - may not follow code exactly.

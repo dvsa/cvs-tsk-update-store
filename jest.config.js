@@ -9,7 +9,6 @@ module.exports = {
       roots: ["<rootDir>/tests"],
       setupFiles: ["jest-plugin-context/setup"],
       moduleFileExtensions: ["js", "ts"],
-      testResultsProcessor: "jest-sonar-reporter",
       transform: {
         "^.+\\.ts?$": "ts-jest",
       },
@@ -22,7 +21,6 @@ module.exports = {
       roots: ["<rootDir>/tests"],
       setupFiles: ["jest-plugin-context/setup"],
       moduleFileExtensions: ["js", "ts"],
-      testResultsProcessor: "jest-sonar-reporter",
       transform: {
         "^.+\\.ts?$": "ts-jest",
       },
