@@ -32,7 +32,8 @@
     "security-checks": "git secrets --register-aws && git secrets --scan",
     "tools-setup": "liquibase --changeLogFile ../cvs-nop/changelog-master.xml --username root --password 12345 --url jdbc:mysql://127.0.0.1:3306/CVSBNOP?createDatabaseIfNotExist=true --classpath /liquibase/lib/mysql.jar update",
     "prepare": "husky install",
-    "start-db": "docker compose -f 'docker-compose.yaml' up -d --build --wait && liquibase --url=jdbc:mysql://127.0.0.1:3306/CVSBNOP --driver=com.mysql.cj.jdbc.Driver --classpath=./tests/resources/mysql-connector-java-8.0.23.jar --username=root --password=12345 --changeLogFile ./cvs-nop/changelog-master.xml update"
+    "start-local-db": "docker compose -f 'docker-compose.yaml' up -d --build --wait && liquibase --url=jdbc:mysql://127.0.0.1:3306/CVSBNOP --driver=com.mysql.cj.jdbc.Driver --classpath=./tests/resources/mysql-connector-java-8.0.23.jar --username=root --password=12345 --changeLogFile ./cvs-nop/changelog-master.xml update",
+    "stop-local-db": "docker compose down"
   },
   "nyc": {
     "include": [
