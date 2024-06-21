@@ -4,7 +4,7 @@ import {
   executeSql,
 } from '../../src/services/connection-pool';
 import { exampleContext, useLocalDb } from '../utils';
-import techRecordDocumentJson from '../resources/dynamodb-image-technical-record.json';
+import techRecordDocumentJson from '../resources/dynamodb-image-technical-record-V3.json';
 import { getContainerizedDatabase } from './cvsbnop-container';
 import { processStreamEvent } from '../../src/functions/process-stream-event';
 import { getConnectionPoolOptions } from '../../src/services/connection-pool-options';
@@ -47,24 +47,21 @@ describe('convertTechRecordDocument() integration tests', () => {
       );
       techRecordDocumentJsonNew.systemNumber = { S: 'SYSTEM-NUMBER-1a' };
       techRecordDocumentJsonNew.vin = { S: 'VIN1a' };
-      techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService = {
-        M: {
-          cocIssueDate: {
+      techRecordDocumentJsonNew.techRecord_authIntoService_cocIssueDate = {
             S: '2020-01-01',
-          },
-          dateAuthorised: {
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateAuthorised = {
             NULL: true,
-          },
-          datePending: {
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_datePending = {
             S: '2020-03-03',
-          },
-          dateReceived: {
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateReceived = {
             NULL: true,
-          },
-          dateRejected: {
+      };
+
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateRejected = {
             S: '2020-05-05',
-          },
-        },
       };
 
       const event = {
@@ -140,24 +137,21 @@ describe('convertTechRecordDocument() integration tests', () => {
       );
       techRecordDocumentJsonNew.systemNumber = { S: 'SYSTEM-NUMBER-1a' };
       techRecordDocumentJsonNew.vin = { S: 'VIN1a' };
-      techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService = {
-        M: {
-          cocIssueDate: {
+      techRecordDocumentJsonNew.techRecord_authIntoService_cocIssueDate = {
+        NULL: true,
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateAuthorised = {
+        S: '2020-04-04',
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_datePending = {
             NULL: true,
-          },
-          dateReceived: {
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateReceived = {
             S: '2020-02-02',
-          },
-          datePending: {
+      };
+
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateRejected = {
             NULL: true,
-          },
-          dateAuthorised: {
-            S: '2020-04-04',
-          },
-          dateRejected: {
-            NULL: true,
-          },
-        },
       };
 
       const event = {
@@ -234,7 +228,22 @@ describe('convertTechRecordDocument() integration tests', () => {
       );
       techRecordDocumentJsonNew.systemNumber = { S: 'SYSTEM-NUMBER-1b' };
       techRecordDocumentJsonNew.vin = { S: 'VIN1b' };
-      techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService = { M: {} };
+      techRecordDocumentJsonNew.techRecord_authIntoService_cocIssueDate = {
+        NULL: true,
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateAuthorised = {
+        NULL: true,
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_datePending = {
+        NULL: true,
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateReceived = {
+        NULL: true,
+      };
+
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateRejected = {
+        NULL: true,
+      };
 
       const event = {
         Records: [
@@ -369,7 +378,11 @@ describe('convertTechRecordDocument() integration tests', () => {
       );
       techRecordDocumentJsonNew.systemNumber = { S: 'SYSTEM-NUMBER-1b' };
       techRecordDocumentJsonNew.vin = { S: 'VIN1b' };
-      techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService = { M: {} };
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_cocIssueDate;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateAuthorised;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_datePending;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateReceived;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateRejected;
 
       const event = {
         Records: [
@@ -427,7 +440,11 @@ describe('convertTechRecordDocument() integration tests', () => {
       );
       techRecordDocumentJsonNew.systemNumber = { S: 'SYSTEM-NUMBER-1c' };
       techRecordDocumentJsonNew.vin = { S: 'VIN1c' };
-      delete techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_cocIssueDate;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateAuthorised;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_datePending;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateReceived;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateRejected;
 
       const event = {
         Records: [
@@ -567,7 +584,11 @@ describe('convertTechRecordDocument() integration tests', () => {
       );
       techRecordDocumentJsonNew.systemNumber = { S: 'SYSTEM-NUMBER-1c' };
       techRecordDocumentJsonNew.vin = { S: 'VIN1c' };
-      delete techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_cocIssueDate;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateAuthorised;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_datePending;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateReceived;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateRejected;
 
       const event = {
         Records: [

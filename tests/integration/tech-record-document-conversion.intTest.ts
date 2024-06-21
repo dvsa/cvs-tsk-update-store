@@ -4,7 +4,7 @@ import {
   executeSql,
 } from '../../src/services/connection-pool';
 import { exampleContext, useLocalDb } from '../utils';
-import techRecordDocumentJson from '../resources/dynamodb-image-technical-record.json';
+import techRecordDocumentJson from '../resources/dynamodb-image-technical-record-V3.json';
 import { getContainerizedDatabase } from './cvsbnop-container';
 import { processStreamEvent } from '../../src/functions/process-stream-event';
 import { getConnectionPoolOptions } from '../../src/services/connection-pool-options';
