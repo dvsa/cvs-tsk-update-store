@@ -3,7 +3,7 @@ import {
   executeSql,
 } from '../../src/services/connection-pool';
 import { exampleContext, useLocalDb } from '../utils';
-import techRecordDocumentJson from '../resources/dynamodb-image-technical-record.json';
+import techRecordDocumentJson from '../resources/dynamodb-image-technical-record-V3.json';
 import { processStreamEvent } from '../../src/functions/process-stream-event';
 import { getConnectionPoolOptions } from '../../src/services/connection-pool-options';
 import { databaseTearDown } from './database-teardown';
@@ -37,24 +37,21 @@ describe('convertTechRecordDocument() integration tests', () => {
       );
       techRecordDocumentJsonNew.systemNumber = { S: 'SYSTEM-NUMBER-1a' };
       techRecordDocumentJsonNew.vin = { S: 'VIN1a' };
-      techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService = {
-        M: {
-          cocIssueDate: {
-            S: '2020-01-01',
-          },
-          dateAuthorised: {
-            NULL: true,
-          },
-          datePending: {
-            S: '2020-03-03',
-          },
-          dateReceived: {
-            NULL: true,
-          },
-          dateRejected: {
-            S: '2020-05-05',
-          },
-        },
+      techRecordDocumentJsonNew.techRecord_authIntoService_cocIssueDate = {
+        S: '2020-01-01',
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateAuthorised = {
+        NULL: true,
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_datePending = {
+        S: '2020-03-03',
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateReceived = {
+        NULL: true,
+      };
+
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateRejected = {
+        S: '2020-05-05',
       };
 
       const event = {
@@ -62,7 +59,7 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+                'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
               eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
@@ -130,24 +127,21 @@ describe('convertTechRecordDocument() integration tests', () => {
       );
       techRecordDocumentJsonNew.systemNumber = { S: 'SYSTEM-NUMBER-1a' };
       techRecordDocumentJsonNew.vin = { S: 'VIN1a' };
-      techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService = {
-        M: {
-          cocIssueDate: {
-            NULL: true,
-          },
-          dateAuthorised: {
-            S: '2020-02-02',
-          },
-          datePending: {
-            NULL: true,
-          },
-          dateReceived: {
-            S: '2020-04-04',
-          },
-          dateRejected: {
-            NULL: true,
-          },
-        },
+      techRecordDocumentJsonNew.techRecord_authIntoService_cocIssueDate = {
+        NULL: true,
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateAuthorised = {
+        S: '2020-04-04',
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_datePending = {
+        NULL: true,
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateReceived = {
+        S: '2020-02-02',
+      };
+
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateRejected = {
+        NULL: true,
       };
 
       const event = {
@@ -155,7 +149,7 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+                'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
               eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
@@ -224,14 +218,29 @@ describe('convertTechRecordDocument() integration tests', () => {
       );
       techRecordDocumentJsonNew.systemNumber = { S: 'SYSTEM-NUMBER-1b' };
       techRecordDocumentJsonNew.vin = { S: 'VIN1b' };
-      techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService = { M: {} };
+      techRecordDocumentJsonNew.techRecord_authIntoService_cocIssueDate = {
+        NULL: true,
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateAuthorised = {
+        NULL: true,
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_datePending = {
+        NULL: true,
+      };
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateReceived = {
+        NULL: true,
+      };
+
+      techRecordDocumentJsonNew.techRecord_authIntoService_dateRejected = {
+        NULL: true,
+      };
 
       const event = {
         Records: [
           {
             body: JSON.stringify({
               eventSourceARN:
-              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+                'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
               eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
@@ -286,7 +295,7 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+                'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
               eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
@@ -359,14 +368,18 @@ describe('convertTechRecordDocument() integration tests', () => {
       );
       techRecordDocumentJsonNew.systemNumber = { S: 'SYSTEM-NUMBER-1b' };
       techRecordDocumentJsonNew.vin = { S: 'VIN1b' };
-      techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService = { M: {} };
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_cocIssueDate;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateAuthorised;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_datePending;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateReceived;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateRejected;
 
       const event = {
         Records: [
           {
             body: JSON.stringify({
               eventSourceARN:
-                'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+                'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
               eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
@@ -417,14 +430,18 @@ describe('convertTechRecordDocument() integration tests', () => {
       );
       techRecordDocumentJsonNew.systemNumber = { S: 'SYSTEM-NUMBER-1c' };
       techRecordDocumentJsonNew.vin = { S: 'VIN1c' };
-      delete techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_cocIssueDate;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateAuthorised;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_datePending;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateReceived;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateRejected;
 
       const event = {
         Records: [
           {
             body: JSON.stringify({
               eventSourceARN:
-              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+                'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
               eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
@@ -484,7 +501,7 @@ describe('convertTechRecordDocument() integration tests', () => {
           {
             body: JSON.stringify({
               eventSourceARN:
-              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+                'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
               eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,
@@ -557,14 +574,18 @@ describe('convertTechRecordDocument() integration tests', () => {
       );
       techRecordDocumentJsonNew.systemNumber = { S: 'SYSTEM-NUMBER-1c' };
       techRecordDocumentJsonNew.vin = { S: 'VIN1c' };
-      delete techRecordDocumentJsonNew.techRecord.L[0].M.authIntoService;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_cocIssueDate;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateAuthorised;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_datePending;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateReceived;
+      delete techRecordDocumentJsonNew.techRecord_authIntoService_dateRejected;
 
       const event = {
         Records: [
           {
             body: JSON.stringify({
               eventSourceARN:
-              'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+                'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
               eventName: 'INSERT',
               dynamodb: {
                 NewImage: techRecordDocumentJsonNew,

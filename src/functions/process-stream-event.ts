@@ -29,7 +29,7 @@ export const processStreamEvent: Handler = async (
   };
 
   try {
-    debugLog('Received SQS event: ', event);
+    debugLog('Received SQS event: ', JSON.stringify(event));
 
     validateEvent(event);
 

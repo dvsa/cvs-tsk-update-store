@@ -13,13 +13,13 @@ describe('parseAuthIntoService()', () => {
         cocIssueDate: {
           S: '2020-01-01',
         },
-        dateAuthorised: {
+        dateReceived: {
           S: '2020-02-02',
         },
         datePending: {
           S: '2020-03-03',
         },
-        dateReceived: {
+        dateAuthorised: {
           S: '2020-04-04',
         },
         dateRejected: {
@@ -27,7 +27,6 @@ describe('parseAuthIntoService()', () => {
         },
       },
     };
-
     const image = DynamoDbImage.parse(castToImageShape(techRecordDocumentJson));
     const techRecordDocument: TechRecordDocument = parseTechRecordDocument(
       image,
@@ -38,13 +37,13 @@ describe('parseAuthIntoService()', () => {
       techRecordDocument.techRecord![0].authIntoService?.cocIssueDate,
     ).toBe('2020-01-01');
     expect(
-      techRecordDocument.techRecord![0].authIntoService?.dateAuthorised,
+      techRecordDocument.techRecord![0].authIntoService?.dateReceived,
     ).toBe('2020-02-02');
     expect(
       techRecordDocument.techRecord![0].authIntoService?.datePending,
     ).toBe('2020-03-03');
     expect(
-      techRecordDocument.techRecord![0].authIntoService?.dateReceived,
+      techRecordDocument.techRecord![0].authIntoService?.dateAuthorised,
     ).toBe('2020-04-04');
     expect(
       techRecordDocument.techRecord![0].authIntoService?.dateRejected,

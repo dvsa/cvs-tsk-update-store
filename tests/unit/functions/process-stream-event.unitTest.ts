@@ -22,13 +22,13 @@ describe('processStreamEvent()', () => {
         {
           Records: [
             {
-              body: JSON.stringify({      
-                eventName: "INSERT",
+              body: JSON.stringify({
+                eventName: 'INSERT',
                 dynamodb: {
                   NewImage: {},
                 },
                 eventSourceARN:
-                  "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
+                  'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
               }),
             },
           ],
@@ -187,34 +187,34 @@ describe('processStreamEvent()', () => {
           {
             messageId: 'SUCCESS',
             body: JSON.stringify({
-              eventName: "INSERT",
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: {},
               },
               eventSourceARN:
-                "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
+                'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
             }),
           },
           {
             messageId: 'FAILURE',
             body: JSON.stringify({
-              eventName: "INSERT",
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: {},
               },
               eventSourceARN:
-                "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
+                'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
             }),
           },
           {
             messageId: 'SUCCESS',
             body: JSON.stringify({
-              eventName: "INSERT",
+              eventName: 'INSERT',
               dynamodb: {
                 NewImage: {},
               },
               eventSourceARN:
-                "arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000",
+                'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
             }),
           },
         ],
