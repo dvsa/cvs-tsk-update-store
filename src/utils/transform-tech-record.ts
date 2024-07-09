@@ -36,7 +36,7 @@ const nestItem = (record: LegacyKeyStructure, key: string, value: string | numbe
   return record;
 };
 
-const transformImage = (image: NewKeyStructure) => {
+export const transformImage = (image: NewKeyStructure) => {
   const vehicle = {} as LegacyTechRecord;
   vehicle.techRecord = [];
 

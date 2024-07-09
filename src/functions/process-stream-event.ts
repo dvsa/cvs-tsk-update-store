@@ -13,7 +13,12 @@ import { DynamoDbImage } from '../services/dynamodb-images';
 import { convert } from '../services/entity-conversion';
 import { debugLog } from '../services/logger';
 import { SqlOperation, deriveSqlOperation } from '../services/sql-operations';
-import { transformTechRecord } from '../utils/transform-tech-record';
+import {transformImage, transformTechRecord} from '../utils/transform-tech-record';
+import {unmarshall} from "@aws-sdk/util-dynamodb";
+import {TestResult} from "../models/test-results";
+import {TechRecord} from "../models/tech-record";
+
+let logManager: ILog[] = [];
 
 /**
  * λ function: convert a DynamoDB document to Aurora RDS rows
@@ -27,10 +32,13 @@ export const processStreamEvent: Handler = async (
   const res: BatchItemFailuresResponse = {
     batchItemFailures: [],
   };
-
   try {
+    const processStartTime: Date = new Date();
     debugLog('Received SQS event: ', JSON.stringify(event));
-
+    let changeType: string = 'Test record change';
+    let testResultId: string = '';
+    let identifier: string | undefined = '';
+    let statusCode: string | undefined = '';
     validateEvent(event);
 
     const region = process.env.AWS_REGION;
@@ -58,13 +66,26 @@ export const processStreamEvent: Handler = async (
       if (tableName.includes('flat-tech-records')) {
         transformTechRecord(dynamoRecord as _Record);
         debugLog(`Dynamo Record after transformation: ${dynamoRecord}`);
+        let technicalRecord: any = dynamoRecord.dynamodb?.NewImage
+        const unmarshalledTechnicalRecord =  transformImage(unmarshall(technicalRecord)) as TechRecord;
+        statusCode = unmarshalledTechnicalRecord.statusCode;
+        changeType = "Technical Record Change"
+      } else {
+        const testResult: any  = dynamoRecord.dynamodb?.NewImage;
+        const unmarshalledTestResult = unmarshall(testResult) as TestResult;
+        testResultId = unmarshalledTestResult.testResultId ?? '';
+        identifier = unmarshalledTestResult.vehicleType === 'trl' ? unmarshalledTestResult.trailerId : unmarshalledTestResult.vrm
       }
-
+      addToILog(
+          tableName,
+          changeType,
+          statusCode,
+          testResultId,
+      );
       // is this an INSERT, UPDATE, or DELETE?
       const operationType: SqlOperation = deriveSqlOperation(
         dynamoRecord.eventName!,
       );
-
       // parse native DynamoDB format to usable TS map
       const image: DynamoDbImage = selectImage(
         operationType,
@@ -83,6 +104,8 @@ export const processStreamEvent: Handler = async (
         debugLog(
           `DynamoDB ---> Aurora | END   (event ID: ${dynamoRecord.eventID})`,
         );
+        console.log(`** RESULTS **\nProcess start time is: ${processStartTime.toISOString()} \n${JSON.stringify(logManager)}`,
+        )
       } catch (err) {
         console.error(
           "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
@@ -164,4 +187,19 @@ const validateRecord = (record: DynamoDBRecord): void => {
 const dumpArguments = (event: DynamoDBStreamEvent, context: Context): void => {
   console.error('Event dump  : ', JSON.stringify(event));
   console.error('Context dump: ', JSON.stringify(context));
+};
+
+const addToILog = (
+    identifier: string,
+    changeType: string,
+    statusCode?: string,
+    testResultId?: string,
+) => {
+    const iLog: ILog = {
+        identifier,
+        changeType,
+        statusCode,
+        testResultId,
+    };
+    logManager.push(iLog);
 };
