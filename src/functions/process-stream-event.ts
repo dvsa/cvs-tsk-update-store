@@ -14,9 +14,9 @@ import { convert } from '../services/entity-conversion';
 import { debugLog } from '../services/logger';
 import { SqlOperation, deriveSqlOperation } from '../services/sql-operations';
 import { transformImage, transformTechRecord } from '../utils/transform-tech-record';
-import {unmarshall} from "@aws-sdk/util-dynamodb";
-import {TestResult} from "../models/test-results";
-import {TechRecord} from "../models/tech-record";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { TestResult } from "../models/test-results";
+import { TechRecord } from "../models/tech-record";
 
 let logManager: ILog[] = [];
 
