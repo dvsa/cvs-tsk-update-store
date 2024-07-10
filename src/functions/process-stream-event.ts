@@ -13,7 +13,7 @@ import { DynamoDbImage } from '../services/dynamodb-images';
 import { convert } from '../services/entity-conversion';
 import { debugLog } from '../services/logger';
 import { SqlOperation, deriveSqlOperation } from '../services/sql-operations';
-import {transformImage, transformTechRecord} from '../utils/transform-tech-record';
+import { transformImage, transformTechRecord } from '../utils/transform-tech-record';
 import {unmarshall} from "@aws-sdk/util-dynamodb";
 import {TestResult} from "../models/test-results";
 import {TechRecord} from "../models/tech-record";
@@ -101,7 +101,7 @@ export const processStreamEvent: Handler = async (
 
         await convert(tableName, operationType, image);
 
-        debugLog(
+        debugLog(tt
           `DynamoDB ---> Aurora | END   (event ID: ${dynamoRecord.eventID})`,
         );
         console.log(`** RESULTS **\nProcess start time is: ${processStartTime.toISOString()} \n${JSON.stringify(logManager)}`,
