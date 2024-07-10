@@ -101,7 +101,7 @@ export const processStreamEvent: Handler = async (
 
         await convert(tableName, operationType, image);
 
-        debugLog(tt
+        debugLog(
           `DynamoDB ---> Aurora | END   (event ID: ${dynamoRecord.eventID})`,
         );
         console.log(`** RESULTS **\nProcess start time is: ${processStartTime.toISOString()} \n${JSON.stringify(logManager)}`,
