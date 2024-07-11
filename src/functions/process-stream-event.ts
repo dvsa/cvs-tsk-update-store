@@ -20,7 +20,7 @@ import { TechRecord } from "../models/tech-record";
 
 let logManager: ILog[] = [];
 
-/**
+tt/**
  * λ function: convert a DynamoDB document to Aurora RDS rows
  * @param event - DynamoDB stream event, containing DynamoDB document image
  * @param context - λ context
@@ -36,7 +36,7 @@ export const processStreamEvent: Handler = async (
     const processStartTime: Date = new Date();
     debugLog('Received SQS event: ', JSON.stringify(event));
     let changeType: string = 'Test record change';
-    let testResultId: string = '';
+    let testResultId: tstring = '';
     let identifier: string | undefined = '';
     let statusCode: string | undefined = '';
     validateEvent(event);
@@ -66,15 +66,15 @@ export const processStreamEvent: Handler = async (
       if (tableName.includes('flat-tech-records')) {
         transformTechRecord(dynamoRecord as _Record);
         debugLog(`Dynamo Record after transformation: ${dynamoRecord}`);
-        let technicalRecord: any = dynamoRecord.dynamodb?.NewImage
+        let technicalRecord: any = dynamoRecord.dynamodb?.NewImage;
         const unmarshalledTechnicalRecord =  transformImage(unmarshall(technicalRecord)) as TechRecord;
         statusCode = unmarshalledTechnicalRecord.statusCode;
-        changeType = "Technical Record Change"
+        changeType = "Technical Record Change";
       } else {
         const testResult: any  = dynamoRecord.dynamodb?.NewImage;
         const unmarshalledTestResult = unmarshall(testResult) as TestResult;
         testResultId = unmarshalledTestResult.testResultId ?? '';
-        identifier = unmarshalledTestResult.vehicleType === 'trl' ? unmarshalledTestResult.trailerId : unmarshalledTestResult.vrm
+        identifier = unmarshalledTestResult.vehicleType === 'trl' ? unmarshalledTestResult.trailerId : unmarshalledTestResult.vrm;
       }
       addToILog(
           tableName,
