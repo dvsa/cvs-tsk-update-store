@@ -20,7 +20,7 @@ import { TechRecord } from "../models/tech-record";
 
 let logManager: ILog[] = [];
 
-tt/**
+/**
  * λ function: convert a DynamoDB document to Aurora RDS rows
  * @param event - DynamoDB stream event, containing DynamoDB document image
  * @param context - λ context
@@ -36,7 +36,7 @@ export const processStreamEvent: Handler = async (
     const processStartTime: Date = new Date();
     debugLog('Received SQS event: ', JSON.stringify(event));
     let changeType: string = 'Test record change';
-    let testResultId: tstring = '';
+    let testResultId: string = '';
     let identifier: string | undefined = '';
     let statusCode: string | undefined = '';
     validateEvent(event);
