@@ -96,7 +96,7 @@ describe('processStreamEvent()', () => {
         ),
     ).resolves.not.toThrow();
     expect(convert).toHaveBeenCalledTimes(1);
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[{\"changeType\":\"Technical Record Change\",\"identifier\":\"VRM-1\",\"operationType\":\"INSERT\"}]'));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[{\"changeType\":\"Technical Record Change\",\"identifier\":\"VRM-1\"}]'));
   });
 
   it('should fail on null event', async () => {
