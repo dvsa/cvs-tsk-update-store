@@ -5,6 +5,9 @@ import {
 } from '../../../src/functions/process-stream-event';
 import { convert } from '../../../src/services/entity-conversion';
 import { exampleContext } from '../../utils';
+import testResultWithTestType from '../../resources/dynamodb-image-test-results-with-testtypes.json';
+import techRecordV3 from '../../resources/dynamodb-image-technical-record-V3.json';
+
 
 jest.mock('../../../src/services/entity-conversion', () => ({
   convert: jest.fn(),
@@ -16,7 +19,7 @@ describe('processStreamEvent()', () => {
     mocked(convert).mockResolvedValueOnce({});
   });
 
-  it('should allow valid events to reach the entity conversion procedure', async () => {
+  it('should allow valid events to reach the entity conversion procedure TECHNICAL RECORD', async () => {
     await expect(
       processStreamEvent(
         {
@@ -25,10 +28,10 @@ describe('processStreamEvent()', () => {
               body: JSON.stringify({
                 eventName: 'INSERT',
                 dynamodb: {
-                  NewImage: {},
+                  NewImage: techRecordV3
                 },
                 eventSourceARN:
-                  'arn:aws:dynamodb:eu-west-1:1:table/technical-records/stream/2020-01-01T00:00:00.000',
+                  'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
               }),
             },
           ],
@@ -40,6 +43,60 @@ describe('processStreamEvent()', () => {
       ),
     ).resolves.not.toThrow();
     expect(convert).toHaveBeenCalledTimes(1);
+  });
+
+  it('should allow valid events to reach the entity conversion procedure test RECORD TRL', async () => {
+    await expect(
+        processStreamEvent(
+            {
+              Records: [
+                {
+                  body: JSON.stringify({
+                    eventName: 'INSERT',
+                    dynamodb: {
+                      NewImage: testResultWithTestType,
+                    },
+                    eventSourceARN:
+                        'arn:aws:dynamodb:eu-west-1:1:table/test-result/stream/2020-01-01T00:00:00.000',
+                  }),
+                },
+              ],
+            },
+            exampleContext(),
+            () => {
+
+            },
+        ),
+    ).resolves.not.toThrow();
+    expect(convert).toHaveBeenCalledTimes(1);
+  });
+
+  it('should allow valid events to reach the entity conversion procedure test RECORD TRL and produce result log', async () => {
+    const consoleSpy = jest.spyOn(console, 'log');
+
+    await expect(
+        processStreamEvent(
+            {
+              Records: [
+                {
+                  body: JSON.stringify({
+                    eventName: 'INSERT',
+                    dynamodb: {
+                      NewImage: testResultWithTestType,
+                    },
+                    eventSourceARN:
+                        'arn:aws:dynamodb:eu-west-1:1:table/test-result/stream/2020-01-01T00:00:00.000',
+                  }),
+                },
+              ],
+            },
+            exampleContext(),
+            () => {
+            },
+        ),
+    ).resolves.not.toThrow();
+    expect(convert).toHaveBeenCalledTimes(1);
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[{\"changeType\":\"Technical Record Change\",\"identifier\":\"VRM-1\"}]'));
   });
 
   it('should fail on null event', async () => {
