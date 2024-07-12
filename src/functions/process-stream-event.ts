@@ -68,7 +68,7 @@ export const processStreamEvent: Handler = async (
         iLog.changeType = "Technical Record Change";
         iLog.identifier = unmarshalledTechnicalRecord.vehicleType === 'trl'
             ? unmarshalledTechnicalRecord.trailerId
-            : unmarshalledTechnicalRecord.primaryVrm!
+            : unmarshalledTechnicalRecord.primaryVrm;
       } else if (tableName.includes('test-results')) {
         const testResult: any = dynamoRecord.dynamodb?.NewImage;
         const unmarshalledTestResult = unmarshall(testResult);
