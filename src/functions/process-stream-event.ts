@@ -62,7 +62,7 @@ export const processStreamEvent: Handler = async (
       if (tableName.includes('flat-tech-records')) {
         transformTechRecord(dynamoRecord as _Record);
         debugLog(`Dynamo Record after transformation: ${dynamoRecord}`);
-        let technicalRecord: any = dynamoRecord.dynamodb?.NewImage;
+        const technicalRecord: any = dynamoRecord.dynamodb?.NewImage;
         const unmarshalledTechnicalRecord = unmarshall(technicalRecord);
         iLog.statusCode = unmarshalledTechnicalRecord.statusCode;
         iLog.changeType = "Technical Record Change";
