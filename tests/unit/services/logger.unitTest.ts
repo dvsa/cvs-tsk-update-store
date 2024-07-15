@@ -1,4 +1,4 @@
-import {debugLog} from "../../../src/services/logger";
+import { debugLog } from "../../../src/services/logger";
 
 describe('logger service', () => {
     it('Should be able to get a logger instance', () => {
