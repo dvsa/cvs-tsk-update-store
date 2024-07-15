@@ -33,7 +33,7 @@ export const processStreamEvent: Handler = async (
   try {
     const processStartTime: Date = new Date();
     debugLog('Received SQS event: ', JSON.stringify(event));
-    let iLog: ILog = {changeType: "", identifier: ""};
+    let iLog: ILog = { changeType: "", identifier: "", operationType: "" };
 
     validateEvent(event);
 
@@ -78,11 +78,14 @@ export const processStreamEvent: Handler = async (
             ? unmarshalledTestResult.trailerId :
             unmarshalledTestResult.primaryVrm;
       }
-      addToILog(iLog);
       // is this an INSERT, UPDATE, or DELETE?
       const operationType: SqlOperation = deriveSqlOperation(
           dynamoRecord.eventName!,
       );
+
+      iLog.operationType = operationType;
+      addToILog(iLog);
+
       // parse native DynamoDB format to usable TS map
       const image: DynamoDbImage = selectImage(
           operationType,
