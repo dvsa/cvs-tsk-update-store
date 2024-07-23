@@ -97,9 +97,9 @@ describe('processStreamEvent()', () => {
         ),
     ).resolves.not.toThrow();
     expect(convert).toHaveBeenCalledTimes(1);
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Process start time is: '));
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[{\"changeType\":\"Test Record Change\",\"identifier\":\"VRM-3\",\"operationType\":\"INSERT\",\"testResultId\":\"TEST-RESULT-ID-3\"}]'));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('changeType\":\"Test Record Change\",\"testResultId\":\"TEST-RESULT-ID-3\",\"identifier\":\"VRM-3\",\"operationType\":\"INSERT\"}]'));
   });
+
   it('should allow valid events to reach the entity conversion procedure tech RECORD TRL and produce result log', async () => {
     const consoleSpy = jest.spyOn(console, 'log');
 
@@ -114,7 +114,7 @@ describe('processStreamEvent()', () => {
                       NewImage: techRecordV3,
                     },
                     eventSourceARN:
-                        'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-record/stream/2020-01-01T00:00:00.000',
+                        'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
                   }),
                 },
               ],
@@ -125,8 +125,8 @@ describe('processStreamEvent()', () => {
         ),
     ).resolves.not.toThrow();
     expect(convert).toHaveBeenCalledTimes(1);
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Process start time is: '));
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('\"changeType\":\"Technical Record Change\",\"identifier\":\"VRM-1\",\"operationType\":\"INSERT\",\"statusCode\":\"STATUS-CODE\"'));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"changeType\":\"Technical Record Change\",\"identifier\":\"VRM-1\",\"statusCode\":\"STATUS-CODE\",\"operationType\":\"INSERT\"}]'));
+    consoleSpy.mockRestore()
   });
 
   it('should fail on null event', async () => {

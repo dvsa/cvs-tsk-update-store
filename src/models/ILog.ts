@@ -1,4 +1,5 @@
 interface ILog {
+    timestamp: string;
     changeType: string;
     identifier: string;
     operationType: string;
