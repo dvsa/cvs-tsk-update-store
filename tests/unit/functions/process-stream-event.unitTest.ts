@@ -16,6 +16,7 @@ jest.mock('../../../src/services/entity-conversion', () => ({
 describe('processStreamEvent()', () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    jest.restoreAllMocks()
     mocked(convert).mockResolvedValueOnce({});
   });
 
@@ -85,7 +86,7 @@ describe('processStreamEvent()', () => {
                       NewImage: testResultWithTestType,
                     },
                     eventSourceARN:
-                        'arn:aws:dynamodb:eu-west-1:1:table/test-result/stream/2020-01-01T00:00:00.000',
+                        'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
                   }),
                 },
               ],
@@ -96,7 +97,36 @@ describe('processStreamEvent()', () => {
         ),
     ).resolves.not.toThrow();
     expect(convert).toHaveBeenCalledTimes(1);
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[{\"changeType\":\"Technical Record Change\",\"identifier\":\"VRM-1\",\"operationType\":\"INSERT\"}]'));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Process start time is: '));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[{\"changeType\":\"Test Record Change\",\"identifier\":\"VRM-3\",\"operationType\":\"INSERT\",\"testResultId\":\"TEST-RESULT-ID-3\"}]'));
+  });
+  it('should allow valid events to reach the entity conversion procedure tech RECORD TRL and produce result log', async () => {
+    const consoleSpy = jest.spyOn(console, 'log');
+
+    await expect(
+        processStreamEvent(
+            {
+              Records: [
+                {
+                  body: JSON.stringify({
+                    eventName: 'INSERT',
+                    dynamodb: {
+                      NewImage: techRecordV3,
+                    },
+                    eventSourceARN:
+                        'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-record/stream/2020-01-01T00:00:00.000',
+                  }),
+                },
+              ],
+            },
+            exampleContext(),
+            () => {
+            },
+        ),
+    ).resolves.not.toThrow();
+    expect(convert).toHaveBeenCalledTimes(1);
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Process start time is: '));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('\"changeType\":\"Technical Record Change\",\"identifier\":\"VRM-1\",\"operationType\":\"INSERT\",\"statusCode\":\"STATUS-CODE\"'));
   });
 
   it('should fail on null event', async () => {

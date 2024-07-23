@@ -58,26 +58,27 @@ export const processStreamEvent: Handler = async (
       const tableName: string = getTableNameFromArn(
           dynamoRecord.eventSourceARN!,
       );
-
       if (tableName.includes('flat-tech-records')) {
         transformTechRecord(dynamoRecord as _Record);
         debugLog(`Dynamo Record after transformation: ${dynamoRecord}`);
         const technicalRecord: any = dynamoRecord.dynamodb?.NewImage;
         const unmarshalledTechnicalRecord = unmarshall(technicalRecord);
-        iLog.statusCode = unmarshalledTechnicalRecord.statusCode;
+        iLog.statusCode = unmarshalledTechnicalRecord.techRecord[0]?.statusCode;
         iLog.changeType = "Technical Record Change";
         iLog.identifier = unmarshalledTechnicalRecord.vehicleType === 'trl'
             ? unmarshalledTechnicalRecord.trailerId
             : unmarshalledTechnicalRecord.primaryVrm;
-      } else if (tableName.includes('test-results')) {
+      }
+      if (tableName.includes("test-result")) {
         const testResult: any = dynamoRecord.dynamodb?.NewImage;
         const unmarshalledTestResult = unmarshall(testResult);
-        iLog.changeType = 'Test record change';
+        iLog.changeType = 'Test Record Change';
         iLog.testResultId = unmarshalledTestResult.testResultId;
         iLog.identifier = unmarshalledTestResult.vehicleType === 'trl'
             ? unmarshalledTestResult.trailerId :
-            unmarshalledTestResult.primaryVrm;
+            unmarshalledTestResult.vrm;
       }
+
       // is this an INSERT, UPDATE, or DELETE?
       const operationType: SqlOperation = deriveSqlOperation(
           dynamoRecord.eventName!,
@@ -106,6 +107,8 @@ export const processStreamEvent: Handler = async (
         );
         console.log(`** RESULTS **\nProcess start time is: ${processStartTime.toISOString()} \n${JSON.stringify(logManager)}`,
         )
+        iLog = { changeType: "", identifier: "", operationType: "" };
+        logManager = [];
       } catch (err) {
         console.error(
             "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
