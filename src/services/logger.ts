@@ -17,4 +17,3 @@ export const addToLogManager = (entry: Partial<ILog>) => logManager.push(<ILog>e
 export const printLogs = () => console.log(JSON.stringify(logManager));
 
 export const clearLogs = () => logManager = [];
-
