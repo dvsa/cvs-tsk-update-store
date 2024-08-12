@@ -11,7 +11,7 @@ import { debugLog } from '../services/logger';
 
 export type TestVersion = 'current' | 'archived';
 
-export type TestStationType = 'atf' | 'gvts' | 'hq';
+export type TestStationType = 'atf' | 'gvts' | 'hq' | 'vef';
 
 export type TestStatus = 'submitted' | 'cancelled';
 
