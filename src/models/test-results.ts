@@ -8,10 +8,9 @@ import {
 } from './shared-enums';
 import { DynamoDbImage, parseStringArray } from '../services/dynamodb-images';
 import { debugLog } from '../services/logger';
+import { TestStationTypes } from "@dvsa/cvs-type-definitions/types/v1/enums/testStationType.enum";
 
 export type TestVersion = 'current' | 'archived';
-
-export type TestStationType = 'atf' | 'gvts' | 'hq';
 
 export type TestStatus = 'submitted' | 'cancelled';
 
@@ -37,7 +36,7 @@ export interface TestResult {
   shouldEmailCertificate?: string;
   testStationName?: string;
   testStationPNumber?: string;
-  testStationType?: TestStationType;
+  testStationType?: TestStationTypes;
   testerName?: string;
   testerStaffId?: string;
   testResultId?: string;
@@ -98,7 +97,7 @@ export const parseTestResult = (image: DynamoDbImage): TestResult => ({
   shouldEmailCertificate: image.getString('shouldEmailCertificate'),
   testStationName: image.getString('testStationName'),
   testStationPNumber: image.getString('testStationPNumber'),
-  testStationType: image.getString('testStationType') as TestStationType,
+  testStationType: image.getString('testStationType') as TestStationTypes,
   testerName: image.getString('testerName'),
   testerStaffId: image.getString('testerStaffId'),
   testResultId: image.getString('testResultId'),
