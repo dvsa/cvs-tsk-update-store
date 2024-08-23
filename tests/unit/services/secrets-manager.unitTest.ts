@@ -2,8 +2,9 @@ import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-sec
 import { mockClient } from 'aws-sdk-client-mock';
 import { getSecretValue } from '../../../src/services/secrets-manager';
 
-const mockSecretsManager = mockClient(SecretsManagerClient);
+const mockSecretsManager = mockClient(SecretsManagerClient as any);
 const mockSecretValue = (expectedSecretKey: string, secretValue: any) => {
+  // @ts-ignore
   mockSecretsManager.on(GetSecretValueCommand).callsFake((actualSecretKey) => {
     if (expectedSecretKey === actualSecretKey?.SecretId) {
       return Promise.resolve(secretValue);

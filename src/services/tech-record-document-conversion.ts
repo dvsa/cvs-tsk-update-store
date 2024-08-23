@@ -24,9 +24,10 @@ import {
   AUTH_INTO_SERVICE_TABLE,
 } from './table-details';
 import {
-  deleteBasedOnWhereIn,
-  executeFullUpsert,
-  executePartialUpsertIfNotExists,
+    deleteBasedOnWhereIn,
+    executeFullUpsert,
+    executePartialUpsertIfNotExists,
+    selectRecordIds,
 } from './sql-execution';
 import { getConnectionPool } from './connection-pool';
 import { EntityConverter } from './entity-conversion';
@@ -69,6 +70,7 @@ const upsertTechRecords = async (
   const techRecords = techRecordDocument.techRecord;
 
   if (!techRecords) {
+    debugLog(`there are no tech records - returning ...`);
     return;
   }
 
@@ -241,6 +243,24 @@ const upsertVehicle = async (
   connection: Connection,
   techRecordDocument: TechRecordDocument,
 ): Promise<number> => {
+
+  if (techRecordDocument.techRecord && techRecordDocument.techRecord[0].statusCode === 'archived') {
+      debugLog('upsertTechRecords: Retrieving vehicle...');
+      // retrieve records associated with systemNumber
+      const existingRecordIds = await selectRecordIds(
+          VEHICLE_TABLE.tableName,
+          { system_number: techRecordDocument.systemNumber, vin: vinCleanser(techRecordDocument.vin) },
+          connection,
+      );
+      if (existingRecordIds.rows.length > 0) {
+          return existingRecordIds.rows[0].id;
+      } else {
+          debugLog(
+              `archived tech record, but no associated vehicle record found for systemNumber: ${techRecordDocument.systemNumber} and vin: ${vinCleanser(techRecordDocument.vin)}`,
+          );
+      }
+  }
+
   debugLog('upsertTechRecords: Upserting vehicle...');
 
   const response = await executeFullUpsert(
