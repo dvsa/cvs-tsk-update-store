@@ -686,7 +686,6 @@ describe('convertTechRecordDocument() integration tests', () => {
 
   describe('when updating an existing technical record to be archived', () => {
     it('then the existing vehicle record id is returned and used in the update', async () => {
-          // Create a record for the INSERT operation
           const techRecordDocumentJsonInsert = JSON.parse(JSON.stringify(techRecordDocumentJson));
           techRecordDocumentJsonInsert.systemNumber = { S: 'SYSTEM-NUMBER-6' };
           techRecordDocumentJsonInsert.vin = { S: 'VIN6' };
@@ -706,7 +705,6 @@ describe('convertTechRecordDocument() integration tests', () => {
             ],
           };
 
-          // Process the INSERT event and retrieve the vehicle ID
           await processStreamEvent(insertEvent, exampleContext(), () => {});
 
           const insertResultSet = await executeSql(
@@ -732,7 +730,6 @@ describe('convertTechRecordDocument() integration tests', () => {
             ],
           };
 
-          // Process the MODIFY event and retrieve the vehicle ID
           await processStreamEvent(modifyEvent, exampleContext(), () => {});
 
           const modifyResultSet = await executeSql(
@@ -740,7 +737,6 @@ describe('convertTechRecordDocument() integration tests', () => {
           );
           const vehicleIdModify = modifyResultSet.rows[0].id;
 
-          // Validate that the vehicle ID from the MODIFY operation matches the vehicle ID from the INSERT operation
           expect(vehicleIdModify).toBe(vehicleIdInsert);
     }
     );
@@ -748,7 +744,6 @@ describe('convertTechRecordDocument() integration tests', () => {
 
   describe('when adding a new technical record that is archived', () => {
     it('then a new vehicle id is returned and used', async () => {
-      // Create a record for the INSERT operation
       const techRecordDocumentJsonInsert = JSON.parse(JSON.stringify(techRecordDocumentJson));
       techRecordDocumentJsonInsert.systemNumber = { S: 'SYSTEM-NUMBER-7' };
       techRecordDocumentJsonInsert.vin = { S: 'VIN7' };
@@ -769,7 +764,6 @@ describe('convertTechRecordDocument() integration tests', () => {
         ],
       };
 
-      // Process the INSERT event and retrieve the vehicle ID
       await processStreamEvent(insertEvent, exampleContext(), () => {});
 
       const insertResultSet = await executeSql(
@@ -777,7 +771,6 @@ describe('convertTechRecordDocument() integration tests', () => {
       );
       const vehicleIdInsert = insertResultSet.rows[0].id;
 
-      // Validate that a new vehicle ID is returned
       expect(vehicleIdInsert).not.toBeNull();
     });
   });

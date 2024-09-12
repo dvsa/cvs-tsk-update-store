@@ -6,7 +6,7 @@ import {
   parseTechRecordDocument,
   TechRecordDocument,
 } from '../models/tech-record-document';
-import { getFaxNumber, TechRecord } from '../models/tech-record';
+import {getFaxNumber, StatusCode, TechRecord} from '../models/tech-record';
 import {
   AXLE_SPACING_TABLE,
   AXLES_TABLE,
@@ -244,7 +244,7 @@ const upsertVehicle = async (
   techRecordDocument: TechRecordDocument,
 ): Promise<number> => {
 
-  if (techRecordDocument.techRecord && techRecordDocument.techRecord[0].statusCode === 'archived') {
+  if (techRecordDocument.techRecord && techRecordDocument.techRecord[0].statusCode === 'archived' as StatusCode) {
       debugLog('upsertTechRecords: Retrieving vehicle...');
       // retrieve records associated with systemNumber
       const existingRecordIds = await selectRecordIds(
