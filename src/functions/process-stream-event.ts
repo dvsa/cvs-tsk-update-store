@@ -58,7 +58,7 @@ export const processStreamEvent: Handler = async (
       );
       if (tableName.includes('flat-tech-records')) {
         transformTechRecord(dynamoRecord as _Record);
-        debugLog(`Dynamo Record after transformation: ${dynamoRecord}`);
+        debugLog(`Dynamo Record after transformation: ${JSON.stringify(dynamoRecord)}`);
 
         const technicalRecord: any = dynamoRecord.dynamodb?.NewImage;
         const unmarshalledTechnicalRecord = unmarshall(technicalRecord);

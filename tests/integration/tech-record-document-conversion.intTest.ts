@@ -683,4 +683,95 @@ describe('convertTechRecordDocument() integration tests', () => {
       ).not.toBeNull(); // todo This returns null
     });
   });
+
+  describe('when updating an existing technical record to be archived', () => {
+    it('then the existing vehicle record id is returned and used in the update', async () => {
+          const techRecordDocumentJsonInsert = JSON.parse(JSON.stringify(techRecordDocumentJson));
+          techRecordDocumentJsonInsert.systemNumber = { S: 'SYSTEM-NUMBER-6' };
+          techRecordDocumentJsonInsert.vin = { S: 'VIN6' };
+          techRecordDocumentJsonInsert.primaryVrm = { S: 'VRM666NEW' };
+
+          const insertEvent = {
+            Records: [
+              {
+                body: JSON.stringify({
+                  eventSourceARN: 'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
+                  eventName: 'INSERT',
+                  dynamodb: {
+                    NewImage: techRecordDocumentJsonInsert,
+                  },
+                }),
+              },
+            ],
+          };
+
+          await processStreamEvent(insertEvent, exampleContext(), () => {});
+
+          const insertResultSet = await executeSql(
+              `SELECT \`id\` FROM \`vehicle\` WHERE \`system_number\` = "SYSTEM-NUMBER-6"`
+          );
+          const vehicleIdInsert = insertResultSet.rows[0].id;
+
+          // Create a record for the MODIFY operation
+          const techRecordDocumentJsonModify = JSON.parse(JSON.stringify(techRecordDocumentJsonInsert));
+          techRecordDocumentJsonModify.statusCode = { S: 'archived' };
+
+          const modifyEvent = {
+            Records: [
+              {
+                body: JSON.stringify({
+                  eventSourceARN: 'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
+                  eventName: 'MODIFY',
+                  dynamodb: {
+                    NewImage: techRecordDocumentJsonModify,
+                  },
+                }),
+              },
+            ],
+          };
+
+          await processStreamEvent(modifyEvent, exampleContext(), () => {});
+
+          const modifyResultSet = await executeSql(
+              `SELECT \`id\` FROM \`vehicle\` WHERE \`system_number\` = "SYSTEM-NUMBER-6"`
+          );
+          const vehicleIdModify = modifyResultSet.rows[0].id;
+
+          expect(vehicleIdModify).toBe(vehicleIdInsert);
+    }
+    );
+  });
+
+  describe('when adding a new technical record that is archived', () => {
+    it('then a new vehicle id is returned and used', async () => {
+      const techRecordDocumentJsonInsert = JSON.parse(JSON.stringify(techRecordDocumentJson));
+      techRecordDocumentJsonInsert.systemNumber = { S: 'SYSTEM-NUMBER-7' };
+      techRecordDocumentJsonInsert.vin = { S: 'VIN7' };
+      techRecordDocumentJsonInsert.primaryVrm = { S: 'VRM777NEW' };
+      techRecordDocumentJsonInsert.statusCode = { S: 'archived' };
+
+      const insertEvent = {
+        Records: [
+          {
+            body: JSON.stringify({
+              eventSourceARN: 'arn:aws:dynamodb:eu-west-1:1:table/flat-tech-records/stream/2020-01-01T00:00:00.000',
+              eventName: 'INSERT',
+              dynamodb: {
+                NewImage: techRecordDocumentJsonInsert,
+              },
+            }),
+          },
+        ],
+      };
+
+      await processStreamEvent(insertEvent, exampleContext(), () => {});
+
+      const insertResultSet = await executeSql(
+          `SELECT \`id\` FROM \`vehicle\` WHERE \`system_number\` = "SYSTEM-NUMBER-7"`
+      );
+      const vehicleIdInsert = insertResultSet.rows[0].id;
+
+      expect(vehicleIdInsert).not.toBeNull();
+    });
+  });
 });
