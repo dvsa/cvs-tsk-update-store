@@ -1,9 +1,14 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable import/no-cycle */
+import { Connection } from 'mysql2/promise';
+import moment from 'moment';
 import {
   parseTestResults,
   TestResult,
   TestResults,
-} from "../models/test-results";
-import { TestType } from "../models/test-types";
+} from '../models/test-results';
+import { TestType } from '../models/test-types';
 import {
   CUSTOM_DEFECT_TABLE,
   DEFECTS_TABLE,
@@ -19,31 +24,27 @@ import {
   VEHICLE_CLASS_TABLE,
   VEHICLE_SUBCLASS_TABLE,
   VEHICLE_TABLE,
-} from "./table-details";
+} from './table-details';
 import {
   deleteBasedOnWhereIn,
   executeFullUpsert,
   executePartialUpsert,
   executePartialUpsertIfNotExists,
   selectRecordIds,
-} from "./sql-execution";
-import { getConnectionPool } from "./connection-pool";
-import { Connection } from "mysql2/promise";
-import { EntityConverter } from "./entity-conversion";
-import { debugLog } from "./logger";
-import { vinCleanser } from "../utils/cleanser";
-import moment from "moment";
+} from './sql-execution';
+import { getConnectionPool } from './connection-pool';
+import { EntityConverter } from './entity-conversion';
+import { debugLog } from './logger';
+import { vinCleanser } from '../utils/cleanser';
 
-export const testResultsConverter = (): EntityConverter<TestResults> => {
-  return {
-    parseRootImage: parseTestResults,
-    upsertEntity: upsertTestResults,
-    deleteEntity: deleteTestResults,
-  };
-};
+export const testResultsConverter = (): EntityConverter<TestResults> => ({
+  parseRootImage: parseTestResults,
+  upsertEntity: upsertTestResults,
+  deleteEntity: deleteTestResults,
+});
 
 const upsertTestResults = async (testResults: TestResults): Promise<void> => {
-  debugLog(`upsertTestResults: START`);
+  debugLog('upsertTestResults: START');
 
   if (!testResults) {
     return;
@@ -55,7 +56,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
 
   for (const testResult of testResults) {
     if (!testResult) {
-      throw new Error(`testResult cannot be null`);
+      throw new Error('testResult cannot be null');
     }
 
     const vehicleConnection = await pool.getConnection();
@@ -63,7 +64,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
     let vehicleId;
     try {
       await vehicleConnection.execute(
-        "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED"
+        'SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED',
       );
       await vehicleConnection.beginTransaction();
 
@@ -82,33 +83,33 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
 
     try {
       await testResultConnection.execute(
-        "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED"
+        'SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED',
       );
 
       const testStationId = await upsertTestStation(
         testResultConnection,
-        testResult
+        testResult,
       );
       const testerId = await upsertTester(testResultConnection, testResult);
       const vehicleClassId = await upsertVehicleClass(
         testResultConnection,
-        testResult
+        testResult,
       );
       await upsertVehicleSubclasses(
         testResultConnection,
         vehicleClassId,
-        testResult
+        testResult,
       );
       const preparerId = await upsertPreparer(testResultConnection, testResult);
       const createdById = await upsertIdentity(
         testResultConnection,
         testResult.createdById!,
-        testResult.createdByName!
+        testResult.createdByName!,
       );
       const lastUpdatedById = await upsertIdentity(
         testResultConnection,
         testResult.lastUpdatedById!,
-        testResult.lastUpdatedByName!
+        testResult.lastUpdatedByName!,
       );
 
       if (!testResult.testTypes || testResult.testTypes.length < 1) {
@@ -155,11 +156,11 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
             undefined,
             createdById,
             lastUpdatedById,
-            moment().format("YYYY-MM-DD HH:mm:ss.SSS"),
+            moment().format('YYYY-MM-DD HH:mm:ss.SSS'),
           ],
-          testResultConnection
+          testResultConnection,
         );
-
+        // eslint-disable-next-line no-continue
         continue;
       }
 
@@ -167,47 +168,47 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
         const existingTestResultIds = await selectRecordIds(
           TEST_RESULT_TABLE.tableName,
           { vehicle_id: vehicleId, testResultId: testResult.testResultId },
-          testResultConnection
+          testResultConnection,
         );
         if (existingTestResultIds.rows.length > 0) {
           await testResultConnection.beginTransaction();
 
           const testResultIds = existingTestResultIds.rows.map(
-            (row: { id: any }) => row.id
+            (row: { id: any }) => row.id,
           );
           await deleteBasedOnWhereIn(
             CUSTOM_DEFECT_TABLE.tableName,
-            "test_result_id",
+            'test_result_id',
             testResultIds,
-            testResultConnection
+            testResultConnection,
           );
           await deleteBasedOnWhereIn(
             TEST_DEFECT_TABLE.tableName,
-            "test_result_id",
+            'test_result_id',
             testResultIds,
-            testResultConnection
+            testResultConnection,
           );
           await deleteBasedOnWhereIn(
             TEST_RESULT_TABLE.tableName,
-            "id",
+            'id',
             testResultIds,
-            testResultConnection
+            testResultConnection,
           );
 
           await testResultConnection.commit();
         }
       }
 
-      for (const testType of testResult.testTypes!) {
+      for (const testType of testResult.testTypes) {
         await testResultConnection.beginTransaction();
 
         const fuelEmissionId = await upsertFuelEmission(
           testResultConnection,
-          testType
+          testType,
         );
         const testTypeId = await upsertTestType(testResultConnection, testType);
 
-        debugLog(`upsertTestResults: Upserting test result...`);
+        debugLog('upsertTestResults: Upserting test result...');
 
         const response = await executeFullUpsert(
           TEST_RESULT_TABLE,
@@ -252,22 +253,22 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
             testType.smokeTestKLimitApplied,
             createdById,
             lastUpdatedById,
-            moment().format("YYYY-MM-DD HH:mm:ss.SSS"),
+            moment().format('YYYY-MM-DD HH:mm:ss.SSS'),
           ],
-          testResultConnection
+          testResultConnection,
         );
 
         const testResultRecordId = response.rows.insertId;
 
         debugLog(
-          `upsertTestResults: Upserted test result (ID: ${testResultRecordId})`
+          `upsertTestResults: Upserted test result (ID: ${testResultRecordId})`,
         );
 
         await upsertDefects(testResultConnection, testResultRecordId, testType);
         await upsertCustomDefects(
           testResultConnection,
           testResultRecordId,
-          testType
+          testType,
         );
 
         await testResultConnection.commit();
@@ -280,18 +281,19 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
     }
   }
 
-  debugLog(`upsertTestResults: END`);
+  debugLog('upsertTestResults: END');
 };
 
+// eslint-disable-next-line @typescript-eslint/require-await
 const deleteTestResults = async (testResult: TestResults): Promise<void> => {
-  throw new Error("deleting test results is not implemented yet");
+  throw new Error('deleting test results is not implemented yet');
 };
 
 const upsertVehicle = async (
   connection: Connection,
-  testResult: TestResult
+  testResult: TestResult,
 ): Promise<number> => {
-  debugLog(`upsertTestResults: Upserting vehicle...`);
+  debugLog('upsertTestResults: Upserting vehicle...');
 
   const response = await executePartialUpsert(
     VEHICLE_TABLE,
@@ -302,11 +304,11 @@ const upsertVehicle = async (
       testResult.trailerId,
       new Date().toISOString().substring(0, 23),
     ],
-    connection
+    connection,
   );
 
   debugLog(
-    `upsertTestResults: Upserted vehicle (ID: ${response.rows.insertId})`
+    `upsertTestResults: Upserted vehicle (ID: ${response.rows.insertId})`,
   );
 
   return response.rows.insertId;
@@ -314,9 +316,9 @@ const upsertVehicle = async (
 
 const upsertTestStation = async (
   connection: Connection,
-  testResult: TestResult
+  testResult: TestResult,
 ): Promise<number> => {
-  debugLog(`upsertTestResults: Upserting test station...`);
+  debugLog('upsertTestResults: Upserting test station...');
 
   const response = await executePartialUpsertIfNotExists(
     TEST_STATION_TABLE,
@@ -325,11 +327,11 @@ const upsertTestStation = async (
       testResult.testStationName,
       testResult.testStationType,
     ].fingerprintCleanser(),
-    connection
+    connection,
   );
 
   debugLog(
-    `upsertTestResults: Upserted test station (ID: ${response.rows.insertId})`
+    `upsertTestResults: Upserted test station (ID: ${response.rows.insertId})`,
   );
 
   return response.rows.insertId;
@@ -337,9 +339,9 @@ const upsertTestStation = async (
 
 const upsertTester = async (
   connection: Connection,
-  testResult: TestResult
+  testResult: TestResult,
 ): Promise<number> => {
-  debugLog(`upsertTestResults: Upserting tester...`);
+  debugLog('upsertTestResults: Upserting tester...');
 
   const response = await executePartialUpsertIfNotExists(
     TESTER_TABLE,
@@ -348,11 +350,11 @@ const upsertTester = async (
       testResult.testerName,
       testResult.testerEmailAddress,
     ].fingerprintCleanser(),
-    connection
+    connection,
   );
 
   debugLog(
-    `upsertTestResults: Upserted tester (ID: ${response.rows.insertId})`
+    `upsertTestResults: Upserted tester (ID: ${response.rows.insertId})`,
   );
 
   return response.rows.insertId;
@@ -360,9 +362,9 @@ const upsertTester = async (
 
 const upsertVehicleClass = async (
   connection: Connection,
-  testResult: TestResult
+  testResult: TestResult,
 ): Promise<number> => {
-  debugLog(`upsertTestResults: Upserting vehicle class...`);
+  debugLog('upsertTestResults: Upserting vehicle class...');
 
   const response = await executePartialUpsertIfNotExists(
     VEHICLE_CLASS_TABLE,
@@ -374,11 +376,11 @@ const upsertVehicleClass = async (
       testResult.vehicleConfiguration,
       testResult.euVehicleCategory,
     ].fingerprintCleanser(),
-    connection
+    connection,
   );
 
   debugLog(
-    `upsertTestResults: Upserted vehicle class (ID: ${response.rows.insertId})`
+    `upsertTestResults: Upserted vehicle class (ID: ${response.rows.insertId})`,
   );
 
   return response.rows.insertId;
@@ -387,12 +389,12 @@ const upsertVehicleClass = async (
 const upsertVehicleSubclasses = async (
   connection: Connection,
   vehicleClassId: number,
-  testResult: TestResult
+  testResult: TestResult,
 ): Promise<void> => {
-  debugLog(`upsertTestResults: Upserting vehicle subclasses...`);
+  debugLog('upsertTestResults: Upserting vehicle subclasses...');
 
   if (!testResult.vehicleSubclass) {
-    debugLog(`upsertTestResults: no vehicle subclasses present`);
+    debugLog('upsertTestResults: no vehicle subclasses present');
     return;
   }
 
@@ -400,22 +402,20 @@ const upsertVehicleSubclasses = async (
     const response = await executePartialUpsertIfNotExists(
       VEHICLE_SUBCLASS_TABLE,
       [vehicleClassId, vehicleSubclass].fingerprintCleanser(),
-      connection
+      connection,
     );
 
     debugLog(
-      `upsertTestResults: Upserted vehicle subclass (ID: ${response.rows.insertId})`
+      `upsertTestResults: Upserted vehicle subclass (ID: ${response.rows.insertId})`,
     );
   }
-
-  return;
 };
 
 const upsertFuelEmission = async (
   connection: Connection,
-  testType: TestType
+  testType: TestType,
 ): Promise<number> => {
-  debugLog(`upsertTestResults: Upserting fuel emission...`);
+  debugLog('upsertTestResults: Upserting fuel emission...');
 
   const response = await executePartialUpsertIfNotExists(
     FUEL_EMISSION_TABLE,
@@ -425,11 +425,11 @@ const upsertFuelEmission = async (
       testType.emissionStandard,
       testType.fuelType,
     ].fingerprintCleanser(),
-    connection
+    connection,
   );
 
   debugLog(
-    `upsertTestResults: Upserted fuel emission (ID: ${response.rows.insertId})`
+    `upsertTestResults: Upserted fuel emission (ID: ${response.rows.insertId})`,
   );
 
   return response.rows.insertId;
@@ -437,9 +437,9 @@ const upsertFuelEmission = async (
 
 const upsertTestType = async (
   connection: Connection,
-  testType: TestType
+  testType: TestType,
 ): Promise<number> => {
-  debugLog(`upsertTestResults: Upserting test type...`);
+  debugLog('upsertTestResults: Upserting test type...');
 
   const response = await executePartialUpsertIfNotExists(
     TEST_TYPE_TABLE,
@@ -447,11 +447,11 @@ const upsertTestType = async (
       testType.testTypeClassification,
       testType.testTypeName,
     ].fingerprintCleanser(),
-    connection
+    connection,
   );
 
   debugLog(
-    `upsertTestResults: Upserted test type (ID: ${response.rows.insertId})`
+    `upsertTestResults: Upserted test type (ID: ${response.rows.insertId})`,
   );
 
   return response.rows.insertId;
@@ -459,18 +459,18 @@ const upsertTestType = async (
 
 const upsertPreparer = async (
   connection: Connection,
-  testResult: TestResult
+  testResult: TestResult,
 ): Promise<number> => {
-  debugLog(`upsertTestResults: Upserting preparer...`);
+  debugLog('upsertTestResults: Upserting preparer...');
 
   const response = await executePartialUpsertIfNotExists(
     PREPARER_TABLE,
     [testResult.preparerId, testResult.preparerName].fingerprintCleanser(),
-    connection
+    connection,
   );
 
   debugLog(
-    `upsertTestResults: Upserted preparer (ID: ${response.rows.insertId})`
+    `upsertTestResults: Upserted preparer (ID: ${response.rows.insertId})`,
   );
 
   return response.rows.insertId;
@@ -479,18 +479,18 @@ const upsertPreparer = async (
 const upsertIdentity = async (
   connection: Connection,
   id: string,
-  name: string
+  name: string,
 ): Promise<number> => {
   debugLog(`upsertTestResults: Upserting identity (${id} ---> ${name})...`);
 
   const response = await executePartialUpsertIfNotExists(
     IDENTITY_TABLE,
     [id, name].fingerprintCleanser(),
-    connection
+    connection,
   );
 
   debugLog(
-    `upsertTestResults: Upserted identity (ID: ${response.rows.insertId})`
+    `upsertTestResults: Upserted identity (ID: ${response.rows.insertId})`,
   );
 
   return response.rows.insertId;
@@ -499,7 +499,7 @@ const upsertIdentity = async (
 const upsertDefects = async (
   connection: Connection,
   testResultId: number,
-  testType: TestType
+  testType: TestType,
 ): Promise<void> => {
   if (!testType.defects) {
     return;
@@ -508,7 +508,7 @@ const upsertDefects = async (
   const insertedIds: number[] = [];
 
   for (const defect of testType.defects) {
-    debugLog(`upsertTestResults: Upserting defect...`);
+    debugLog('upsertTestResults: Upserting defect...');
 
     const insertDefectResponse = await executePartialUpsertIfNotExists(
       DEFECTS_TABLE,
@@ -524,7 +524,7 @@ const upsertDefects = async (
         defect.deficiencyText,
         defect.stdForProhibition,
       ].fingerprintCleanser(),
-      connection
+      connection,
     );
 
     const defectId = insertDefectResponse.rows.insertId;
@@ -544,13 +544,13 @@ const upsertDefects = async (
         defect.additionalInformation?.location?.seatNumber,
         defect.additionalInformation?.location?.axleNumber,
       ].fingerprintCleanser(),
-      connection
+      connection,
     );
 
     const locationId = insertLocationResponse.rows.insertId;
 
     debugLog(
-      `upsertTestResults: Upserted defect location (location ID: ${locationId})`
+      `upsertTestResults: Upserted defect location (location ID: ${locationId})`,
     );
 
     await executePartialUpsert(
@@ -563,26 +563,24 @@ const upsertDefects = async (
         defect.prs,
         defect.prohibitionIssued,
       ],
-      connection
+      connection,
     );
 
-    debugLog(`upsertTestResults: Upserted defect test-defect mapping`);
+    debugLog('upsertTestResults: Upserted defect test-defect mapping');
   }
-
-  return;
 };
 
 const upsertCustomDefects = async (
   connection: Connection,
   testResultId: number,
-  testType: TestType
+  testType: TestType,
 ): Promise<void> => {
   if (!testType.customDefects) {
     return;
   }
 
   for (const customDefect of testType.customDefects) {
-    debugLog(`upsertTestResults: Upserting custom defect...`);
+    debugLog('upsertTestResults: Upserting custom defect...');
 
     const response = await executePartialUpsert(
       CUSTOM_DEFECT_TABLE,
@@ -592,13 +590,11 @@ const upsertCustomDefects = async (
         customDefect.defectName,
         customDefect.defectNotes,
       ],
-      connection
+      connection,
     );
 
     debugLog(
-      `upsertTestResults: Upserted custom defect (ID: ${response.rows.insertId})`
+      `upsertTestResults: Upserted custom defect (ID: ${response.rows.insertId})`,
     );
   }
-
-  return;
 };
