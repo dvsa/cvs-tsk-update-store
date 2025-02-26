@@ -1,6 +1,6 @@
-import { PoolOptions } from "mysql2/promise";
-import { getSecretValue } from "./secrets-manager";
-import { SecretsManagerConfig } from "../models/aws-sm-config";
+import { PoolOptions } from 'mysql2/promise';
+import { getSecretValue } from './secrets-manager';
+import { SecretsManagerConfig } from '../models/aws-sm-config';
 
 export const getConnectionPoolOptions = async (): Promise<PoolOptions> => {
   const config: SecretsManagerConfig = await getConfig();
