@@ -1,24 +1,22 @@
+import { createPool } from 'mysql2/promise';
 import {
   destroyConnectionPool,
   executeSql,
   getConnectionPool,
-} from "../../../src/services/connection-pool";
-import { createPool } from "mysql2/promise";
-import { useLocalDb } from "../../utils";
+} from '../../../src/services/connection-pool';
+import { useLocalDb } from '../../utils';
 
-jest.mock("mysql2/promise", () => {
-  return {
-    createPool: jest.fn().mockReturnValue({
-      end: jest.fn(),
-      execute: jest.fn(),
-    }),
-  };
-});
+jest.mock('mysql2/promise', () => ({
+  createPool: jest.fn().mockReturnValue({
+    end: jest.fn(),
+    execute: jest.fn(),
+  }),
+}));
 
 useLocalDb();
 
-describe("getConnectionPool()", () => {
-  it("should create connection pool exactly once", async () => {
+describe('getConnectionPool()', () => {
+  it('should create connection pool exactly once', async () => {
     await getConnectionPool();
     await getConnectionPool();
     await getConnectionPool();
@@ -27,23 +25,23 @@ describe("getConnectionPool()", () => {
   });
 });
 
-describe("destroyConnectionPool()", () => {
+describe('destroyConnectionPool()', () => {
   beforeEach(async () => {
     await destroyConnectionPool();
 
     // need to access nested function directly via mocked module parent function
     // using getConnectionPool().end will implicitly add 1 to mock calls counter
-    // @ts-ignore
+    // @ts-expect-error
     createPool().end.mockReset();
   });
 
-  it("should do nothing if connection pool is undefined", async () => {
+  it('should do nothing if connection pool is undefined', async () => {
     await destroyConnectionPool();
 
     expect((await getConnectionPool()).end).not.toHaveBeenCalled();
   });
 
-  it("should destroy connection pool if present", async () => {
+  it('should destroy connection pool if present', async () => {
     await getConnectionPool();
     await destroyConnectionPool();
 
@@ -51,38 +49,38 @@ describe("destroyConnectionPool()", () => {
   });
 });
 
-describe("executeSql()", () => {
-  beforeEach(async () => {
+describe('executeSql()', () => {
+  beforeEach(() => {
     // need to access nested function directly via mocked module parent function
     // using getConnectionPool().execute will implicitly add 1 to mock calls counter
-    // @ts-ignore
+    // @ts-expect-error
     createPool().execute.mockReset();
     // Jest hoisting forces us to mockImplementation anywhere except in the module-level mock
-    // @ts-ignore
+    // @ts-expect-error
     createPool().execute.mockImplementation(() => [[], []]);
   });
 
-  it("should accept single SQL statement", async () => {
-    await executeSql("SELECT 1");
+  it('should accept single SQL statement', async () => {
+    await executeSql('SELECT 1');
 
     expect((await getConnectionPool()).execute).toHaveBeenCalledWith(
-      "SELECT 1",
-      undefined
+      'SELECT 1',
+      undefined,
     );
   });
 
-  it("should accept SQL statement + template variables", async () => {
-    const sql = "SELECT 1 FROM t WHERE a = ? AND b = ?";
-    const templateVariables = ["a", "b"];
+  it('should accept SQL statement + template variables', async () => {
+    const sql = 'SELECT 1 FROM t WHERE a = ? AND b = ?';
+    const templateVariables = ['a', 'b'];
     await executeSql(sql, templateVariables);
 
     expect((await getConnectionPool()).execute).toHaveBeenCalledWith(
       sql,
-      templateVariables
+      templateVariables,
     );
   });
 
-  it("should use explicit connection if provided", async () => {
+  it('should use explicit connection if provided', async () => {
     const mockPoolExecute = jest.fn().mockReturnValue([[], []]);
     (createPool as jest.Mock) = jest
       .fn()
@@ -93,18 +91,18 @@ describe("executeSql()", () => {
       execute: mockConnectionExecute,
     };
 
-    const sql = "SELECT 1 FROM t WHERE a = ? AND b = ?";
-    const templateVariables = ["a", "b"];
+    const sql = 'SELECT 1 FROM t WHERE a = ? AND b = ?';
+    const templateVariables = ['a', 'b'];
 
-    // @ts-ignore
+    // @ts-expect-error
     await executeSql(sql, templateVariables, mockConnection);
 
     expect(mockPoolExecute).not.toHaveBeenCalled();
     expect(mockConnectionExecute).toHaveBeenCalledWith(sql, templateVariables);
   });
 
-  it("should return object, not tuple", async () => {
-    const response = await executeSql("SELECT 1");
+  it('should return object, not tuple', async () => {
+    const response = await executeSql('SELECT 1');
 
     expect(response).toEqual({
       rows: [],

@@ -1,31 +1,31 @@
-import { ModType, parseModType } from "./mod-type";
+import { ModType, parseModType } from './mod-type';
 import {
   CustomDefects,
   Defects,
   parseCustomDefects,
   parseDefects,
-} from "./defects";
-import { DynamoDbImage } from "../services/dynamodb-images";
+} from './defects';
+import { DynamoDbImage } from '../services/dynamodb-images';
 
-export type TestResultStatus = "fail" | "pass" | "prs" | "abandoned";
+export type TestResultStatus = 'fail' | 'pass' | 'prs' | 'abandoned';
 
 export type EmissionStandard =
-  | "0.10 g/kWh Euro 3 PM"
-  | "0.03 g/kWh Euro IV PM"
-  | "Euro 3"
-  | "Euro 4"
-  | "Euro 6"
-  | "Euro VI"
-  | "Full Electric";
+  | '0.10 g/kWh Euro 3 PM'
+  | '0.03 g/kWh Euro IV PM'
+  | 'Euro 3'
+  | 'Euro 4'
+  | 'Euro 6'
+  | 'Euro VI'
+  | 'Full Electric';
 
 export type FuelType =
-  | "diesel"
-  | "gas-cng"
-  | "gas-lng"
-  | "gas-lpg"
-  | "fuel cell"
-  | "petrol"
-  | "full electric";
+  | 'diesel'
+  | 'gas-cng'
+  | 'gas-lng'
+  | 'gas-lpg'
+  | 'fuel cell'
+  | 'petrol'
+  | 'full electric';
 
 export type TestTypes = TestType[];
 
@@ -80,47 +80,45 @@ export const parseTestTypes = (image?: DynamoDbImage): TestTypes => {
   return testResults;
 };
 
-export const parseTestType = (image: DynamoDbImage): TestType => {
-  return {
-    createdAt: image.getDate("createdAt"),
-    lastUpdatedAt: image.getDate("lastUpdatedAt"),
-    deletionFlag: image.getBoolean("deletionFlag"),
-    testCode: image.getString("testCode"),
-    testTypeClassification: image.getString("testTypeClassification"),
-    testTypeName: image.getString("testTypeName"),
-    name: image.getString("name"),
-    testTypeId: image.getString("testTypeId"),
-    testNumber: image.getString("testNumber"),
-    certificateNumber: image.getString("certificateNumber"),
-    secondaryCertificateNumber: image.getString("secondaryCertificateNumber"),
-    certificateLink: image.getString("certificateLink"),
-    testExpiryDate: image.getDate("testExpiryDate"),
-    testAnniversaryDate: image.getDate("testAnniversaryDate"),
-    testTypeStartTimestamp: image.getDate("testTypeStartTimestamp"),
-    testTypeEndTimestamp: image.getDate("testTypeEndTimestamp"),
-    statusUpdatedFlag: image.getBoolean("statusUpdatedFlag"),
-    numberOfSeatbeltsFitted: image.getNumber("numberOfSeatbeltsFitted"),
-    lastSeatbeltInstallationCheckDate: image.getString(
-      "lastSeatbeltInstallationCheckDate"
-    ),
-    seatbeltInstallationCheckDate: image.getBoolean(
-      "seatbeltInstallationCheckDate"
-    ),
-    testResult: image.getString("testResult") as TestResultStatus,
-    prohibitionIssued: image.getBoolean("prohibitionIssued"),
-    reasonForAbandoning: image.getString("reasonForAbandoning"),
-    additionalNotesRecorded: image.getString("additionalNotesRecorded"),
-    additionalCommentsForAbandon: image.getString(
-      "additionalCommentsForAbandon"
-    ),
-    modType: parseModType(image.getMap("modType")),
-    emissionStandard: image.getString("emissionStandard") as EmissionStandard,
-    fuelType: image.getString("fuelType") as FuelType,
-    particulateTrapFitted: image.getString("particulateTrapFitted"),
-    particulateTrapSerialNumber: image.getString("particulateTrapSerialNumber"),
-    modificationTypeUsed: image.getString("modificationTypeUsed"),
-    smokeTestKLimitApplied: image.getString("smokeTestKLimitApplied"),
-    defects: parseDefects(image.getList("defects")),
-    customDefects: parseCustomDefects(image.getList("customDefects")),
-  };
-};
+export const parseTestType = (image: DynamoDbImage): TestType => ({
+  createdAt: image.getDate('createdAt'),
+  lastUpdatedAt: image.getDate('lastUpdatedAt'),
+  deletionFlag: image.getBoolean('deletionFlag'),
+  testCode: image.getString('testCode'),
+  testTypeClassification: image.getString('testTypeClassification'),
+  testTypeName: image.getString('testTypeName'),
+  name: image.getString('name'),
+  testTypeId: image.getString('testTypeId'),
+  testNumber: image.getString('testNumber'),
+  certificateNumber: image.getString('certificateNumber'),
+  secondaryCertificateNumber: image.getString('secondaryCertificateNumber'),
+  certificateLink: image.getString('certificateLink'),
+  testExpiryDate: image.getDate('testExpiryDate'),
+  testAnniversaryDate: image.getDate('testAnniversaryDate'),
+  testTypeStartTimestamp: image.getDate('testTypeStartTimestamp'),
+  testTypeEndTimestamp: image.getDate('testTypeEndTimestamp'),
+  statusUpdatedFlag: image.getBoolean('statusUpdatedFlag'),
+  numberOfSeatbeltsFitted: image.getNumber('numberOfSeatbeltsFitted'),
+  lastSeatbeltInstallationCheckDate: image.getString(
+    'lastSeatbeltInstallationCheckDate',
+  ),
+  seatbeltInstallationCheckDate: image.getBoolean(
+    'seatbeltInstallationCheckDate',
+  ),
+  testResult: image.getString('testResult') as TestResultStatus,
+  prohibitionIssued: image.getBoolean('prohibitionIssued'),
+  reasonForAbandoning: image.getString('reasonForAbandoning'),
+  additionalNotesRecorded: image.getString('additionalNotesRecorded'),
+  additionalCommentsForAbandon: image.getString(
+    'additionalCommentsForAbandon',
+  ),
+  modType: parseModType(image.getMap('modType')),
+  emissionStandard: image.getString('emissionStandard') as EmissionStandard,
+  fuelType: image.getString('fuelType') as FuelType,
+  particulateTrapFitted: image.getString('particulateTrapFitted'),
+  particulateTrapSerialNumber: image.getString('particulateTrapSerialNumber'),
+  modificationTypeUsed: image.getString('modificationTypeUsed'),
+  smokeTestKLimitApplied: image.getString('smokeTestKLimitApplied'),
+  defects: parseDefects(image.getList('defects')),
+  customDefects: parseCustomDefects(image.getList('customDefects')),
+});
