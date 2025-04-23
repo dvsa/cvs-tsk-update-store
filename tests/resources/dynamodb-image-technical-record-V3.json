@@ -1,0 +1,537 @@
+{
+  "systemNumber": {
+    "S": "SYSTEM-NUMBER-1"
+  },
+  "createdTimestamp": {
+    "S": "2020-01-01T00:00:00.055Z"
+  },
+  "partialVin": {
+    "S": "PARTIAL-VIN"
+  },
+  "primaryVrm": {
+    "S": "VRM-1"
+  },
+  "secondaryVrms": {
+    "L": [
+      {
+        "S": "SECONDARY-VRM"
+      }
+    ]
+  },
+  "techRecord_alterationMarker": {
+    "BOOL": true
+  },
+  "techRecord_applicantDetails_address1": {
+    "S": "ADDRESS-1"
+  },
+  "techRecord_applicantDetails_address2": {
+    "S": "ADDRESS-2"
+  },
+  "techRecord_applicantDetails_address3": {
+    "S": "ADDRESS-3"
+  },
+  "techRecord_applicantDetails_emailAddress": {
+    "S": "EMAIL-ADDRESS"
+  },
+  "techRecord_applicantDetails_name": {
+    "S": "NAME"
+  },
+  "techRecord_applicantDetails_postCode": {
+    "S": "POST-CODE"
+  },
+  "techRecord_applicantDetails_postTown": {
+    "S": "POST-TOWN"
+  },
+  "techRecord_applicantDetails_telephoneNumber": {
+    "S": "TELEPHONE-NUMBER"
+  },
+  "techRecord_approvalType": {
+    "S": "NTA"
+  },
+  "techRecord_approvalTypeNumber": {
+    "S": "1"
+  },
+  "techRecord_authIntoService_cocIssueDate": {
+    "S": "2020-01-01"
+  },
+  "techRecord_authIntoService_dateAuthorised": {
+    "S": "2020-04-04"
+  },
+  "techRecord_authIntoService_datePending": {
+    "S": "2020-03-03"
+  },
+  "techRecord_authIntoService_dateReceived": {
+    "S": "2020-02-02"
+  },
+  "techRecord_authIntoService_dateRejected": {
+    "S": "2020-05-05"
+  },
+  "techRecord_axles_0_axleNumber": {
+    "N": "1"
+  },
+  "techRecord_axles_0_brakes_brakeActuator": {
+    "N": "1"
+  },
+  "techRecord_axles_0_brakes_leverLength": {
+    "N": "1"
+  },
+  "techRecord_axles_0_brakes_springBrakeParking": {
+    "BOOL": true
+  },
+  "techRecord_axles_0_parkingBrakeMrk": {
+    "BOOL": true
+  },
+  "techRecord_axles_0_tyres_dataTrAxles": {
+    "N": "1"
+  },
+  "techRecord_axles_0_tyres_fitmentCode": {
+    "S": "double"
+  },
+  "techRecord_axles_0_tyres_plyRating": {
+    "S": "22"
+  },
+  "techRecord_axles_0_tyres_speedCategorySymbol": {
+    "S": "a7"
+  },
+  "techRecord_axles_0_tyres_tyreCode": {
+    "N": "1"
+  },
+  "techRecord_axles_0_tyres_tyreSize": {
+    "S": "TYRE-SIZE"
+  },
+  "techRecord_axles_0_weights_designWeight": {
+    "N": "1"
+  },
+  "techRecord_axles_0_weights_eecWeight": {
+    "N": "1"
+  },
+  "techRecord_axles_0_weights_gbWeight": {
+    "N": "1"
+  },
+  "techRecord_axles_0_weights_kerbWeight": {
+    "N": "1"
+  },
+  "techRecord_axles_0_weights_ladenWeight": {
+    "N": "1"
+  },
+  "techRecord_bodyMake": {
+    "S": "BODY-MAKE"
+  },
+  "techRecord_bodyModel": {
+    "S": "BODY-MODEL"
+  },
+  "techRecord_bodyType_code": {
+    "S": "a"
+  },
+  "techRecord_bodyType_description": {
+    "S": "articulated"
+  },
+  "techRecord_brakeCode": {
+    "S": "1"
+  },
+  "techRecord_brakes_antilockBrakingSystem": {
+    "BOOL": true
+  },
+  "techRecord_brakes_brakeCode": {
+    "S": "666666"
+  },
+  "techRecord_brakes_brakeCodeOriginal": {
+    "S": "333"
+  },
+  "techRecord_brakes_brakeForceWheelsNotLocked_parkingBrakeForceA": {
+    "N": "1"
+  },
+  "techRecord_brakes_brakeForceWheelsNotLocked_secondaryBrakeForceA": {
+    "N": "1"
+  },
+  "techRecord_brakes_brakeForceWheelsNotLocked_serviceBrakeForceA": {
+    "N": "1"
+  },
+  "techRecord_brakes_brakeForceWheelsUpToHalfLocked_parkingBrakeForceB": {
+    "N": "1"
+  },
+  "techRecord_brakes_brakeForceWheelsUpToHalfLocked_secondaryBrakeForceB": {
+    "N": "1"
+  },
+  "techRecord_brakes_brakeForceWheelsUpToHalfLocked_serviceBrakeForceB": {
+    "N": "1"
+  },
+  "techRecord_brakes_dataTrBrakeOne": {
+    "S": "DATA-TR-BRAKE-ONE"
+  },
+  "techRecord_brakes_dataTrBrakeThree": {
+    "S": "DATA-TR-BRAKE-THREE"
+  },
+  "techRecord_brakes_dataTrBrakeTwo": {
+    "S": "DATA-TR-BRAKE-TWO"
+  },
+  "techRecord_brakes_dtpNumber": {
+    "S": "666666"
+  },
+  "techRecord_brakes_loadSensingValve": {
+    "BOOL": true
+  },
+  "techRecord_brakes_retarderBrakeOne": {
+    "S": "electric"
+  },
+  "techRecord_brakes_retarderBrakeTwo": {
+    "S": "electric"
+  },
+  "techRecord_centreOfRearmostAxleToRearOfTrl": {
+    "N": "1"
+  },
+  "techRecord_chassisMake": {
+    "S": "CHASSIS-MAKE"
+  },
+  "techRecord_chassisModel": {
+    "S": "CHASSIS-MODEL"
+  },
+  "techRecord_coifCertifierName": {
+    "S": "COIF-CERTIFIER-NAME"
+  },
+  "techRecord_coifDate": {
+    "S": "2020-01-01"
+  },
+  "techRecord_coifSerialNumber": {
+    "S": "88888888"
+  },
+  "techRecord_conversionRefNo": {
+    "S": "1010101010"
+  },
+  "techRecord_couplingCenterToRearAxleMax": {
+    "N": "1"
+  },
+  "techRecord_couplingCenterToRearAxleMin": {
+    "N": "1"
+  },
+  "techRecord_couplingCenterToRearTrlMax": {
+    "N": "1"
+  },
+  "techRecord_couplingCenterToRearTrlMin": {
+    "N": "1"
+  },
+  "techRecord_couplingType": {
+    "S": "1"
+  },
+  "techRecord_createdAt": {
+    "S": "2020-01-01T00:00:00.055Z"
+  },
+  "techRecord_createdById": {
+    "S": "CREATED-BY-ID-2"
+  },
+  "techRecord_createdByName": {
+    "S": "CREATED-BY-NAME-2"
+  },
+  "techRecord_departmentalVehicleMarker": {
+    "BOOL": true
+  },
+  "techRecord_dimensions_axleSpacing_0_axles": {
+    "S": "1-2"
+  },
+  "techRecord_dimensions_axleSpacing_0_value": {
+    "N": "1"
+  },
+  "techRecord_dimensions_height": {
+    "N": "1"
+  },
+  "techRecord_dimensions_length": {
+    "N": "1"
+  },
+  "techRecord_dimensions_width": {
+    "N": "1"
+  },
+  "techRecord_dispensations": {
+    "S": "DISPENSATIONS"
+  },
+  "techRecord_drawbarCouplingFitted": {
+    "BOOL": true
+  },
+  "techRecord_emissionsLimit": {
+    "N": "1"
+  },
+  "techRecord_euroStandard": {
+    "S": "euroStd"
+  },
+  "techRecord_euVehicleCategory": {
+    "S": "m1"
+  },
+  "techRecord_firstUseDate": {
+    "S": "2020-01-01"
+  },
+  "techRecord_frameDescription": {
+    "S": "Channel section"
+  },
+  "techRecord_frontAxleTo5thWheelMax": {
+    "N": "1"
+  },
+  "techRecord_frontAxleTo5thWheelMin": {
+    "N": "1"
+  },
+  "techRecord_frontAxleToRearAxle": {
+    "N": "1"
+  },
+  "techRecord_frontVehicleTo5thWheelCouplingMax": {
+    "N": "1"
+  },
+  "techRecord_frontVehicleTo5thWheelCouplingMin": {
+    "N": "1"
+  },
+  "techRecord_fuelPropulsionSystem": {
+    "S": "DieselPetrol"
+  },
+  "techRecord_functionCode": {
+    "S": "1"
+  },
+  "techRecord_grossDesignWeight": {
+    "N": "1"
+  },
+  "techRecord_grossEecWeight": {
+    "N": "1"
+  },
+  "techRecord_grossGbWeight": {
+    "N": "1"
+  },
+  "techRecord_grossKerbWeight": {
+    "N": "1"
+  },
+  "techRecord_grossLadenWeight": {
+    "N": "1"
+  },
+  "techRecord_lastUpdatedAt": {
+    "S": "2020-01-01T00:00:00.000000Z"
+  },
+  "techRecord_lastUpdatedById": {
+    "S": "LAST-UPDATED-BY-ID-2"
+  },
+  "techRecord_lastUpdatedByName": {
+    "S": "LAST-UPDATED-BY-NAME-2"
+  },
+  "techRecord_lettersOfAuth_letterContents": {
+    "S": "LETTER-CONTENTS"
+  },
+  "techRecord_lettersOfAuth_letterDateRequested": {
+    "S": "2020-01-01"
+  },
+  "techRecord_lettersOfAuth_letterType": {
+    "S": "Trailer authorization"
+  },
+  "techRecord_make": {
+    "S": "MAKE"
+  },
+  "techRecord_manufacturerDetails_address1": {
+    "S": "ADDRESS-1"
+  },
+  "techRecord_manufacturerDetails_address2": {
+    "S": "ADDRESS-2"
+  },
+  "techRecord_manufacturerDetails_address3": {
+    "S": "ADDRESS-3"
+  },
+  "techRecord_manufacturerDetails_emailAddress": {
+    "S": "EMAIL-ADDRESS"
+  },
+  "techRecord_manufacturerDetails_faxNumber": {
+    "S": "FAX-NUMBER"
+  },
+  "techRecord_manufacturerDetails_manufacturerNotes": {
+    "S": "MANUFACTURER-NOTES"
+  },
+  "techRecord_manufacturerDetails_name": {
+    "S": "NAME"
+  },
+  "techRecord_manufacturerDetails_postCode": {
+    "S": "POST-CODE"
+  },
+  "techRecord_manufacturerDetails_postTown": {
+    "S": "POST-TOWN"
+  },
+  "techRecord_manufacturerDetails_telephoneNumber": {
+    "S": "TELEPHONE-NUMBER"
+  },
+  "techRecord_manufactureYear": {
+    "N": "2020"
+  },
+  "techRecord_maxLoadOnCoupling": {
+    "N": "1"
+  },
+  "techRecord_maxTrainDesignWeight": {
+    "N": "1"
+  },
+  "techRecord_maxTrainEecWeight": {
+    "N": "1"
+  },
+  "techRecord_maxTrainGbWeight": {
+    "N": "1"
+  },
+  "techRecord_microfilm_microfilmDocumentType": {
+    "S": "PSV Miscellaneous"
+  },
+  "techRecord_microfilm_microfilmRollNumber": {
+    "S": "1"
+  },
+  "techRecord_microfilm_microfilmSerialNumber": {
+    "S": "1"
+  },
+  "techRecord_model": {
+    "S": "MODEL"
+  },
+  "techRecord_modelLiteral": {
+    "S": "MODEL-LITERAL"
+  },
+  "techRecord_noOfAxles": {
+    "N": "1"
+  },
+  "techRecord_notes": {
+    "S": "NOTES"
+  },
+  "techRecord_ntaNumber": {
+    "S": "NTA-NUMBER"
+  },
+  "techRecord_numberOfSeatbelts": {
+    "S": "NUMBER-OF-SEATBELTS"
+  },
+  "techRecord_numberOfWheelsDriven": {
+    "N": "1"
+  },
+  "techRecord_offRoad": {
+    "BOOL": true
+  },
+  "techRecord_plates_0_plateIssueDate": {
+    "S": "2020-01-01"
+  },
+  "techRecord_plates_0_plateIssuer": {
+    "S": "PLATE-ISSUER"
+  },
+  "techRecord_plates_0_plateReasonForIssue": {
+    "S": "Free replacement"
+  },
+  "techRecord_plates_0_plateSerialNumber": {
+    "S": "1"
+  },
+  "techRecord_plates_0_toEmailAddress": {
+    "S": "TO-EMAIL-ADDRESS"
+  },
+  "techRecord_purchaserDetails_address1": {
+    "S": "ADDRESS-1"
+  },
+  "techRecord_purchaserDetails_address2": {
+    "S": "ADDRESS-2"
+  },
+  "techRecord_purchaserDetails_address3": {
+    "S": "ADDRESS-3"
+  },
+  "techRecord_purchaserDetails_emailAddress": {
+    "S": "EMAIL-ADDRESS"
+  },
+  "techRecord_purchaserDetails_faxNumber": {
+    "S": "FAX-NUMBER"
+  },
+  "techRecord_purchaserDetails_name": {
+    "S": "NAME"
+  },
+  "techRecord_purchaserDetails_postCode": {
+    "S": "POST-CODE"
+  },
+  "techRecord_purchaserDetails_postTown": {
+    "S": "POST-TOWN"
+  },
+  "techRecord_purchaserDetails_purchaserNotes": {
+    "S": "PURCHASER-NOTES"
+  },
+  "techRecord_purchaserDetails_telephoneNumber": {
+    "S": "TELEPHONE-NUMBER"
+  },
+  "techRecord_rearAxleToRearTrl": {
+    "N": "1"
+  },
+  "techRecord_reasonForCreation": {
+    "S": "REASON-FOR-CREATION"
+  },
+  "techRecord_recordCompleteness": {
+    "S": "88888888"
+  },
+  "techRecord_regnDate": {
+    "S": "2020-01-01"
+  },
+  "techRecord_remarks": {
+    "S": "REMARKS"
+  },
+  "techRecord_roadFriendly": {
+    "BOOL": true
+  },
+  "techRecord_seatbeltInstallationApprovalDate": {
+    "S": "2020-01-01"
+  },
+  "techRecord_seatsLowerDeck": {
+    "N": "1"
+  },
+  "techRecord_seatsUpperDeck": {
+    "N": "1"
+  },
+  "techRecord_speedLimiterMrk": {
+    "BOOL": true
+  },
+  "techRecord_speedRestriction": {
+    "N": "1"
+  },
+  "techRecord_standingCapacity": {
+    "N": "1"
+  },
+  "techRecord_statusCode": {
+    "S": "STATUS-CODE"
+  },
+  "techRecord_suspensionType": {
+    "S": "1"
+  },
+  "techRecord_tachoExemptMrk": {
+    "BOOL": true
+  },
+  "techRecord_trainDesignWeight": {
+    "N": "1"
+  },
+  "techRecord_trainEecWeight": {
+    "N": "1"
+  },
+  "techRecord_trainGbWeight": {
+    "N": "1"
+  },
+  "techRecord_tyreUseCode": {
+    "S": "22"
+  },
+  "techRecord_unladenWeight": {
+    "N": "1"
+  },
+  "techRecord_updateType": {
+    "S": "adrUpdate"
+  },
+  "techRecord_variantNumber": {
+    "S": "1"
+  },
+  "techRecord_variantVersionNumber": {
+    "S": "1"
+  },
+  "techRecord_vehicleClass_code": {
+    "S": "2"
+  },
+  "techRecord_vehicleClass_description": {
+    "S": "motorbikes over 200cc or with a sidecar"
+  },
+  "techRecord_vehicleConfiguration": {
+    "S": "rigid"
+  },
+  "techRecord_vehicleSize": {
+    "S": "small"
+  },
+  "techRecord_vehicleSubclass_0": {
+    "S": "1"
+  },
+  "techRecord_vehicleType": {
+    "S": "psv"
+  },
+  "trailerId": {
+    "S": "TRL-1"
+  },
+  "vin": {
+    "S": "VIN-1"
+  }
+}

@@ -1,5 +1,5 @@
-import { DynamoDbImage } from "../services/dynamodb-images";
-import { Maybe } from "./optionals";
+import { DynamoDbImage } from '../services/dynamodb-images';
+import { Maybe } from './optionals';
 
 export interface ApplicantDetailsProperties {
   name?: string;
@@ -13,20 +13,20 @@ export interface ApplicantDetailsProperties {
 }
 
 export const parseApplicantDetailsProperties = (
-  applicantDetailsProperties?: DynamoDbImage
+  applicantDetailsProperties?: DynamoDbImage,
 ): Maybe<ApplicantDetailsProperties> => {
   if (!applicantDetailsProperties) {
     return undefined;
   }
 
   return {
-    name: applicantDetailsProperties.getString("name"),
-    address1: applicantDetailsProperties.getString("address1"),
-    address2: applicantDetailsProperties.getString("address2"),
-    postTown: applicantDetailsProperties.getString("postTown"),
-    address3: applicantDetailsProperties.getString("address3"),
-    postCode: applicantDetailsProperties.getString("postCode"),
-    emailAddress: applicantDetailsProperties.getString("emailAddress"),
-    telephoneNumber: applicantDetailsProperties.getString("telephoneNumber"),
+    name: applicantDetailsProperties.getString('name'),
+    address1: applicantDetailsProperties.getString('address1'),
+    address2: applicantDetailsProperties.getString('address2'),
+    postTown: applicantDetailsProperties.getString('postTown'),
+    address3: applicantDetailsProperties.getString('address3'),
+    postCode: applicantDetailsProperties.getString('postCode'),
+    emailAddress: applicantDetailsProperties.getString('emailAddress'),
+    telephoneNumber: applicantDetailsProperties.getString('telephoneNumber'),
   };
 };

@@ -66,13 +66,13 @@
               "cocIssueDate": {
                 "S": "2020-01-01"
               },
-              "dateAuthorised": {
+              "dateReceived": {
                 "S": "2020-02-02"
               },
               "datePending": {
                 "S": "2020-03-03"
               },
-              "dateReceived": {
+              "dateAuthorised": {
                 "S": "2020-04-04"
               },
               "dateRejected": {
