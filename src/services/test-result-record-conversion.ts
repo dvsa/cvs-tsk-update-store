@@ -68,7 +68,21 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
       );
       await vehicleConnection.beginTransaction();
 
-      vehicleId = await upsertVehicle(vehicleConnection, testResult);
+      const existingVehicleRecordIds = await selectRecordIds(
+        VEHICLE_TABLE.tableName,
+        { system_number: testResult.systemNumber, vin: vinCleanser(testResult.vin) },
+        vehicleConnection,
+      );
+
+      if (existingVehicleRecordIds.rows.length > 0) {
+        vehicleId = existingVehicleRecordIds.rows[0].id;
+      } else {
+        // Throw here to avoid since we are in a try catch anyway.
+        // and so can avoid having to move all the code that relies on vehicleId being set
+        // within this if statement.
+        debugLog(`upserting vehicle as associated vehicle record found for testResult with systemNumber: ${testResult.systemNumber} and vin: ${vinCleanser(testResult.vin)} could be found.`);
+        vehicleId = await upsertVehicle(vehicleConnection, testResult);
+      }
 
       await vehicleConnection.commit();
     } catch (err) {
@@ -157,6 +171,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
             createdById,
             lastUpdatedById,
             moment().format('YYYY-MM-DD HH:mm:ss.SSS'),
+            testResult.vrm,
           ],
           testResultConnection,
         );
@@ -254,6 +269,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
             createdById,
             lastUpdatedById,
             moment().format('YYYY-MM-DD HH:mm:ss.SSS'),
+            testResult.vrm,
           ],
           testResultConnection,
         );
