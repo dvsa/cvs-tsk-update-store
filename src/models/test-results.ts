@@ -1,4 +1,3 @@
-import { TestStationTypes } from '@dvsa/cvs-type-definitions/types/v1/enums/testStationType.enum';
 import { parseVehicleClass, VehicleClass } from './vehicle-class';
 import { parseTestTypes, TestTypes } from './test-types';
 import {
@@ -9,6 +8,7 @@ import {
 } from './shared-enums';
 import { DynamoDbImage, parseStringArray } from '../services/dynamodb-images';
 import { debugLog } from '../services/logger';
+import { TestStationTypes } from "@dvsa/cvs-type-definitions/types/v1/enums/testStationType.enum";
 
 export type TestVersion = 'current' | 'archived';
 
