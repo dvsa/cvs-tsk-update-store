@@ -80,7 +80,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
         // Throw here to avoid since we are in a try catch anyway.
         // and so can avoid having to move all the code that relies on vehicleId being set
         // within this if statement.
-        debugLog(`upserting vehicle as no associated vehicle record was found for testResult with systemNumber: ${testResult.systemNumber} and vin: ${vinCleanser(testResult.vin)} could be found.`);
+        debugLog(`upserting vehicle as no associated vehicle record was found for testResult with systemNumber: ${testResult.systemNumber} and vin: ${vinCleanser(testResult.vin)}`);
         vehicleId = await upsertVehicle(vehicleConnection, testResult);
       }
 
