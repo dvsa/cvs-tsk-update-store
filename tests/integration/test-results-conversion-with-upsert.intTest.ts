@@ -33,6 +33,7 @@ describe('convertTestResults() integration tests with upsert', () => {
       require('../resources/dynamodb-image-test-results-without-testtypes.json'),
     ),
   );
+
   testResultsJson.testResultId.S = `${testResultsJson.testResultId.S}-U`;
   testResultsJson.systemNumber.S = `${testResultsJson.systemNumber.S}-U`;
   testResultsJsonWithTestTypes.testResultId.S = `${testResultsJsonWithTestTypes.testResultId.S}-U`;
@@ -40,6 +41,16 @@ describe('convertTestResults() integration tests with upsert', () => {
   testResultsJsonWithNoSystemNumber.testResultId.S = `${testResultsJsonWithNoSystemNumber.testResultId.S}-U`;
   testResultsJsonWithoutTestTypes.testResultId.S = `${testResultsJsonWithoutTestTypes.testResultId.S}-U`;
   testResultsJsonWithoutTestTypes.systemNumber.S = `${testResultsJsonWithoutTestTypes.systemNumber.S}-U`;
+
+  // This test case is needed to ensure that VRM changes on a test-result do not get propagated
+  // to the vehicle table - assuming a vehicle already exists with that system number, vin combination
+  const testResultsJsonWithDifferentVrm = JSON.parse(
+    // This feels easier than creating an entirely new test case JSON file that only differs on VRM
+    JSON.stringify(require('../resources/dynamodb-image-test-results.json')).replace("VRM-5", "VRM-6"),
+  );
+  // Ensure system number and rest result id allign with testResultsJson test case as well
+  testResultsJsonWithDifferentVrm.testResultId.S = `${testResultsJsonWithDifferentVrm.testResultId.S}-U`;
+  testResultsJsonWithDifferentVrm.systemNumber.S = `${testResultsJsonWithDifferentVrm.systemNumber.S}-U`;
 
   beforeAll(async () => {
     process.env.DISABLE_DELETE_ON_UPDATE = 'true';
@@ -342,6 +353,62 @@ describe('convertTestResults() integration tests with upsert', () => {
     ).toBe('DEFECT-NOTES-5');
   });
 
+  it('should not overwrite the vrm on the existing vehicle when the VRM changes on a test result', async () => {
+    const event = {
+      Records: [
+        {
+          body: JSON.stringify({
+            eventSourceARN:
+            'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
+            eventName: 'INSERT',
+            dynamodb: {
+            NewImage: testResultsJsonWithDifferentVrm,
+            },
+          }),
+        },
+      ],
+    };
+
+    const consoleSpy = jest
+      .spyOn(global.console, 'error')
+      .mockImplementation();
+
+    await processStreamEvent(event, exampleContext(), () => {
+
+    });
+
+    expect(consoleSpy).toHaveBeenCalledTimes(0);
+
+    const vehicleResultSet = await executeSql(
+      `SELECT \`system_number\`, \`vin\`, \`vrm_trm\`, \`trailer_id\`, \`createdAt\`, \`id\`
+            FROM \`vehicle\`
+            WHERE \`vehicle\`.\`id\` IN (
+              SELECT \`id\`
+              FROM \`vehicle\`
+              WHERE \`vehicle\`.\`system_number\` = "${testResultsJsonWithDifferentVrm.systemNumber.S}"
+            )`,
+    );
+
+    expect(vehicleResultSet.rows).toHaveLength(1);
+    expect(vehicleResultSet.rows[0].system_number).toBe(
+      'SYSTEM-NUMBER-5-U',
+    );
+    expect(vehicleResultSet.rows[0].vin).toBe('VIN5');
+    // Expect the VRM on the vehicle table to be unchanged from previous test case
+    expect(vehicleResultSet.rows[0].vrm_trm).toBe('VRM-5');
+
+    const testResultSet = await executeSql(
+      `SELECT \`vrm_trm\`
+          FROM \`test_result\`
+          WHERE \`test_result\`.\`vehicle_id\` = ${vehicleResultSet.rows[0].id}`,
+    );
+
+    // But, expect the VRM on the test result to be changed
+    expect(testResultSet.rows[0].vrm_trm).toBe(
+      'VRM-6',
+    );
+
+  });
   it('should correctly convert a DynamoDB event into Aurora rows when processed a second time', async () => {
     const event = {
       Records: [
@@ -437,6 +504,8 @@ describe('convertTestResults() integration tests with upsert', () => {
     expect(testResultSet.rows[0].smokeTestKLimitApplied).toBe(
       'SMOKE-TEST-K-LIMIT-APPLIED',
     );
+
+    // But, expect the VRM on the test result to be changed
     expect(testResultSet.rows[0].vrm_trm).toBe(
       'VRM-5',
     );
@@ -1771,7 +1840,7 @@ describe('convertTestResults() integration tests with upsert', () => {
               WHERE testResultId like '%-U';`,
     );
 
-    expect(customDefectResultSet.rows).toHaveLength(5);
+    expect(customDefectResultSet.rows).toHaveLength(6);
 
     const testTypeResultSet = await executeSql(
       `SELECT DISTINCT tt.id FROM test_type tt
