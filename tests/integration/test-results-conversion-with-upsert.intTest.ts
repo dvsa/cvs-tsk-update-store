@@ -113,7 +113,7 @@ describe('convertTestResults() integration tests with upsert', () => {
                   \`fuel_emission_id\`, \`test_type_id\`, \`id\`, \`testResultId\`, \`testCode\`,  \`certificateNumber\`,  \`secondaryCertificateNumber\`,
                   \`testExpiryDate\`,  \`testAnniversaryDate\`,  \`testTypeStartTimestamp\`,  \`numberOfSeatbeltsFitted\`, \`lastSeatbeltInstallationCheckDate\`,
                   \`seatbeltInstallationCheckDate\`,  \`testResult\`,  \`reasonForAbandoning\`,  \`additionalNotesRecorded\`,  \`additionalCommentsForAbandon\`,
-                  \`particulateTrapFitted\`,  \`particulateTrapSerialNumber\`,  \`modificationTypeUsed\`, \`smokeTestKLimitApplied\`
+                  \`particulateTrapFitted\`,  \`particulateTrapSerialNumber\`,  \`modificationTypeUsed\`, \`smokeTestKLimitApplied\`, \`vrm_trm\`
           FROM \`test_result\`
           WHERE \`test_result\`.\`vehicle_id\` = ${vehicleResultSet.rows[0].id}`,
     );
@@ -156,6 +156,9 @@ describe('convertTestResults() integration tests with upsert', () => {
     );
     expect(testResultSet.rows[0].smokeTestKLimitApplied).toBe(
       'SMOKE-TEST-K-LIMIT-APPLIED',
+    );
+    expect(testResultSet.rows[0].vrm_trm).toBe(
+      'VRM-5',
     );
 
     expect(testResultSet.rows).toHaveLength(1);
@@ -390,7 +393,7 @@ describe('convertTestResults() integration tests with upsert', () => {
                   \`fuel_emission_id\`, \`test_type_id\`, \`id\`, \`testResultId\`, \`testCode\`,  \`certificateNumber\`,  \`secondaryCertificateNumber\`,
                   \`testExpiryDate\`,  \`testAnniversaryDate\`,  \`testTypeStartTimestamp\`,  \`numberOfSeatbeltsFitted\`, \`lastSeatbeltInstallationCheckDate\`,
                   \`seatbeltInstallationCheckDate\`,  \`testResult\`,  \`reasonForAbandoning\`,  \`additionalNotesRecorded\`,  \`additionalCommentsForAbandon\`,
-                  \`particulateTrapFitted\`,  \`particulateTrapSerialNumber\`,  \`modificationTypeUsed\`, \`smokeTestKLimitApplied\`
+                  \`particulateTrapFitted\`,  \`particulateTrapSerialNumber\`,  \`modificationTypeUsed\`, \`smokeTestKLimitApplied\`, \`vrm_trm\`
           FROM \`test_result\`
           WHERE \`test_result\`.\`vehicle_id\` = ${vehicleResultSet.rows[0].id}`,
     );
@@ -433,6 +436,9 @@ describe('convertTestResults() integration tests with upsert', () => {
     );
     expect(testResultSet.rows[0].smokeTestKLimitApplied).toBe(
       'SMOKE-TEST-K-LIMIT-APPLIED',
+    );
+    expect(testResultSet.rows[0].vrm_trm).toBe(
+      'VRM-5',
     );
 
     expect(testResultSet.rows).toHaveLength(1);
@@ -683,7 +689,7 @@ describe('convertTestResults() integration tests with upsert', () => {
                   \`fuel_emission_id\`, \`test_type_id\`, \`id\`, \`testResultId\`, \`testCode\`,  \`certificateNumber\`,  \`secondaryCertificateNumber\`,
                   \`testExpiryDate\`,  \`testAnniversaryDate\`,  \`testTypeStartTimestamp\`,  \`numberOfSeatbeltsFitted\`, \`lastSeatbeltInstallationCheckDate\`,
                   \`seatbeltInstallationCheckDate\`,  \`testResult\`,  \`reasonForAbandoning\`,  \`additionalNotesRecorded\`,  \`additionalCommentsForAbandon\`,
-                  \`particulateTrapFitted\`,  \`particulateTrapSerialNumber\`,  \`modificationTypeUsed\`, \`smokeTestKLimitApplied\`
+                  \`particulateTrapFitted\`,  \`particulateTrapSerialNumber\`,  \`modificationTypeUsed\`, \`smokeTestKLimitApplied\`, \`vrm_trm\`
           FROM \`test_result\`
           WHERE \`test_result\`.\`vehicle_id\` = ${vehicleResultSet.rows[0].id}`,
     );
@@ -723,6 +729,9 @@ describe('convertTestResults() integration tests with upsert', () => {
     );
     expect(testResultSet.rows[0].smokeTestKLimitApplied).toBe(
       'NEW-SMOKE-TEST-K-LIMIT-APPLIED',
+    );
+    expect(testResultSet.rows[0].vrm_trm).toBe(
+      'VRM-5',
     );
 
     const {
@@ -973,12 +982,12 @@ describe('convertTestResults() integration tests with upsert', () => {
                   \`fuel_emission_id\`, \`test_type_id\`, \`id\`, \`testResultId\`, \`testCode\`,  \`certificateNumber\`,  \`secondaryCertificateNumber\`,
                   \`testExpiryDate\`,  \`testAnniversaryDate\`,  \`testTypeStartTimestamp\`,  \`numberOfSeatbeltsFitted\`, \`lastSeatbeltInstallationCheckDate\`,
                   \`seatbeltInstallationCheckDate\`,  \`testResult\`,  \`reasonForAbandoning\`,  \`additionalNotesRecorded\`,  \`additionalCommentsForAbandon\`,
-                  \`particulateTrapFitted\`,  \`particulateTrapSerialNumber\`,  \`modificationTypeUsed\`, \`smokeTestKLimitApplied\`
+                  \`particulateTrapFitted\`,  \`particulateTrapSerialNumber\`,  \`modificationTypeUsed\`, \`smokeTestKLimitApplied\`, \`vrm_trm\`
           FROM \`test_result\`
           WHERE \`test_result\`.\`vehicle_id\` = ${vehicleResultSet.rows[0].id}`,
     );
 
-    expect(testResultSet.rows[0].testResultId).toBe('TEST-RESULT-ID-5-U');
+    expect(testResultSet.rows[0].vrm_trm).toBe('VRM-5');
     expect(testResultSet.rows).toHaveLength(2);
     expect(testResultSet.rows[0].testCode).toBe('555');
     expect(testResultSet.rows[0].certificateNumber).toBe('W43434343');
@@ -1013,6 +1022,9 @@ describe('convertTestResults() integration tests with upsert', () => {
     );
     expect(testResultSet.rows[0].smokeTestKLimitApplied).toBe(
       'NEW-SMOKE-TEST-K-LIMIT-APPLIED',
+    );
+    expect(testResultSet.rows[0].vrm_trm).toBe(
+      'VRM-5',
     );
 
     const {
@@ -1242,7 +1254,7 @@ describe('convertTestResults() integration tests with upsert', () => {
                   \`fuel_emission_id\`, \`test_type_id\`, \`id\`, \`testResultId\`, \`testCode\`,  \`certificateNumber\`,  \`secondaryCertificateNumber\`,
                   \`testExpiryDate\`,  \`testAnniversaryDate\`,  \`testTypeStartTimestamp\`,  \`numberOfSeatbeltsFitted\`, \`lastSeatbeltInstallationCheckDate\`,
                   \`seatbeltInstallationCheckDate\`,  \`testResult\`,  \`reasonForAbandoning\`,  \`additionalNotesRecorded\`,  \`additionalCommentsForAbandon\`,
-                  \`particulateTrapFitted\`,  \`particulateTrapSerialNumber\`,  \`modificationTypeUsed\`, \`smokeTestKLimitApplied\`, \`testTypeEndTimestamp\`
+                  \`particulateTrapFitted\`,  \`particulateTrapSerialNumber\`,  \`modificationTypeUsed\`, \`smokeTestKLimitApplied\`, \`testTypeEndTimestamp\`, \`vrm_trm\`
           FROM \`test_result\`
           WHERE \`test_result\`.\`vehicle_id\` = ${vehicleResultSet.rows[0].id}
           ORDER BY id ASC`,
@@ -1290,6 +1302,9 @@ describe('convertTestResults() integration tests with upsert', () => {
     );
     expect(testResultSet.rows[0].smokeTestKLimitApplied).toBe(
       'SMOKE-TEST-K-LIMIT-APPLIED',
+    );
+    expect(testResultSet.rows[0].vrm_trm).toBe(
+      'VRM-3',
     );
 
     expect(testResultSet.rows[1].testResultId).toBe('TEST-RESULT-ID-3-U');
@@ -1604,14 +1619,13 @@ describe('convertTestResults() integration tests with upsert', () => {
                   \`fuel_emission_id\`, \`test_type_id\`, \`id\`, \`testResultId\`, \`testCode\`,  \`certificateNumber\`,  \`secondaryCertificateNumber\`,
                   \`testExpiryDate\`,  \`testAnniversaryDate\`,  \`testTypeStartTimestamp\`,  \`numberOfSeatbeltsFitted\`, \`lastSeatbeltInstallationCheckDate\`,
                   \`seatbeltInstallationCheckDate\`,  \`testResult\`,  \`reasonForAbandoning\`,  \`additionalNotesRecorded\`,  \`additionalCommentsForAbandon\`,
-                  \`particulateTrapFitted\`,  \`particulateTrapSerialNumber\`,  \`modificationTypeUsed\`, \`smokeTestKLimitApplied\`, \`testTypeEndTimestamp\`
+                  \`particulateTrapFitted\`,  \`particulateTrapSerialNumber\`,  \`modificationTypeUsed\`, \`smokeTestKLimitApplied\`, \`testTypeEndTimestamp\`, \`vrm_trm\`
           FROM \`test_result\`
           WHERE \`test_result\`.\`vehicle_id\` = ${vehicleResultSet.rows[0].id}
           ORDER BY id ASC`,
     );
 
     expect(testResultSet.rows).toHaveLength(1);
-
     expect(testResultSet.rows[0].testResultId).toBe('TEST-RESULT-ID-4-U');
     expect(testResultSet.rows[0].testCode).toBeNull();
     expect(testResultSet.rows[0].certificateNumber).toBeNull();
@@ -1631,6 +1645,7 @@ describe('convertTestResults() integration tests with upsert', () => {
     expect(testResultSet.rows[0].particulateTrapSerialNumber).toBeNull();
     expect(testResultSet.rows[0].modificationTypeUsed).toBeNull();
     expect(testResultSet.rows[0].smokeTestKLimitApplied).toBeNull();
+    expect(testResultSet.rows[0].vrm_trm).toBe("VRM-4");
 
     const {
       test_station_id,
