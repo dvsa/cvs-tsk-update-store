@@ -1,8 +1,6 @@
 import { techRecordDocumentConverter } from '../../../src/services/tech-record-document-conversion';
 import { convert } from '../../../src/services/entity-conversion';
 import { DynamoDbImage } from '../../../src/services/dynamodb-images';
-import { testResultsConverter } from '../../../src/services/test-result-record-conversion';
-import { selectRecordIds } from '../../../src/services/sql-execution';
 
 jest.mock('../../../src/services/tech-record-document-conversion', () => ({
   techRecordDocumentConverter: jest.fn().mockReturnValue({
@@ -52,38 +50,3 @@ describe('convert()', () => {
     },
   });
 });
-
-// jest.mock('../../../src/services/test-result-record-conversion.ts', () => ({
-//   testResultsConverter: jest.fn().mockReturnValue({
-//     parseRootImage: jest.fn(),
-//     upsertEntity: jest.fn(),
-//     deleteEntity: jest.fn(),
-//   }),
-// }));
-//
-// // Mock sql-execution so that it always returns one row
-// jest.mock('../../../src/services/sql-execution.ts', () => ({
-//   selectRecordIds: jest.fn().mockReturnValue({
-//     rows: [1]
-//   })
-// }));
-//
-// describe('upsertTestResults()', () => {
-//   beforeEach(() => {
-//     // techRecordDocumentConverter().parseRootImage.mockReset();
-//     // techRecordDocumentConverter().upsertEntity.mockReset();
-//     // techRecordDocumentConverter().deleteEntity.mockReset();
-//   });
-//
-//   it("should be ", () => {
-//     convert('technical-records', 'INSERT', exampleImage());
-//
-//     expect(techRecordDocumentConverter().parseRootImage).toHaveBeenCalledTimes(
-//       1,
-//     );
-//     expect(techRecordDocumentConverter().upsertEntity).toHaveBeenCalledTimes(1);
-//     expect(techRecordDocumentConverter().deleteEntity).toHaveBeenCalledTimes(0);
-//   });
-//
-//
-//
