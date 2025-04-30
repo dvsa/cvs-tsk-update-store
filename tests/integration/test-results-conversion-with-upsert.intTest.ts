@@ -1056,6 +1056,7 @@ describe('convertTestResults() integration tests with upsert', () => {
           WHERE \`test_result\`.\`vehicle_id\` = ${vehicleResultSet.rows[0].id}`,
     );
 
+    expect(testResultSet.rows[0].testResultId).toBe('TEST-RESULT-ID-5-U');
     expect(testResultSet.rows[0].vrm_trm).toBe('VRM-5');
     expect(testResultSet.rows).toHaveLength(2);
     expect(testResultSet.rows[0].testCode).toBe('555');
