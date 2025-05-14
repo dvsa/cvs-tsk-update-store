@@ -68,7 +68,18 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
       );
       await vehicleConnection.beginTransaction();
 
-      vehicleId = await upsertVehicle(vehicleConnection, testResult);
+      const existingVehicleRecordIds = await selectRecordIds(
+        VEHICLE_TABLE.tableName,
+        { system_number: testResult.systemNumber, vin: vinCleanser(testResult.vin) },
+        vehicleConnection,
+      );
+
+      if (existingVehicleRecordIds.rows.length > 0) {
+        vehicleId = existingVehicleRecordIds.rows[0].id;
+      } else {
+        debugLog(`upserting vehicle as no associated vehicle record was found for testResult with systemNumber: ${testResult.systemNumber} and vin: ${vinCleanser(testResult.vin)}`);
+        vehicleId = await upsertVehicle(vehicleConnection, testResult);
+      }
 
       await vehicleConnection.commit();
     } catch (err) {
@@ -157,6 +168,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
             createdById,
             lastUpdatedById,
             moment().format('YYYY-MM-DD HH:mm:ss.SSS'),
+            testResult.vrm,
           ],
           testResultConnection,
         );
@@ -254,6 +266,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
             createdById,
             lastUpdatedById,
             moment().format('YYYY-MM-DD HH:mm:ss.SSS'),
+            testResult.vrm,
           ],
           testResultConnection,
         );
