@@ -16,6 +16,7 @@ describe('processStreamEvent()', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     jest.restoreAllMocks();
+    jest.useFakeTimers().setSystemTime(new Date('2023-01-01T00:00:00Z'));
     mocked(convert).mockResolvedValueOnce({});
   });
 
@@ -96,7 +97,9 @@ describe('processStreamEvent()', () => {
       ),
     ).resolves.not.toThrow();
     expect(convert).toHaveBeenCalledTimes(1);
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('changeType\":\"Test Record Change\",\"testResultId\":\"TEST-RESULT-ID-3\",\"identifier\":\"VRM-3\",\"operationType\":\"INSERT\"}]'));
+    expect(consoleSpy).toHaveBeenCalledTimes(2);
+    expect(consoleSpy).toHaveBeenCalledWith('{"serviceState":"ENQUIRY_UPDATE_NOP_INITIATED"}');
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[{"timestamp":"2023-01-01T00:00:00.000Z","changeType":"Test Record Change","identifier":"VRM-3","operationType":"INSERT","statusCode":null,"testResultId":"TEST-RESULT-ID-3","techRecordVIN":null,"techRecordSystemNumber":null,"serviceState":"ENQUIRY_UPDATE_NOP_SUCCESSFUL","eventId":null}'));
   });
 
   it('should allow valid events to reach the entity conversion procedure tech RECORD TRL and produce result log', async () => {
@@ -124,7 +127,9 @@ describe('processStreamEvent()', () => {
       ),
     ).resolves.not.toThrow();
     expect(convert).toHaveBeenCalledTimes(1);
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"changeType\":\"Technical Record Change\",\"identifier\":\"VRM-1\",\"statusCode\":\"STATUS-CODE\",\"operationType\":\"INSERT\"}]'));
+    expect(consoleSpy).toHaveBeenCalledTimes(2);
+    expect(consoleSpy).toHaveBeenCalledWith('{"serviceState":"ENQUIRY_UPDATE_NOP_INITIATED"}');
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[{"timestamp":"2023-01-01T00:00:00.000Z","changeType":"Technical Record Change","identifier":"VRM-1","operationType":"INSERT","statusCode":"STATUS-CODE","testResultId":null,"serviceState":"ENQUIRY_UPDATE_NOP_SUCCESSFUL","eventId":null}]'));
     consoleSpy.mockRestore();
   });
 
