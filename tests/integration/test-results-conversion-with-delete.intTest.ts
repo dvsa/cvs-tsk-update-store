@@ -58,6 +58,7 @@ describe('convertTestResults() integration tests with delete', () => {
         database: 'CVSBNOP',
       });
     }
+    jest.useFakeTimers().setSystemTime(new Date('2023-01-01T00:00:00Z'));
   });
 
   afterAll(async () => {
@@ -1558,10 +1559,12 @@ describe('convertTestResults() integration tests with delete', () => {
       ],
       {
         changeType: 'Test Record Change',
-        testResultId: 'TEST-RESULT-ID-0',
-        identifier: 'TRL-0',
-        serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_SUCCESSFUL,
         eventId: 'faf41ab1-5b42-462c-b242-c4450e15c724',
+        identifier: 'VRM-0',
+        operationType: 'INSERT',
+        serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_SUCCESSFUL,
+        testResultId: 'TEST-RESULT-ID-0-D',
+        timestamp: '2023-01-01T00:00.000Z',
       },
     );
   });

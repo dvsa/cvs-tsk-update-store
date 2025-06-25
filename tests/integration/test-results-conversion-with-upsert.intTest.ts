@@ -47,7 +47,7 @@ describe('convertTestResults() integration tests with upsert', () => {
   // to the vehicle table - assuming a vehicle already exists with that system number, vin combination
   const testResultsJsonWithDifferentVrm = JSON.parse(
     // This feels easier than creating an entirely new test case JSON file that only differs on VRM
-    JSON.stringify(require('../resources/dynamodb-image-test-results.json')).replace("VRM-5", "VRM-6"),
+    JSON.stringify(require('../resources/dynamodb-image-test-results.json')).replace('VRM-5', 'VRM-6'),
   );
   // Ensure system number and rest result id allign with testResultsJson test case as well
   testResultsJsonWithDifferentVrm.testResultId.S = `${testResultsJsonWithDifferentVrm.testResultId.S}-U`;
@@ -69,6 +69,7 @@ describe('convertTestResults() integration tests with upsert', () => {
         database: 'CVSBNOP',
       });
     }
+    jest.useFakeTimers().setSystemTime(new Date('2023-01-01T00:00:00Z'));
   });
 
   afterAll(async () => {
@@ -363,7 +364,7 @@ describe('convertTestResults() integration tests with upsert', () => {
             'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
             eventName: 'INSERT',
             dynamodb: {
-            NewImage: testResultsJsonWithDifferentVrm,
+              NewImage: testResultsJsonWithDifferentVrm,
             },
           }),
         },
@@ -408,7 +409,6 @@ describe('convertTestResults() integration tests with upsert', () => {
     expect(testResultSet.rows[0].vrm_trm).toBe(
       'VRM-6',
     );
-
   });
   it('should correctly convert a DynamoDB event into Aurora rows when processed a second time', async () => {
     const event = {
@@ -1642,10 +1642,12 @@ describe('convertTestResults() integration tests with upsert', () => {
         new Error("result is missing required field 'systemNumber'"),
         {
           changeType: 'Test Record Change',
-          testResultId: 'TEST-RESULT-ID-0',
-          identifier: 'TRL-0',
-          serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_SUCCESSFUL,
           eventId: 'faf41ab1-5b42-462c-b242-c4450e15c724',
+          identifier: 'VRM-0',
+          operationType: 'INSERT',
+          serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_SUCCESSFUL,
+          testResultId: 'TEST-RESULT-ID-0-D',
+          timestamp: '2023-01-01T00:00.000Z',
         },
       ],
     );
@@ -1723,7 +1725,7 @@ describe('convertTestResults() integration tests with upsert', () => {
     expect(testResultSet.rows[0].particulateTrapSerialNumber).toBeNull();
     expect(testResultSet.rows[0].modificationTypeUsed).toBeNull();
     expect(testResultSet.rows[0].smokeTestKLimitApplied).toBeNull();
-    expect(testResultSet.rows[0].vrm_trm).toBe("VRM-4");
+    expect(testResultSet.rows[0].vrm_trm).toBe('VRM-4');
 
     const {
       test_station_id,
