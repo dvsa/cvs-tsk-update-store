@@ -1202,6 +1202,7 @@ describe('convertTestResults() integration tests with delete', () => {
     const event = {
       Records: [
         {
+          messageId: '12345',
           body: JSON.stringify({
             eventSourceARN:
             'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
