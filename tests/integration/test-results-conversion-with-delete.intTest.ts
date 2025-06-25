@@ -10,6 +10,7 @@ import { exampleContext, useLocalDb } from '../utils';
 import { getContainerizedDatabase } from './cvsbnop-container';
 import { processStreamEvent } from '../../src/functions/process-stream-event';
 import { getConnectionPoolOptions } from '../../src/services/connection-pool-options';
+import { EventLoggingEnum } from '../../src/models/EventLogging.enum';
 
 useLocalDb();
 jest.setTimeout(60_000);
@@ -1555,6 +1556,13 @@ describe('convertTestResults() integration tests with delete', () => {
         'messageId: faf41ab1-5b42-462c-b242-c4450e15c724',
         new Error("result is missing required field 'systemNumber'"),
       ],
+      {
+        changeType: 'Test Record Change',
+        testResultId: 'TEST-RESULT-ID-0',
+        identifier: 'TRL-0',
+        serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_SUCCESSFUL,
+        eventId: 'faf41ab1-5b42-462c-b242-c4450e15c724',
+      },
     );
   });
 
