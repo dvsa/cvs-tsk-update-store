@@ -33,7 +33,8 @@ export const processStreamEvent: Handler = async (
   };
   let currentLog = null;
   try {
-    currentLog = createLogEntry();
+    const startingCurrentLog = createLogEntry();
+
     debugLog('Received SQS event: ', JSON.stringify(event));
 
     validateEvent(event);
@@ -43,25 +44,18 @@ export const processStreamEvent: Handler = async (
       console.error('AWS_REGION envvar not available');
       return;
     }
+    console.log(JSON.stringify({
+      serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_INITIATED,
+    }));
 
     debugLog(`Received valid SQS event (${event.Records.length} records)`);
 
     for await (const record of event.Records) {
       const id = record.messageId;
-      updateLogEntry(currentLog, {
-        changeType: null,
-        identifier: null,
-        operationType: null,
-        statusCode: null,
-        testResultId: null,
-        techRecordVIN: null,
-        techRecordSystemNumber: null,
-        serviceState: null,
-        eventId: null,
-      });
+      currentLog = startingCurrentLog;
       console.log(JSON.stringify({
         eventId: id,
-        serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_INITIATED,
+        serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_INITIATED_FOR_RECORD_ID,
       }));
 
       const dynamoRecord: DynamoDBRecord = JSON.parse(record.body) as DynamoDBRecord;
@@ -85,15 +79,20 @@ export const processStreamEvent: Handler = async (
           identifier: unmarshalledTechnicalRecord.vehicleType === 'trl'
             ? unmarshalledTechnicalRecord.trailerId
             : unmarshalledTechnicalRecord.primaryVrm,
-          techRecordVIN: unmarshalledTechnicalRecord.techRecord[0]?.vin,
-          techRecordSystemNumber: unmarshalledTechnicalRecord.techRecord[0]?.systemNumber,
+          techRecordVIN: unmarshalledTechnicalRecord?.vin,
+          techRecordSystemNumber: unmarshalledTechnicalRecord?.systemNumber,
           statusCode: unmarshalledTechnicalRecord.techRecord[0]?.statusCode,
           serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_SUCCESSFUL,
+          eventId: id,
         });
       }
       if (tableName.includes('test-result')) {
         const testResult: any = dynamoRecord.dynamodb?.NewImage;
         const unmarshalledTestResult = unmarshall(testResult);
+        console.log(JSON.stringify({
+          eventId: id,
+          TECH_RECORD: unmarshalledTestResult,
+        }));
         updateLogEntry(currentLog, {
           changeType: 'Test Record Change',
           testResultId: unmarshalledTestResult.testResultId,
@@ -101,6 +100,7 @@ export const processStreamEvent: Handler = async (
             ? unmarshalledTestResult.trailerId
             : unmarshalledTestResult.vrm,
           serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_SUCCESSFUL,
+          eventId: id,
         });
       }
 
@@ -145,7 +145,7 @@ export const processStreamEvent: Handler = async (
           ],
         );
         res.batchItemFailures.push({ itemIdentifier: id });
-        dumpArguments(event, context);
+        dumpArguments(event, context, currentLog);
       }
     }
   } catch (err) {
@@ -159,7 +159,7 @@ export const processStreamEvent: Handler = async (
         },
       ],
     );
-    dumpArguments(event, context);
+    dumpArguments(event, context, currentLog);
     await destroyConnectionPool();
   }
   // eslint-disable-next-line consistent-return
@@ -223,7 +223,13 @@ const validateRecord = (record: DynamoDBRecord): void => {
   }
 };
 
-const dumpArguments = (event: DynamoDBStreamEvent, context: Context): void => {
-  console.error('Event dump  : ', JSON.stringify(event));
-  console.error('Context dump: ', JSON.stringify(context));
+const dumpArguments = (event: DynamoDBStreamEvent, context: Context, currentLog: Partial<ILog> | null): void => {
+  console.error('Event dump  : ', {
+    currentLog,
+    event: JSON.stringify(event),
+  });
+  console.error('Context dump: ', {
+    currentLog,
+    context: JSON.stringify(context),
+  });
 };
