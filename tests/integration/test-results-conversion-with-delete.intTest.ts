@@ -1563,7 +1563,7 @@ describe('convertTestResults() integration tests with delete', () => {
           serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED,
           testResultId: 'TEST-RESULT-ID-0-D',
         },
-      }
+      }),
     );
   });
 
