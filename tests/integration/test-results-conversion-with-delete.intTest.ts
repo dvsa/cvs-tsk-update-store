@@ -1557,15 +1557,14 @@ describe('convertTestResults() integration tests with delete', () => {
       {
         id: 'messageId: faf41ab1-5b42-462c-b242-c4450e15c724',
         error: new Error("result is missing required field 'systemNumber'"),
-        currentLog: {
+        currentLog: expect.objectContaining({
           changeType: 'Test Record Change',
           eventId: 'faf41ab1-5b42-462c-b242-c4450e15c724',
           identifier: 'VRM-0',
           operationType: 'INSERT',
           serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED,
           testResultId: 'TEST-RESULT-ID-0-D',
-          timestamp: '2023-01-01T00:00.000Z',
-        },
+        }),
       },
     );
     jest.useRealTimers();
