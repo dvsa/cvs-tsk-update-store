@@ -1535,6 +1535,7 @@ describe('convertTestResults() integration tests with delete', () => {
     const consoleSpy = jest
       .spyOn(global.console, 'error')
       .mockImplementation();
+    jest.useFakeTimers().setSystemTime(new Date('2023-01-01T00:00:00Z'));
     const returnValue = await processStreamEvent(
       event,
       exampleContext(),
@@ -1567,6 +1568,7 @@ describe('convertTestResults() integration tests with delete', () => {
         },
       },
     );
+    jest.useRealTimers();
   });
 
   it('A new Test Result with no TestTypes is inserted correctly', async () => {
