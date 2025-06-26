@@ -104,13 +104,20 @@ export const processStreamEvent: Handler = async (
         });
       }
 
+      updateLogEntry(currentLog, { eventId: 'here1' });
+
       // is this an INSERT, UPDATE, or DELETE?
       const operationType: SqlOperation = deriveSqlOperation(
         dynamoRecord.eventName!,
       );
+      updateLogEntry(currentLog, { eventId: 'here2' });
+
       updateLogEntry(currentLog, { operationType });
+      updateLogEntry(currentLog, { eventId: 'here3' });
+
       addToLogManager(currentLog);
 
+      updateLogEntry(currentLog, { eventId: 'here4' });
       // parse native DynamoDB format to usable TS map
       const image: DynamoDbImage = selectImage(
         operationType,
@@ -118,6 +125,7 @@ export const processStreamEvent: Handler = async (
       );
 
       debugLog('Dynamo image dump:', image);
+      updateLogEntry(currentLog, { eventId: 'here5' });
 
       try {
         debugLog(

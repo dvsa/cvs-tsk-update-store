@@ -1619,7 +1619,7 @@ describe('convertTestResults() integration tests with upsert', () => {
     jest
       .spyOn(global.console, 'error')
       .mockImplementation((message: string, object: Object)=> {
-        if (iter === 1) {
+        if (iter === 0) {
           expect(message).toEqual(
             "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
           );
