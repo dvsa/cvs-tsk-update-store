@@ -1645,7 +1645,7 @@ describe('convertTestResults() integration tests with upsert', () => {
           eventId: 'faf41ab1-5b42-462c-b242-c4450e15c724',
           identifier: 'VRM-0',
           operationType: 'INSERT',
-          serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_SUCCESSFUL,
+          serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED,
           testResultId: 'TEST-RESULT-ID-0-D',
           timestamp: '2023-01-01T00:00.000Z',
         },
