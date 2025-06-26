@@ -1600,6 +1600,8 @@ describe('convertTestResults() integration tests with upsert', () => {
   });
 
   it('A new Test Result with no systemNumber throws an error', async () => {
+    const testResult = structuredClone(testResultsJsonWithNoSystemNumber);
+    delete testResult.vin;
     const event = {
       Records: [
         {
@@ -1609,7 +1611,7 @@ describe('convertTestResults() integration tests with upsert', () => {
             'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
             eventName: 'INSERT',
             dynamodb: {
-              NewImage: testResultsJsonWithNoSystemNumber,
+              NewImage: testResult,
             },
           }),
         },
@@ -1638,6 +1640,7 @@ describe('convertTestResults() integration tests with upsert', () => {
         }
         ++iter;
       });
+    jest
 
     const returnValue = await processStreamEvent(
       event,
