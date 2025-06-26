@@ -1532,9 +1532,29 @@ describe('convertTestResults() integration tests with delete', () => {
       ],
     };
 
-    const consoleSpy = jest
+    let iter = 0;
+    jest
       .spyOn(global.console, 'error')
-      .mockImplementation();
+      .mockImplementation((message: string, object: Object)=> {
+        if (iter === 0) {
+          expect(message).toEqual(
+            "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
+          );
+          expect(object).toEqual(expect.objectContaining({
+            id: 'messageId: faf41ab1-5b42-462c-b242-c4450e15c724',
+            error: new Error("result is missing required field 'systemNumber'"),
+            currentLog: {
+              changeType: 'Test Record Change',
+              eventId: 'faf41ab1-5b42-462c-b242-c4450e15c724',
+              identifier: 'VRM-0',
+              operationType: 'INSERT',
+              serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED,
+              testResultId: 'TEST-RESULT-ID-0-D',
+            },
+          }));
+        }
+        ++iter;
+      });
     const returnValue = await processStreamEvent(
       event,
       exampleContext(),
@@ -1550,22 +1570,7 @@ describe('convertTestResults() integration tests with delete', () => {
     };
 
     expect(returnValue).toEqual(expectedValue);
-    expect(consoleSpy).toHaveBeenNthCalledWith(
-      1,
-      "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
-      expect.objectContaining({
-        id: 'messageId: faf41ab1-5b42-462c-b242-c4450e15c724',
-        error: new Error("result is missing required field 'systemNumber'"),
-        currentLog: {
-          changeType: 'Test Record Change',
-          eventId: 'faf41ab1-5b42-462c-b242-c4450e15c724',
-          identifier: 'VRM-0',
-          operationType: 'INSERT',
-          serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED,
-          testResultId: 'TEST-RESULT-ID-0-D',
-        },
-      }),
-    );
+    expect(iter).not.toEqual(0);
   });
 
   it('A new Test Result with no TestTypes is inserted correctly', async () => {
