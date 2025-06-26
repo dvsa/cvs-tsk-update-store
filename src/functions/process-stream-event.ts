@@ -156,13 +156,11 @@ export const processStreamEvent: Handler = async (
   } catch (err) {
     console.error(
       'An error unrelated to Dynamo-to-Aurora conversion has occurred, event will not be retried',
-      [
-        err,
-        {
-          ...currentLog,
-          serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED,
-        },
-      ],
+      {
+        error: err,
+        ...currentLog,
+        serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED,
+      },
     );
     dumpArguments(event, context, currentLog);
     await destroyConnectionPool();
