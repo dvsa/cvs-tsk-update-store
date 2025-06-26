@@ -125,15 +125,11 @@ export const processStreamEvent: Handler = async (
         debugLog(
           `DynamoDB ---> Aurora | START (event ID: ${dynamoRecord.eventID})`,
         );
-        updateLogEntry(currentLog, { eventId: 'here1' });
 
         await convert(tableName, operationType, image);
-        updateLogEntry(currentLog, { eventId: 'here2' });
         printLogs();
-        updateLogEntry(currentLog, { eventId: 'here3' });
 
         clearLogs();
-        updateLogEntry(currentLog, { eventId: 'here4' });
 
         debugLog(
           `DynamoDB ---> Aurora | END   (event ID: ${dynamoRecord.eventID})`,
