@@ -58,10 +58,6 @@ describe('convertTestResults() integration tests with delete', () => {
         database: 'CVSBNOP',
       });
     }
-    jest.useFakeTimers().setSystemTime(new Date('2023-01-01T00:00:00Z'));
-    const consoleSpyLog = jest
-      .spyOn(global.console, 'log')
-      .mockImplementation();
   });
 
   afterAll(async () => {
