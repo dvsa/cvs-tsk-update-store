@@ -1536,7 +1536,7 @@ describe('convertTestResults() integration tests with delete', () => {
     jest
       .spyOn(global.console, 'error')
       .mockImplementation((message: string, object: Object)=> {
-        if (iter === 0) {
+        if (iter === 1) {
           expect(message).toEqual(
             "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
           );
