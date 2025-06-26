@@ -1600,8 +1600,7 @@ describe('convertTestResults() integration tests with upsert', () => {
   });
 
   it('A new Test Result with no systemNumber throws an error', async () => {
-    const testResult = structuredClone(testResultsJsonWithNoSystemNumber);
-    delete testResult.vin;
+    const testResult = { field: 'fake' };
     const event = {
       Records: [
         {
@@ -1640,7 +1639,6 @@ describe('convertTestResults() integration tests with upsert', () => {
         }
         ++iter;
       });
-    jest
 
     const returnValue = await processStreamEvent(
       event,

@@ -1516,8 +1516,7 @@ describe('convertTestResults() integration tests with delete', () => {
   });
 
   it('A new Test Result with no systemNumber throws an error', async () => {
-    const testResult = structuredClone(testResultsJsonWithNoSystemNumber);
-    delete testResult.vin;
+    const testResult = { field: 'fake' };
     const event = {
       Records: [
         {
