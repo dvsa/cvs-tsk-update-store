@@ -135,14 +135,14 @@ export const processStreamEvent: Handler = async (
       } catch (err) {
         console.error(
           "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
-          [
-            `messageId: ${id}`,
-            err,
-            {
+          {
+            id: `messageId: ${id}`,
+            error: err,
+            currentLog: {
               ...currentLog,
               serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED,
             },
-          ],
+          },
         );
         res.batchItemFailures.push({ itemIdentifier: id });
         dumpArguments(event, context, currentLog);

@@ -1553,10 +1553,10 @@ describe('convertTestResults() integration tests with delete', () => {
     expect(consoleSpy).toHaveBeenNthCalledWith(
       1,
       "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
-      [
-        'messageId: faf41ab1-5b42-462c-b242-c4450e15c724',
-        new Error("result is missing required field 'systemNumber'"),
-        {
+      {
+        id: 'messageId: faf41ab1-5b42-462c-b242-c4450e15c724',
+        error: new Error("result is missing required field 'systemNumber'"),
+        currentLog: {
           changeType: 'Test Record Change',
           eventId: 'faf41ab1-5b42-462c-b242-c4450e15c724',
           identifier: 'VRM-0',
@@ -1565,7 +1565,7 @@ describe('convertTestResults() integration tests with delete', () => {
           testResultId: 'TEST-RESULT-ID-0-D',
           timestamp: '2023-01-01T00:00.000Z',
         },
-      ],
+      },
     );
   });
 
