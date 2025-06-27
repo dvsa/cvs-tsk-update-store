@@ -134,7 +134,6 @@ export const processStreamEvent: Handler = async (
         debugLog(
           `DynamoDB ---> Aurora | END   (event ID: ${dynamoRecord.eventID})`,
         );
-        updateLogEntry(currentLog, { eventId: 'here5' });
       } catch (err) {
         currentLog.serviceState = EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED;
         console.error(
