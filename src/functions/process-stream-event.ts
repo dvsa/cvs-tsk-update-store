@@ -17,6 +17,7 @@ import {
 } from '../services/logger';
 import { SqlOperation, deriveSqlOperation } from '../services/sql-operations';
 import { transformTechRecord } from '../utils/transform-tech-record';
+import { EventLoggingEnum } from '../models/EventLogging.enum';
 
 /**
  * λ function: convert a DynamoDB document to Aurora RDS rows
@@ -30,10 +31,12 @@ export const processStreamEvent: Handler = async (
   const res: BatchItemFailuresResponse = {
     batchItemFailures: [],
   };
+  let currentLog = null;
   try {
+    const startingCurrentLog = createLogEntry();
+
     debugLog('Received SQS event: ', JSON.stringify(event));
 
-    const currentLog = createLogEntry();
     validateEvent(event);
 
     const region = process.env.AWS_REGION;
@@ -41,11 +44,20 @@ export const processStreamEvent: Handler = async (
       console.error('AWS_REGION envvar not available');
       return;
     }
+    console.log(JSON.stringify({
+      serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_INITIATED,
+    }));
 
     debugLog(`Received valid SQS event (${event.Records.length} records)`);
 
     for await (const record of event.Records) {
       const id = record.messageId;
+      currentLog = startingCurrentLog;
+      console.log(JSON.stringify({
+        eventId: id,
+        serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_INITIATED_FOR_RECORD_ID,
+      }));
+
       const dynamoRecord: DynamoDBRecord = JSON.parse(record.body) as DynamoDBRecord;
 
       debugLog('Original DynamoDB stream event body (parsed): ', dynamoRecord);
@@ -67,18 +79,28 @@ export const processStreamEvent: Handler = async (
           identifier: unmarshalledTechnicalRecord.vehicleType === 'trl'
             ? unmarshalledTechnicalRecord.trailerId
             : unmarshalledTechnicalRecord.primaryVrm,
+          techRecordVIN: unmarshalledTechnicalRecord?.vin,
+          techRecordSystemNumber: unmarshalledTechnicalRecord?.systemNumber,
           statusCode: unmarshalledTechnicalRecord.techRecord[0]?.statusCode,
+          serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_SUCCESSFUL,
+          eventId: id,
         });
       }
       if (tableName.includes('test-result')) {
         const testResult: any = dynamoRecord.dynamodb?.NewImage;
         const unmarshalledTestResult = unmarshall(testResult);
+        console.log(JSON.stringify({
+          eventId: id,
+          TECH_RECORD: unmarshalledTestResult,
+        }));
         updateLogEntry(currentLog, {
           changeType: 'Test Record Change',
           testResultId: unmarshalledTestResult.testResultId,
           identifier: unmarshalledTestResult.vehicleType === 'trl'
             ? unmarshalledTestResult.trailerId
             : unmarshalledTestResult.vrm,
+          serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_SUCCESSFUL,
+          eventId: id,
         });
       }
 
@@ -86,7 +108,9 @@ export const processStreamEvent: Handler = async (
       const operationType: SqlOperation = deriveSqlOperation(
         dynamoRecord.eventName!,
       );
+
       updateLogEntry(currentLog, { operationType });
+
       addToLogManager(currentLog);
 
       // parse native DynamoDB format to usable TS map
@@ -103,28 +127,37 @@ export const processStreamEvent: Handler = async (
         );
 
         await convert(tableName, operationType, image);
-
         printLogs();
+
         clearLogs();
 
         debugLog(
           `DynamoDB ---> Aurora | END   (event ID: ${dynamoRecord.eventID})`,
         );
       } catch (err) {
+        currentLog.serviceState = EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED;
         console.error(
           "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
-          [`messageId: ${id}`, err],
+          {
+            id: `messageId: ${id}`,
+            error: err,
+            currentLog,
+          },
         );
         res.batchItemFailures.push({ itemIdentifier: id });
-        dumpArguments(event, context);
+        dumpArguments(event, context, currentLog);
       }
     }
   } catch (err) {
     console.error(
       'An error unrelated to Dynamo-to-Aurora conversion has occurred, event will not be retried',
-      err,
+      {
+        error: err,
+        ...currentLog,
+        serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED,
+      },
     );
-    dumpArguments(event, context);
+    dumpArguments(event, context, currentLog);
     await destroyConnectionPool();
   }
   // eslint-disable-next-line consistent-return
@@ -188,7 +221,13 @@ const validateRecord = (record: DynamoDBRecord): void => {
   }
 };
 
-const dumpArguments = (event: DynamoDBStreamEvent, context: Context): void => {
-  console.error('Event dump  : ', JSON.stringify(event));
-  console.error('Context dump: ', JSON.stringify(context));
+const dumpArguments = (event: DynamoDBStreamEvent, context: Context, currentLog: Partial<ILog> | null): void => {
+  console.error('Event dump  : ', {
+    currentLog,
+    event: JSON.stringify(event),
+  });
+  console.error('Context dump: ', {
+    currentLog,
+    context: JSON.stringify(context),
+  });
 };

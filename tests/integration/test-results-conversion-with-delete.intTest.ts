@@ -10,6 +10,7 @@ import { exampleContext, useLocalDb } from '../utils';
 import { getContainerizedDatabase } from './cvsbnop-container';
 import { processStreamEvent } from '../../src/functions/process-stream-event';
 import { getConnectionPoolOptions } from '../../src/services/connection-pool-options';
+import { EventLoggingEnum } from '../../src/models/EventLogging.enum';
 
 useLocalDb();
 jest.setTimeout(60_000);
@@ -1551,10 +1552,18 @@ describe('convertTestResults() integration tests with delete', () => {
     expect(consoleSpy).toHaveBeenNthCalledWith(
       1,
       "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
-      [
-        'messageId: faf41ab1-5b42-462c-b242-c4450e15c724',
-        new Error("result is missing required field 'systemNumber'"),
-      ],
+      expect.objectContaining({
+        id: 'messageId: faf41ab1-5b42-462c-b242-c4450e15c724',
+        error: new Error("result is missing required field 'systemNumber'"),
+        currentLog: expect.objectContaining({
+          changeType: 'Test Record Change',
+          eventId: 'faf41ab1-5b42-462c-b242-c4450e15c724',
+          identifier: 'VRM-0',
+          operationType: 'INSERT',
+          serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED,
+          testResultId: 'TEST-RESULT-ID-0-D',
+        }),
+      }),
     );
   });
 

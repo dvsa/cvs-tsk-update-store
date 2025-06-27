@@ -10,6 +10,7 @@ import { exampleContext, useLocalDb } from '../utils';
 import { getContainerizedDatabase } from './cvsbnop-container';
 import { processStreamEvent } from '../../src/functions/process-stream-event';
 import { getConnectionPoolOptions } from '../../src/services/connection-pool-options';
+import { EventLoggingEnum } from '../../src/models/EventLogging.enum';
 
 useLocalDb();
 jest.setTimeout(60_000);
@@ -46,7 +47,7 @@ describe('convertTestResults() integration tests with upsert', () => {
   // to the vehicle table - assuming a vehicle already exists with that system number, vin combination
   const testResultsJsonWithDifferentVrm = JSON.parse(
     // This feels easier than creating an entirely new test case JSON file that only differs on VRM
-    JSON.stringify(require('../resources/dynamodb-image-test-results.json')).replace("VRM-5", "VRM-6"),
+    JSON.stringify(require('../resources/dynamodb-image-test-results.json')).replace('VRM-5', 'VRM-6'),
   );
   // Ensure system number and rest result id allign with testResultsJson test case as well
   testResultsJsonWithDifferentVrm.testResultId.S = `${testResultsJsonWithDifferentVrm.testResultId.S}-U`;
@@ -362,7 +363,7 @@ describe('convertTestResults() integration tests with upsert', () => {
             'arn:aws:dynamodb:eu-west-1:1:table/test-results/stream/2020-01-01T00:00:00.000',
             eventName: 'INSERT',
             dynamodb: {
-            NewImage: testResultsJsonWithDifferentVrm,
+              NewImage: testResultsJsonWithDifferentVrm,
             },
           }),
         },
@@ -407,7 +408,6 @@ describe('convertTestResults() integration tests with upsert', () => {
     expect(testResultSet.rows[0].vrm_trm).toBe(
       'VRM-6',
     );
-
   });
   it('should correctly convert a DynamoDB event into Aurora rows when processed a second time', async () => {
     const event = {
@@ -1636,10 +1636,18 @@ describe('convertTestResults() integration tests with upsert', () => {
     expect(consoleSpy).toHaveBeenNthCalledWith(
       1,
       "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
-      [
-        'messageId: faf41ab1-5b42-462c-b242-c4450e15c724',
-        new Error("result is missing required field 'systemNumber'"),
-      ],
+      expect.objectContaining({
+        id: 'messageId: faf41ab1-5b42-462c-b242-c4450e15c724',
+        error: new Error("result is missing required field 'systemNumber'"),
+        currentLog: expect.objectContaining({
+          changeType: 'Test Record Change',
+          eventId: 'faf41ab1-5b42-462c-b242-c4450e15c724',
+          identifier: 'VRM-0',
+          operationType: 'INSERT',
+          serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED,
+          testResultId: 'TEST-RESULT-ID-0-U',
+        }),
+      }),
     );
   });
 
@@ -1715,7 +1723,7 @@ describe('convertTestResults() integration tests with upsert', () => {
     expect(testResultSet.rows[0].particulateTrapSerialNumber).toBeNull();
     expect(testResultSet.rows[0].modificationTypeUsed).toBeNull();
     expect(testResultSet.rows[0].smokeTestKLimitApplied).toBeNull();
-    expect(testResultSet.rows[0].vrm_trm).toBe("VRM-4");
+    expect(testResultSet.rows[0].vrm_trm).toBe('VRM-4');
 
     const {
       test_station_id,
