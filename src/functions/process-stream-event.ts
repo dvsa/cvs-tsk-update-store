@@ -1,17 +1,23 @@
-import {
+import { _Record } from '@aws-sdk/client-dynamodb-streams';
+import type {
   Context,
   DynamoDBRecord,
   DynamoDBStreamEvent,
   Handler,
   SQSEvent,
   StreamRecord,
-} from "aws-lambda";
-import { convert } from "../services/entity-conversion";
-import { DynamoDbImage } from "../services/dynamodb-images";
-import { deriveSqlOperation, SqlOperation } from "../services/sql-operations";
-import { destroyConnectionPool } from "../services/connection-pool";
-import { debugLog } from "../services/logger";
-import { BatchItemFailuresResponse } from "../models/batch-item-failure-response";
+} from 'aws-lambda';
+import { unmarshall } from '@aws-sdk/util-dynamodb';
+import { BatchItemFailuresResponse } from '../models/batch-item-failure-response';
+import { destroyConnectionPool } from '../services/connection-pool';
+import { DynamoDbImage } from '../services/dynamodb-images';
+import { convert } from '../services/entity-conversion';
+import {
+  addToLogManager, clearLogs, createLogEntry, debugLog, printLogs, updateLogEntry,
+} from '../services/logger';
+import { SqlOperation, deriveSqlOperation } from '../services/sql-operations';
+import { transformTechRecord } from '../utils/transform-tech-record';
+import { EventLoggingEnum } from '../models/EventLogging.enum';
 
 /**
  * λ function: convert a DynamoDB document to Aurora RDS rows
@@ -20,112 +26,172 @@ import { BatchItemFailuresResponse } from "../models/batch-item-failure-response
  */
 export const processStreamEvent: Handler = async (
   event: SQSEvent,
-  context: Context
+  context: Context,
 ): Promise<any> => {
   const res: BatchItemFailuresResponse = {
     batchItemFailures: [],
   };
-
+  let currentLog = null;
   try {
-    debugLog("Received SQS event: ", event);
+    const startingCurrentLog = createLogEntry();
+
+    debugLog('Received SQS event: ', JSON.stringify(event));
 
     validateEvent(event);
 
     const region = process.env.AWS_REGION;
-
     if (!region) {
-      console.error("AWS_REGION envvar not available");
+      console.error('AWS_REGION envvar not available');
       return;
     }
+    console.log(JSON.stringify({
+      serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_INITIATED,
+    }));
 
     debugLog(`Received valid SQS event (${event.Records.length} records)`);
 
     for await (const record of event.Records) {
       const id = record.messageId;
-      const dynamoRecord: DynamoDBRecord = JSON.parse(
-        record.body
-      ) as DynamoDBRecord;
+      currentLog = startingCurrentLog;
+      console.log(JSON.stringify({
+        eventId: id,
+        serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_INITIATED_FOR_RECORD_ID,
+      }));
 
-      debugLog("Original DynamoDB stream event body (parsed): ", dynamoRecord);
+      const dynamoRecord: DynamoDBRecord = JSON.parse(record.body) as DynamoDBRecord;
+
+      debugLog('Original DynamoDB stream event body (parsed): ', dynamoRecord);
 
       validateRecord(dynamoRecord);
 
       // parse source ARN
       const tableName: string = getTableNameFromArn(
-        dynamoRecord.eventSourceARN!
+        dynamoRecord.eventSourceARN!,
       );
+      if (tableName.includes('flat-tech-records')) {
+        transformTechRecord(dynamoRecord as _Record);
+        debugLog(`Dynamo Record after transformation: ${JSON.stringify(dynamoRecord)}`);
+
+        const technicalRecord: any = dynamoRecord.dynamodb?.NewImage;
+        const unmarshalledTechnicalRecord = unmarshall(technicalRecord);
+        updateLogEntry(currentLog, {
+          changeType: 'Technical Record Change',
+          identifier: unmarshalledTechnicalRecord.vehicleType === 'trl'
+            ? unmarshalledTechnicalRecord.trailerId
+            : unmarshalledTechnicalRecord.primaryVrm,
+          techRecordVIN: unmarshalledTechnicalRecord?.vin,
+          techRecordSystemNumber: unmarshalledTechnicalRecord?.systemNumber,
+          statusCode: unmarshalledTechnicalRecord.techRecord[0]?.statusCode,
+          serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_SUCCESSFUL,
+          eventId: id,
+        });
+      }
+      if (tableName.includes('test-result')) {
+        const testResult: any = dynamoRecord.dynamodb?.NewImage;
+        const unmarshalledTestResult = unmarshall(testResult);
+        console.log(JSON.stringify({
+          eventId: id,
+          TECH_RECORD: unmarshalledTestResult,
+        }));
+        updateLogEntry(currentLog, {
+          changeType: 'Test Record Change',
+          testResultId: unmarshalledTestResult.testResultId,
+          identifier: unmarshalledTestResult.vehicleType === 'trl'
+            ? unmarshalledTestResult.trailerId
+            : unmarshalledTestResult.vrm,
+          serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_SUCCESSFUL,
+          eventId: id,
+        });
+      }
 
       // is this an INSERT, UPDATE, or DELETE?
       const operationType: SqlOperation = deriveSqlOperation(
-        dynamoRecord.eventName!
+        dynamoRecord.eventName!,
       );
+
+      updateLogEntry(currentLog, { operationType });
+
+      addToLogManager(currentLog);
 
       // parse native DynamoDB format to usable TS map
       const image: DynamoDbImage = selectImage(
         operationType,
-        dynamoRecord.dynamodb!
+        dynamoRecord.dynamodb!,
       );
 
-      debugLog("Dynamo image dump:", image);
+      debugLog('Dynamo image dump:', image);
 
       try {
         debugLog(
-          `DynamoDB ---> Aurora | START (event ID: ${dynamoRecord.eventID})`
+          `DynamoDB ---> Aurora | START (event ID: ${dynamoRecord.eventID})`,
         );
 
         await convert(tableName, operationType, image);
+        printLogs();
+
+        clearLogs();
 
         debugLog(
-          `DynamoDB ---> Aurora | END   (event ID: ${dynamoRecord.eventID})`
+          `DynamoDB ---> Aurora | END   (event ID: ${dynamoRecord.eventID})`,
         );
       } catch (err) {
+        currentLog.serviceState = EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED;
         console.error(
           "Couldn't convert DynamoDB entity to Aurora, will return record to SQS for retry",
-          [`messageId: ${id}`, err]
+          {
+            id: `messageId: ${id}`,
+            error: err,
+            currentLog,
+          },
         );
         res.batchItemFailures.push({ itemIdentifier: id });
-        dumpArguments(event, context);
+        dumpArguments(event, context, currentLog);
       }
     }
   } catch (err) {
     console.error(
-      "An error unrelated to Dynamo-to-Aurora conversion has occurred, event will not be retried",
-      err
+      'An error unrelated to Dynamo-to-Aurora conversion has occurred, event will not be retried',
+      {
+        error: err,
+        ...currentLog,
+        serviceState: EventLoggingEnum.ENQUIRY_UPDATE_NOP_FAILED,
+      },
     );
-    dumpArguments(event, context);
+    dumpArguments(event, context, currentLog);
     await destroyConnectionPool();
   }
+  // eslint-disable-next-line consistent-return
   return res;
 };
 
-export const getTableNameFromArn = (eventSourceArn: string): string => {
-  return eventSourceArn.split(":")[5].split("/")[1];
-};
+export const getTableNameFromArn = (eventSourceArn: string): string => eventSourceArn.split(':')[5].split('/')[1];
 
 const selectImage = (
   operationType: SqlOperation,
-  streamRecord: StreamRecord
+  streamRecord: StreamRecord,
+  // eslint-disable-next-line consistent-return
 ): DynamoDbImage => {
+  // eslint-disable-next-line default-case
   switch (operationType) {
-    case "INSERT":
-    case "UPDATE":
+    case 'INSERT':
+    case 'UPDATE':
       if (!streamRecord.NewImage) {
         throw new Error("'dynamodb' object missing required field 'NewImage'");
       }
       debugLog(`operation type '${operationType}', selecting image 'NewImage'`);
-      return DynamoDbImage.parse(streamRecord.NewImage!);
-    case "DELETE":
+      return DynamoDbImage.parse(streamRecord.NewImage);
+    case 'DELETE':
       if (!streamRecord.OldImage) {
         throw new Error("'dynamodb' object missing required field 'OldImage'");
       }
       debugLog(`operation type '${operationType}', selecting image 'OldImage'`);
-      return DynamoDbImage.parse(streamRecord.OldImage!);
+      return DynamoDbImage.parse(streamRecord.OldImage);
   }
 };
 
 const validateEvent = (event: DynamoDBStreamEvent): void => {
   if (!event) {
-    throw new Error("event is null or undefined");
+    throw new Error('event is null or undefined');
   }
 
   if (!event.Records) {
@@ -133,13 +199,13 @@ const validateEvent = (event: DynamoDBStreamEvent): void => {
   }
 
   if (!Array.isArray(event.Records)) {
-    throw new Error("event.Records is not an array");
+    throw new Error('event.Records is not an array');
   }
 };
 
 const validateRecord = (record: DynamoDBRecord): void => {
   if (!record) {
-    throw new Error("record is null or undefined");
+    throw new Error('record is null or undefined');
   }
 
   if (!record.eventName) {
@@ -155,7 +221,13 @@ const validateRecord = (record: DynamoDBRecord): void => {
   }
 };
 
-const dumpArguments = (event: DynamoDBStreamEvent, context: Context): void => {
-  console.error("Event dump  : ", JSON.stringify(event));
-  console.error("Context dump: ", JSON.stringify(context));
+const dumpArguments = (event: DynamoDBStreamEvent, context: Context, currentLog: Partial<ILog> | null): void => {
+  console.error('Event dump  : ', {
+    currentLog,
+    event: JSON.stringify(event),
+  });
+  console.error('Context dump: ', {
+    currentLog,
+    context: JSON.stringify(context),
+  });
 };

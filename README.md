@@ -58,6 +58,12 @@ This will cause numerous debug logs to fire. Messages will include event informa
 ```shell
 npm run test
 ```
+Runs all unit tests
+
+```shell
+npm run test-all
+```
+Runs all the tests (Unit and Integration)
 
 ### Integration tests
 Integration tests depend on:
@@ -80,7 +86,7 @@ On Windows, you will need to manually run:
 * Confirm: `echo %USE_CONTAINERIZED_DATABASE%` should return `1`before the above, or run these tests with an IntelliJ configuration which sets the right environment variable for you.
 
 On Tanio Artino's advice, there is a distinction between running integration tests locally, and running them on Jenkins.
-* `USE_CONTAINERIZED_DATABASE=0` will attempt to talk to `localhost:3306`. This only works if you manually start a DB or, in the case of Jenkins, if there is a pre-existing DB running on port `3306`.
+* `USE_CONTAINERIZED_DATABASE=0` will attempt to talk to `127.0.0.1:3306`. This only works if you manually start a DB or, in the case of Jenkins, if there is a pre-existing DB running on port `3306`.
 * `USE_CONTAINERIZED_DATABASE=1` will spin up a TC container as described above.
 
 To run the "Jenkins" version, e.g. `USE_CONTAINERIZED_DATABASE=0`, use:

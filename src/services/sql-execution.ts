@@ -1,13 +1,13 @@
-import { executeSql, QueryResponse } from "./connection-pool";
-import { Connection } from "mysql2/promise";
-import { TableDetails } from "./table-details";
+import { Connection } from 'mysql2/promise';
+import { executeSql, QueryResponse } from './connection-pool';
+import { TableDetails } from './table-details';
 import {
   generateFullUpsertSql,
   generateSelectSql,
   generatePartialUpsertSql,
   generateSelectRecordIds,
   generateDeleteBasedOnWhereIn,
-} from "./sql-generation";
+} from './sql-generation';
 
 /**
  * Execute a "partial upsert" on a fingerprinted table:
@@ -23,14 +23,12 @@ import {
 export const executePartialUpsert = (
   tableDetails: TableDetails,
   templateVariables: any[],
-  connection: Connection
-): Promise<QueryResponse> => {
-  return executeSql(
-    generatePartialUpsertSql(tableDetails),
-    templateVariables,
-    connection
-  );
-};
+  connection: Connection,
+): Promise<QueryResponse> => executeSql(
+  generatePartialUpsertSql(tableDetails),
+  templateVariables,
+  connection,
+);
 
 /**
  * Execute a "select or partial upsert" on a fingerprinted table:
@@ -46,23 +44,22 @@ export const executePartialUpsert = (
 export const executePartialUpsertIfNotExists = async (
   tableDetails: TableDetails,
   templateVariables: any[],
-  connection: Connection
+  connection: Connection,
 ): Promise<QueryResponse> => {
   const selectResultSet = await executeSql(
     generateSelectSql(tableDetails),
     templateVariables,
-    connection
+    connection,
   );
 
   if (selectResultSet.rows.length === 0) {
     return executeSql(
       generatePartialUpsertSql(tableDetails),
       templateVariables,
-      connection
+      connection,
     );
-  } else {
-    return { rows: selectResultSet.rows[0], fields: selectResultSet.fields };
   }
+  return { rows: selectResultSet.rows[0], fields: selectResultSet.fields };
 };
 
 /**
@@ -77,14 +74,15 @@ export const executePartialUpsertIfNotExists = async (
 export const executeFullUpsert = async (
   tableDetails: TableDetails,
   templateVariables: any[],
-  connection: Connection
+  connection: Connection,
 ): Promise<QueryResponse> => {
+  // eslint-disable-next-line  no-param-reassign
   templateVariables = templateVariables.concat(templateVariables.slice());
 
   return executeSql(
     generateFullUpsertSql(tableDetails),
     templateVariables,
-    connection
+    connection,
   );
 };
 
@@ -92,27 +90,27 @@ export async function deleteBasedOnWhereIn(
   targetTableName: string,
   targetColumnName: string,
   ids: any[],
-  connection: Connection
+  connection: Connection,
 ): Promise<QueryResponse> {
   const values: any[] | undefined = Object.values(ids);
 
   return executeSql(
     generateDeleteBasedOnWhereIn(targetTableName, targetColumnName, ids),
     values,
-    connection
+    connection,
   );
 }
 
 export async function selectRecordIds(
   targetTableName: string,
   conditionAttributes: { [key: string]: any },
-  connection: Connection
+  connection: Connection,
 ): Promise<QueryResponse> {
   const values: any[] | undefined = Object.values(conditionAttributes);
 
   return executeSql(
     generateSelectRecordIds(targetTableName, conditionAttributes),
     values,
-    connection
+    connection,
   );
 }
