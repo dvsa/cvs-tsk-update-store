@@ -1,5 +1,5 @@
-import { DynamoDbImage } from "../services/dynamodb-images";
-import { Maybe } from "./optionals";
+import { DynamoDbImage } from '../services/dynamodb-images';
+import { Maybe } from './optionals';
 
 export interface Brakes {
   brakeCodeOriginal?: string;
@@ -17,12 +17,12 @@ export interface Brakes {
 }
 
 export type RetarderBrakeType =
-  | "electric"
-  | "exhaust"
-  | "friction"
-  | "hydraulic"
-  | "other"
-  | "none";
+  | 'electric'
+  | 'exhaust'
+  | 'friction'
+  | 'hydraulic'
+  | 'other'
+  | 'none';
 
 export interface BrakeForceWheelsNotLocked {
   serviceBrakeForceA?: number;
@@ -42,30 +42,30 @@ export const parseBrakes = (brakes?: DynamoDbImage): Maybe<Brakes> => {
   }
 
   const brakeForceWheelsNotLocked = parseBrakeForceWheelsNotLocked(
-    brakes.getMap("brakeForceWheelsNotLocked")
+    brakes.getMap('brakeForceWheelsNotLocked'),
   );
   const brakeForceWheelsUpToHalfLocked = parseBrakeForceWheelsUpToHalfLocked(
-    brakes.getMap("brakeForceWheelsUpToHalfLocked")
+    brakes.getMap('brakeForceWheelsUpToHalfLocked'),
   );
 
   return {
-    brakeCodeOriginal: brakes.getString("brakeCodeOriginal"),
-    brakeCode: brakes.getString("brakeCode"),
-    dataTrBrakeOne: brakes.getString("dataTrBrakeOne"),
-    dataTrBrakeTwo: brakes.getString("dataTrBrakeTwo"),
-    dataTrBrakeThree: brakes.getString("dataTrBrakeThree"),
-    retarderBrakeOne: brakes.getString("retarderBrakeOne") as RetarderBrakeType,
-    retarderBrakeTwo: brakes.getString("retarderBrakeTwo") as RetarderBrakeType,
-    dtpNumber: brakes.getString("dtpNumber"),
+    brakeCodeOriginal: brakes.getString('brakeCodeOriginal'),
+    brakeCode: brakes.getString('brakeCode'),
+    dataTrBrakeOne: brakes.getString('dataTrBrakeOne'),
+    dataTrBrakeTwo: brakes.getString('dataTrBrakeTwo'),
+    dataTrBrakeThree: brakes.getString('dataTrBrakeThree'),
+    retarderBrakeOne: brakes.getString('retarderBrakeOne') as RetarderBrakeType,
+    retarderBrakeTwo: brakes.getString('retarderBrakeTwo') as RetarderBrakeType,
+    dtpNumber: brakes.getString('dtpNumber'),
     brakeForceWheelsNotLocked,
     brakeForceWheelsUpToHalfLocked,
-    loadSensingValve: brakes.getBoolean("loadSensingValve"),
-    antilockBrakingSystem: brakes.getBoolean("antilockBrakingSystem"),
+    loadSensingValve: brakes.getBoolean('loadSensingValve'),
+    antilockBrakingSystem: brakes.getBoolean('antilockBrakingSystem'),
   };
 };
 
 const parseBrakeForceWheelsNotLocked = (
-  brakeForceWheelsNotLockedImage?: DynamoDbImage
+  brakeForceWheelsNotLockedImage?: DynamoDbImage,
 ): Maybe<BrakeForceWheelsNotLocked> => {
   if (!brakeForceWheelsNotLockedImage) {
     return undefined;
@@ -73,19 +73,19 @@ const parseBrakeForceWheelsNotLocked = (
 
   return {
     serviceBrakeForceA: brakeForceWheelsNotLockedImage.getNumber(
-      "serviceBrakeForceA"
+      'serviceBrakeForceA',
     ),
     secondaryBrakeForceA: brakeForceWheelsNotLockedImage.getNumber(
-      "secondaryBrakeForceA"
+      'secondaryBrakeForceA',
     ),
     parkingBrakeForceA: brakeForceWheelsNotLockedImage.getNumber(
-      "parkingBrakeForceA"
+      'parkingBrakeForceA',
     ),
   };
 };
 
 const parseBrakeForceWheelsUpToHalfLocked = (
-  brakeForceWheelsUpToHalfLockedImage?: DynamoDbImage
+  brakeForceWheelsUpToHalfLockedImage?: DynamoDbImage,
 ): Maybe<BrakeForceWheelsUpToHalfLocked> => {
   if (!brakeForceWheelsUpToHalfLockedImage) {
     return undefined;
@@ -93,13 +93,13 @@ const parseBrakeForceWheelsUpToHalfLocked = (
 
   return {
     serviceBrakeForceB: brakeForceWheelsUpToHalfLockedImage.getNumber(
-      "serviceBrakeForceB"
+      'serviceBrakeForceB',
     ),
     secondaryBrakeForceB: brakeForceWheelsUpToHalfLockedImage.getNumber(
-      "secondaryBrakeForceB"
+      'secondaryBrakeForceB',
     ),
     parkingBrakeForceB: brakeForceWheelsUpToHalfLockedImage.getNumber(
-      "parkingBrakeForceB"
+      'parkingBrakeForceB',
     ),
   };
 };

@@ -51,3 +51,6 @@ coverage/**
 
 #reports
 .reports/**
+
+# vscode specific files
+.vscode/**
