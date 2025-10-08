@@ -1,6 +1,6 @@
 // (disability discrimination act)
-import { DynamoDbImage } from "../services/dynamodb-images";
-import { Maybe } from "./optionals";
+import { DynamoDbImage } from '../services/dynamodb-images';
+import { Maybe } from './optionals';
 
 export interface Dda {
   certificateIssued?: boolean;
@@ -22,17 +22,17 @@ export const parseDda = (dda?: DynamoDbImage): Maybe<Dda> => {
     return undefined;
   }
   return {
-    certificateIssued: dda.getBoolean("certificateIssued"),
-    wheelchairCapacity: dda.getNumber("wheelchairCapacity"),
-    wheelchairFittings: dda.getString("wheelchairFittings"),
-    wheelchairLiftPresent: dda.getBoolean("wheelchairLiftPresent"),
-    wheelchairLiftInformation: dda.getString("wheelchairLiftInformation"),
-    wheelchairRampPresent: dda.getBoolean("wheelchairRampPresent"),
-    wheelchairRampInformation: dda.getString("wheelchairRampInformation"),
-    minEmergencyExits: dda.getNumber("minEmergencyExits"),
-    outswing: dda.getString("outswing"),
-    ddaSchedules: dda.getString("ddaSchedules"),
-    seatbeltsFitted: dda.getNumber("seatbeltsFitted"),
-    ddaNotes: dda.getString("ddaNotes"),
+    certificateIssued: dda.getBoolean('certificateIssued'),
+    wheelchairCapacity: dda.getNumber('wheelchairCapacity'),
+    wheelchairFittings: dda.getString('wheelchairFittings'),
+    wheelchairLiftPresent: dda.getBoolean('wheelchairLiftPresent'),
+    wheelchairLiftInformation: dda.getString('wheelchairLiftInformation'),
+    wheelchairRampPresent: dda.getBoolean('wheelchairRampPresent'),
+    wheelchairRampInformation: dda.getString('wheelchairRampInformation'),
+    minEmergencyExits: dda.getNumber('minEmergencyExits'),
+    outswing: dda.getString('outswing'),
+    ddaSchedules: dda.getString('ddaSchedules'),
+    seatbeltsFitted: dda.getNumber('seatbeltsFitted'),
+    ddaNotes: dda.getString('ddaNotes'),
   };
 };

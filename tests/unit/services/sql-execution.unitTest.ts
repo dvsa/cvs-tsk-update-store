@@ -4,84 +4,84 @@ import {
   executePartialUpsert,
   executePartialUpsertIfNotExists,
   selectRecordIds,
-} from "../../../src/services/sql-execution";
-import { executeSql } from "../../../src/services/connection-pool";
+} from '../../../src/services/sql-execution';
+import { executeSql } from '../../../src/services/connection-pool';
 import {
   CUSTOM_DEFECT_TABLE,
   TECHNICAL_RECORD_TABLE,
-} from "../../../src/services/table-details";
+} from '../../../src/services/table-details';
 import {
   generateDeleteBasedOnWhereIn,
   generateFullUpsertSql,
   generatePartialUpsertSql,
   generateSelectRecordIds,
   generateSelectSql,
-} from "../../../src/services/sql-generation";
+} from '../../../src/services/sql-generation';
 
-describe("executePartialUpsert()", () => {
-  it("should call partial upsert SQL generation", () => {
+describe('executePartialUpsert()', () => {
+  it('should call partial upsert SQL generation', () => {
     (generatePartialUpsertSql as jest.Mock) = jest
       .fn()
-      .mockReturnValue("SELECT 1");
+      .mockReturnValue('SELECT 1');
 
     (executeSql as jest.Mock) = jest.fn().mockResolvedValue({
       rows: [],
       fields: [],
     });
 
-    // @ts-ignore
+    // @ts-expect-error
     executePartialUpsert(TECHNICAL_RECORD_TABLE, [], undefined);
 
     expect(executeSql).toHaveBeenCalledTimes(1);
     expect(generatePartialUpsertSql).toHaveBeenCalledTimes(1);
-    expect(executeSql).toHaveBeenCalledWith("SELECT 1", [], undefined);
+    expect(executeSql).toHaveBeenCalledWith('SELECT 1', [], undefined);
   });
 });
 
-describe("executeFullUpsert()", () => {
-  it("should call partial upsert SQL generation", () => {
+describe('executeFullUpsert()', () => {
+  it('should call partial upsert SQL generation', () => {
     (generateFullUpsertSql as jest.Mock) = jest
       .fn()
-      .mockReturnValue("SELECT 1");
+      .mockReturnValue('SELECT 1');
 
     (executeSql as jest.Mock) = jest.fn().mockResolvedValue({
       rows: [],
       fields: [],
     });
 
-    // @ts-ignore
+    // @ts-expect-error
     executeFullUpsert(TECHNICAL_RECORD_TABLE, [], undefined);
 
     expect(executeSql).toHaveBeenCalledTimes(1);
     expect(generateFullUpsertSql).toHaveBeenCalledTimes(1);
-    expect(executeSql).toHaveBeenCalledWith("SELECT 1", [], undefined);
+    expect(executeSql).toHaveBeenCalledWith('SELECT 1', [], undefined);
   });
 });
 
-describe("executePartialUpsertIfNotExists()", () => {
-  it("should call partial upsert SQL generation if no row exists", () => {
-    (generateSelectSql as jest.Mock) = jest.fn().mockReturnValue("SELECT 1");
+describe('executePartialUpsertIfNotExists()', () => {
+  it('should call partial upsert SQL generation if no row exists', () => {
+    (generateSelectSql as jest.Mock) = jest.fn().mockReturnValue('SELECT 1');
     (generatePartialUpsertSql as jest.Mock) = jest
       .fn()
-      .mockReturnValue("INSERT INTO table_name () VALUES () ON DUPLICATE KEY");
+      .mockReturnValue('INSERT INTO table_name () VALUES () ON DUPLICATE KEY');
 
     (executeSql as jest.Mock) = jest.fn().mockResolvedValue({
       rows: [{ column: 1 }],
       fields: [],
     });
-    // @ts-ignore
+    // @ts-expect-error
     executePartialUpsertIfNotExists(TECHNICAL_RECORD_TABLE, [], undefined);
 
     expect(executeSql).toHaveBeenCalledTimes(1);
-    expect(executeSql).toHaveBeenCalledWith("SELECT 1", [], undefined);
+    expect(executeSql).toHaveBeenCalledWith('SELECT 1', [], undefined);
     expect(generateSelectSql).toHaveBeenCalledTimes(1);
   });
 
-  it("should call partial upsert SQL generation if row exists", () => {
-    (generateSelectSql as jest.Mock) = jest.fn().mockReturnValue("SELECT 1");
+  it('should call partial upsert SQL generation if row exists', () => {
+    (generateSelectSql as jest.Mock) = jest.fn().mockReturnValue('SELECT 1');
     (generatePartialUpsertSql as jest.Mock) = jest
       .fn()
-      .mockReturnValue("INSERT INTO table_name () VALUES () ON DUPLICATE KEY");
+      .mockReturnValue('INSERT INTO table_name () VALUES () ON DUPLICATE KEY');
 
     (executeSql as jest.Mock) = jest
       .fn()
@@ -93,51 +93,51 @@ describe("executePartialUpsertIfNotExists()", () => {
         rows: [{ column: 1 }],
         fields: [],
       });
-    // @ts-ignore
+    // @ts-expect-error
     executePartialUpsertIfNotExists(TECHNICAL_RECORD_TABLE, [], undefined);
 
     expect(executeSql).toHaveBeenCalledTimes(1);
-    expect(executeSql).toHaveBeenCalledWith("SELECT 1", [], undefined);
+    expect(executeSql).toHaveBeenCalledWith('SELECT 1', [], undefined);
     expect(generateSelectSql).toHaveBeenCalledTimes(1);
   });
 });
 
-describe("deleteBasedOnWhereIn()", () => {
-  it("should call generateDeleteBasedOnWhereIn", () => {
+describe('deleteBasedOnWhereIn()', () => {
+  it('should call generateDeleteBasedOnWhereIn', () => {
     (generateDeleteBasedOnWhereIn as jest.Mock) = jest
       .fn()
-      .mockReturnValue("DELETE 1");
+      .mockReturnValue('DELETE 1');
 
     (executeSql as jest.Mock) = jest.fn().mockResolvedValue({
       rows: [],
       fields: [],
     });
 
-    // @ts-ignore
-    deleteBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, "id", [], undefined);
+    // @ts-expect-error
+    deleteBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, 'id', [], undefined);
 
     expect(executeSql).toHaveBeenCalledTimes(1);
     expect(generateDeleteBasedOnWhereIn).toHaveBeenCalledTimes(1);
-    expect(executeSql).toHaveBeenCalledWith("DELETE 1", [], undefined);
+    expect(executeSql).toHaveBeenCalledWith('DELETE 1', [], undefined);
   });
 });
 
-describe("selectRecordIds()", () => {
-  it("should call generateSelectRecordIds", () => {
+describe('selectRecordIds()', () => {
+  it('should call generateSelectRecordIds', () => {
     (generateSelectRecordIds as jest.Mock) = jest
       .fn()
-      .mockReturnValue("SELECT 1");
+      .mockReturnValue('SELECT 1');
 
     (executeSql as jest.Mock) = jest.fn().mockResolvedValue({
       rows: [],
       fields: [],
     });
 
-    // @ts-ignore
+    // @ts-expect-error
     selectRecordIds(CUSTOM_DEFECT_TABLE.tableName, [], undefined);
 
     expect(executeSql).toHaveBeenCalledTimes(1);
     expect(generateSelectRecordIds).toHaveBeenCalledTimes(1);
-    expect(executeSql).toHaveBeenCalledWith("SELECT 1", [], undefined);
+    expect(executeSql).toHaveBeenCalledWith('SELECT 1', [], undefined);
   });
 });
