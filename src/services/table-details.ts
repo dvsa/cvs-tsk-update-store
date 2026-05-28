@@ -365,6 +365,21 @@ export const TEST_RESULT_TABLE: TableDetails = {
   ],
 };
 
+export const MEDIA_TYPE_TABLE: TableDetails = {
+  tableName: 'media_type',
+  columnNames: [ 'type' ],
+};
+
+export const DEFECT_MEDIA_TABLE: TableDetails = {
+  tableName: 'defect_media',
+  columnNames: [ 'test_defect_id', 'path', 'reason', 'media_type_id' ],
+};
+
+export const TEST_RESULT_MEDIA_TABLE: TableDetails = {
+  tableName: 'test_result_media',
+  columnNames: [ 'test_result_id', 'path', 'reason', 'media_type_id' ],
+};
+
 export const allTables = (): TableDetails[] => [
   VEHICLE_TABLE,
   MAKE_MODEL_TABLE,
@@ -389,4 +404,7 @@ export const allTables = (): TableDetails[] => [
   TEST_DEFECT_TABLE,
   CUSTOM_DEFECT_TABLE,
   TEST_RESULT_TABLE,
+  MEDIA_TYPE_TABLE,
+  DEFECT_MEDIA_TABLE,
+  TEST_RESULT_MEDIA_TABLE
 ];

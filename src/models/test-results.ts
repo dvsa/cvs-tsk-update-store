@@ -9,6 +9,7 @@ import {
 import { DynamoDbImage, parseStringArray } from '../services/dynamodb-images';
 import { debugLog } from '../services/logger';
 import { TestStationTypes } from "@dvsa/cvs-type-definitions/types/v1/enums/testStationType.enum";
+import { Medias, parseMedias } from './medias';
 
 export type TestVersion = 'current' | 'archived';
 
@@ -62,6 +63,7 @@ export interface TestResult {
   regnDate?: string;
   firstUseDate?: string;
   testTypes?: TestTypes;
+  medias: Medias;
 }
 
 export const parseTestResults = (image?: DynamoDbImage): TestResults => {
@@ -129,4 +131,5 @@ export const parseTestResult = (image: DynamoDbImage): TestResult => ({
   regnDate: image.getString('regnDate'),
   firstUseDate: image.getString('firstUseDate'),
   testTypes: parseTestTypes(image.getList('testTypes')),
+  medias: parseMedias(image.getList('media')),
 });
