@@ -6,6 +6,7 @@ import {
   generateSelectSql,
   generatePartialUpsertSql,
   generateSelectRecordIds,
+  generateSelectRecordIdsBasedOnWhereIn,
   generateDeleteBasedOnWhereIn,
 } from './sql-generation';
 
@@ -110,6 +111,21 @@ export async function selectRecordIds(
 
   return executeSql(
     generateSelectRecordIds(targetTableName, conditionAttributes),
+    values,
+    connection,
+  );
+}
+
+export async function selectRecordIdsBasedOnWhereIn(
+  targetTableName: string,
+  targetColumnName: string,
+  ids: any[],
+  connection: Connection,
+): Promise<QueryResponse> {
+  const values: any[] | undefined = Object.values(ids);
+
+  return executeSql(
+    generateSelectRecordIdsBasedOnWhereIn(targetTableName, targetColumnName, ids),
     values,
     connection,
   );

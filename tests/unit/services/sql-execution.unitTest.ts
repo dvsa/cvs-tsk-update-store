@@ -4,6 +4,7 @@ import {
   executePartialUpsert,
   executePartialUpsertIfNotExists,
   selectRecordIds,
+  selectRecordIdsBasedOnWhereIn,
 } from '../../../src/services/sql-execution';
 import { executeSql } from '../../../src/services/connection-pool';
 import {
@@ -15,6 +16,7 @@ import {
   generateFullUpsertSql,
   generatePartialUpsertSql,
   generateSelectRecordIds,
+  generateSelectRecordIdsBasedOnWhereIn,
   generateSelectSql,
 } from '../../../src/services/sql-generation';
 
@@ -138,6 +140,26 @@ describe('selectRecordIds()', () => {
 
     expect(executeSql).toHaveBeenCalledTimes(1);
     expect(generateSelectRecordIds).toHaveBeenCalledTimes(1);
+    expect(executeSql).toHaveBeenCalledWith('SELECT 1', [], undefined);
+  });
+});
+
+describe('selectRecordIdsBasedOnWhereIn()', () => {
+  it('should call generateSelectRecordIdsBasedOnWhereIn', () => {
+    (generateSelectRecordIdsBasedOnWhereIn as jest.Mock) = jest
+      .fn()
+      .mockReturnValue('SELECT 1');
+
+    (executeSql as jest.Mock) = jest.fn().mockResolvedValue({
+      rows: [],
+      fields: [],
+    });
+
+    // @ts-expect-error
+    selectRecordIdsBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, 'id', [], undefined);
+
+    expect(executeSql).toHaveBeenCalledTimes(1);
+    expect(generateSelectRecordIdsBasedOnWhereIn).toHaveBeenCalledTimes(1);
     expect(executeSql).toHaveBeenCalledWith('SELECT 1', [], undefined);
   });
 });

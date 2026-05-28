@@ -35,6 +35,7 @@ import {
   executePartialUpsert,
   executePartialUpsertIfNotExists,
   selectRecordIds,
+  selectRecordIdsBasedOnWhereIn,
 } from './sql-execution';
 import { getConnectionPool } from './connection-pool';
 import { EntityConverter } from './entity-conversion';
@@ -140,6 +141,24 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
           const testResultIds = existingTestResultIds.rows.map(
             (row: { id: any }) => row.id,
           );
+          const existingTestDefectIds = await selectRecordIdsBasedOnWhereIn(
+            TEST_DEFECT_TABLE.tableName,
+            'test_result_id',
+            testResultIds,
+            testResultConnection,
+          );
+          const testDefectIds = existingTestDefectIds.rows.map(
+            (row: { id: any }) => row.id,
+          );
+
+          if (testDefectIds.length > 0) {
+            await deleteBasedOnWhereIn(
+              DEFECT_MEDIA_TABLE.tableName,
+              'test_defect_id',
+              testDefectIds,
+              testResultConnection,
+            );
+          }
           await deleteBasedOnWhereIn(
             CUSTOM_DEFECT_TABLE.tableName,
             'test_result_id',
@@ -154,12 +173,6 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
           );
           await deleteBasedOnWhereIn(
             TEST_RESULT_MEDIA_TABLE.tableName,
-            'test_result_id',
-            testResultIds,
-            testResultConnection,
-          );
-          await deleteBasedOnWhereIn(
-            DEFECT_MEDIA_TABLE.tableName,
             'test_result_id',
             testResultIds,
             testResultConnection,
@@ -613,7 +626,7 @@ const upsertDefects = async (
 
     const testDefectId = insertTestDefectResponse.rows.insertId;
 
-    debugLog('upsertTestResults: Upserted defect test-defect mapping (Test Defect ID: ${testDefectId})');
+    debugLog(`upsertTestResults: Upserted defect test-defect mapping (Test Defect ID: ${testDefectId})`);
 
     await upsertMedias(
       connection,
@@ -659,11 +672,17 @@ const upsertMediaType = async (
 ): Promise<number> => {
   debugLog(`upsertTestResults: Upserting media type (${type})...`);
 
-  const response = await executePartialUpsertIfNotExists(
-    MEDIA_TYPE_TABLE,
-    [type],
+  const existingMediaTypeIds = await selectRecordIds(
+    MEDIA_TYPE_TABLE.tableName,
+    { type },
     connection,
   );
+
+  if (existingMediaTypeIds.rows.length > 0) {
+    return existingMediaTypeIds.rows[0].id;
+  }
+
+  const response = await executePartialUpsert(MEDIA_TYPE_TABLE, [type], connection);
 
   debugLog(
     `upsertTestResults: Upserted media type (ID: ${response.rows.insertId})`,
@@ -687,7 +706,7 @@ const upsertMedias = async (
 
     const mediaTypeId = await upsertMediaType(connection, media.type);
 
-    debugLog('upsertTestResults: Upserting ${targetTable.tableName} media...');
+    debugLog(`upsertTestResults: Upserting ${targetTable.tableName} media...`);
 
     const response = await executePartialUpsert(
       targetTable,

@@ -3,6 +3,7 @@ import {
   generateFullUpsertSql,
   generatePartialUpsertSql,
   generateSelectRecordIds,
+  generateSelectRecordIdsBasedOnWhereIn,
   generateSelectSql,
 } from '../../../src/services/sql-generation';
 
@@ -83,6 +84,22 @@ describe('generateSelectRecordIds', () => {
 
     const expectedQuery = 'SELECT id FROM test_result WHERE vehicle_id=? AND testResultId=?';
     const result = generateSelectRecordIds(targetTableName, attributes);
+    expect(result).toEqual(expectedQuery);
+  });
+});
+
+describe('generateSelectRecordIdsBasedOnWhereIn', () => {
+  it('should construct a correct Select SQL query, based on WHERE IN clause', () => {
+    const targetTableName = 'test_defect';
+    const targetColumnName = 'test_result_id';
+    const ids = [1, 3, 5, 6];
+
+    const expectedQuery = 'SELECT id FROM test_defect WHERE test_result_id IN (?,?,?,?)';
+    const result = generateSelectRecordIdsBasedOnWhereIn(
+      targetTableName,
+      targetColumnName,
+      ids,
+    );
     expect(result).toEqual(expectedQuery);
   });
 });
