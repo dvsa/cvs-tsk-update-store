@@ -2,13 +2,20 @@ import { DynamoDbImage } from '../services/dynamodb-images';
 
 export type Medias = Media[];
 
-export type MediaType = 'failReason';
+export type MediaType = 'failReason' | 'image' | 'video';
 
-export interface Media {
+export interface FailReasonMedia {
   path: string;
   reason: string;
-  type: MediaType;
+  type: 'failReason';
 }
+
+export interface FileMedia {
+  path: string;
+  type: 'image' | 'video';
+}
+
+export type Media = FailReasonMedia | FileMedia;
 
 export const parseMedias = (image?: DynamoDbImage): Medias => {
   if (!image) {
@@ -27,10 +34,18 @@ export const parseMedias = (image?: DynamoDbImage): Medias => {
 export const parseMedia = (
     image: DynamoDbImage,
 ): Media => {
+  const type = image.getString('type')! as MediaType;
+
+  if (type === 'failReason') {
+    return {
+      path: image.getString('path')!,
+      reason: image.getString('reason')!,
+      type,
+    };
+  }
 
   return {
     path: image.getString('path')!,
-    reason: image.getString('reason')!,
-    type: image.getString('type')! as MediaType,
+    type,
   };
 };

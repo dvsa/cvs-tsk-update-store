@@ -713,7 +713,7 @@ const upsertMedias = async (
       [
         targetId,
         media.path,
-        media.reason,
+        media.type === 'failReason' ? media.reason : null,
         mediaTypeId,
       ],
       connection,

@@ -145,6 +145,65 @@ describe('convertTestResults() integration tests with media', () => {
     expect(oldDefectMediaSet.rows).toHaveLength(0);
   });
 
+  it('should correctly convert image and video media without reasons into Aurora rows', async () => {
+    const deserializedJson = unmarshall(testResultsJsonWithMedia);
+    deserializedJson.media = [
+      {
+        path: 'test-result-media-image-1.jpg',
+        type: 'image',
+      },
+      {
+        path: 'test-result-media-video-1.mp4',
+        type: 'video',
+      },
+    ];
+    deserializedJson.testTypes[0].defects[0].media = [
+      {
+        path: 'defect-media-image-1.jpg',
+        type: 'image',
+      },
+      {
+        path: 'defect-media-video-1.mp4',
+        type: 'video',
+      },
+    ];
+
+    await processStreamEvent(buildEvent(marshall(deserializedJson), 'MODIFY'), exampleContext(), jest.fn());
+
+    const testResultSet = await executeSql(
+      `SELECT id FROM test_result WHERE testResultId = "${testResultId}"`,
+    );
+    expect(testResultSet.rows).toHaveLength(2);
+
+    const testResultMediaSet = await selectTestResultMedia();
+    expect(testResultMediaSet.rows).toHaveLength(testResultSet.rows.length * 2);
+    testResultMediaSet.rows.forEach((row: any) => {
+      expect(row.reason).toBeNull();
+    });
+    expect(testResultMediaSet.rows.filter((row: any) => (
+      row.path === 'test-result-media-image-1.jpg'
+      && row.type === 'image'
+    ))).toHaveLength(testResultSet.rows.length);
+    expect(testResultMediaSet.rows.filter((row: any) => (
+      row.path === 'test-result-media-video-1.mp4'
+      && row.type === 'video'
+    ))).toHaveLength(testResultSet.rows.length);
+
+    const defectMediaSet = await selectDefectMedia();
+    expect(defectMediaSet.rows).toEqual([
+      {
+        path: 'defect-media-image-1.jpg',
+        reason: null,
+        type: 'image',
+      },
+      {
+        path: 'defect-media-video-1.mp4',
+        reason: null,
+        type: 'video',
+      },
+    ]);
+  });
+
   function buildEvent(newImage: any, eventName = 'INSERT') {
     return {
       Records: [
