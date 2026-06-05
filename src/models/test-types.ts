@@ -27,6 +27,41 @@ export type FuelType =
   | 'petrol'
   | 'full electric';
 
+export type VehicleLoadStatus =
+  | 'Unladen'
+  | 'Partially laden'
+  | 'Partially laden 50% to 65%'
+  | 'Fully laden'
+  | 'Load simulated partially laden'
+  | 'Load simulated fully laden';
+
+export type UnladenBodyType =
+  | 'Skeletal'
+  | 'Curtain'
+  | 'Fridge'
+  | 'Box'
+  | 'Tank'
+  | 'Flat'
+  | 'Car transporter'
+  | 'Fixed plant'
+  | 'Tipper'
+  | 'Refuge'
+  | 'Street cleaner'
+  | 'Specialised vehicle/trailer'
+  | 'Other';
+
+export type ReasonForNotLoading =
+  | 'Obnoxious load'
+  | 'Tanker'
+  | 'Perishable goods'
+  | 'Livestock'
+  | 'Car transporter'
+  | 'Refuge'
+  | 'Street cleaner'
+  | 'ULTAST'
+  | 'Specialist body/load'
+  | 'Other';
+
 export type TestTypes = TestType[];
 
 export interface TestType {
@@ -64,6 +99,12 @@ export interface TestType {
   smokeTestKLimitApplied?: string;
   defects?: Defects;
   customDefects?: CustomDefects;
+  load_status?: VehicleLoadStatus;
+  unladen_body_type?: UnladenBodyType;
+  other_unladen_body_type?: string;
+  reason_for_not_loading?: ReasonForNotLoading;
+  other_reason_for_not_loading?: string;
+  partially_laden_reason?: string;
 }
 
 export const parseTestTypes = (image?: DynamoDbImage): TestTypes => {
@@ -121,4 +162,10 @@ export const parseTestType = (image: DynamoDbImage): TestType => ({
   smokeTestKLimitApplied: image.getString('smokeTestKLimitApplied'),
   defects: parseDefects(image.getList('defects')),
   customDefects: parseCustomDefects(image.getList('customDefects')),
+  load_status: image.getString('load_status') as VehicleLoadStatus,
+  unladen_body_type: image.getString('unladen_body_type') as UnladenBodyType,
+  other_unladen_body_type: image.getString('other_unladen_body_type'),
+  reason_for_not_loading: image.getString('reason_for_not_loading') as ReasonForNotLoading,
+  other_reason_for_not_loading: image.getString('other_reason_for_not_loading'),
+  partially_laden_reason: image.getString('partially_laden_reason'),
 });
