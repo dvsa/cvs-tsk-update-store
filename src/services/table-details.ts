@@ -367,17 +367,37 @@ export const TEST_RESULT_TABLE: TableDetails = {
 
 export const MEDIA_TYPE_TABLE: TableDetails = {
   tableName: 'media_type',
-  columnNames: [ 'type' ],
+  columnNames: ['type'],
 };
 
 export const DEFECT_MEDIA_TABLE: TableDetails = {
   tableName: 'defect_media',
-  columnNames: [ 'test_defect_id', 'path', 'reason', 'media_type_id' ],
+  columnNames: ['test_defect_id', 'path', 'reason', 'media_type_id'],
 };
 
 export const TEST_RESULT_MEDIA_TABLE: TableDetails = {
   tableName: 'test_result_media',
-  columnNames: [ 'test_result_id', 'path', 'reason', 'media_type_id' ],
+  columnNames: ['test_result_id', 'path', 'reason', 'media_type_id'],
+};
+
+export const LOAD_STATUE_TABLE: TableDetails = {
+  tableName: 'load_status',
+  columnNames: ['load_status'],
+};
+
+export const UNLADEN_BODY_TYPE_TABLE: TableDetails = {
+  tableName: 'unladen_body_type',
+  columnNames: ['unladen_body_type'],
+};
+
+export const REASON_FOR_NOT_LOADING_TABLE: TableDetails = {
+  tableName: 'reason_for_not_loading',
+  columnNames: ['reason_for_not_loading'],
+};
+
+export const VEHICLE_LOAD_STATUS_TABLE: TableDetails = {
+  tableName: 'vehicle_load_status',
+  columnNames: ['test_type_id', 'load_status_id', 'unladen_body_type_id', 'other_unladen_body_type', 'reason_for_not_loading_id', 'other_reason_for_not_loading', 'partially_laden_reason'],
 };
 
 export const allTables = (): TableDetails[] => [
@@ -406,5 +426,9 @@ export const allTables = (): TableDetails[] => [
   TEST_RESULT_TABLE,
   MEDIA_TYPE_TABLE,
   DEFECT_MEDIA_TABLE,
-  TEST_RESULT_MEDIA_TABLE
+  TEST_RESULT_MEDIA_TABLE,
+  LOAD_STATUE_TABLE,
+  UNLADEN_BODY_TYPE_TABLE,
+  REASON_FOR_NOT_LOADING_TABLE,
+  VEHICLE_LOAD_STATUS_TABLE,
 ];
