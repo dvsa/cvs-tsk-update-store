@@ -24,6 +24,10 @@ import {
   VEHICLE_CLASS_TABLE,
   VEHICLE_SUBCLASS_TABLE,
   VEHICLE_TABLE,
+  LOAD_STATUE_TABLE,
+  UNLADEN_BODY_TYPE_TABLE,
+  REASON_FOR_NOT_LOADING_TABLE,
+  VEHICLE_LOAD_STATUS_TABLE,
 } from './table-details';
 import {
   deleteBasedOnWhereIn,
@@ -123,6 +127,58 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
         testResult.lastUpdatedByName!,
       );
 
+      if (!process.env.DISABLE_DELETE_ON_UPDATE) {
+        const existingTestResultIds = await selectRecordIds(
+          TEST_RESULT_TABLE.tableName,
+          { vehicle_id: vehicleId, testResultId: testResult.testResultId },
+          testResultConnection,
+        );
+        if (existingTestResultIds.rows.length > 0) {
+          await testResultConnection.beginTransaction();
+
+          const testResultIds = existingTestResultIds.rows.map(
+            (row: { id: any }) => row.id,
+          );
+          const testResultIdPlaceholders = testResultIds.map(() => '?').join(', ');
+          const [existingTestTypeRows] = await testResultConnection.execute(
+            `SELECT test_type_id FROM ${TEST_RESULT_TABLE.tableName} WHERE id IN (${testResultIdPlaceholders})`,
+            testResultIds,
+          );
+          const testTypeIds = (existingTestTypeRows as { test_type_id: any }[])
+            .map((row) => row.test_type_id)
+            .filter((id) => id != null);
+
+          await deleteBasedOnWhereIn(
+            CUSTOM_DEFECT_TABLE.tableName,
+            'test_result_id',
+            testResultIds,
+            testResultConnection,
+          );
+          await deleteBasedOnWhereIn(
+            TEST_DEFECT_TABLE.tableName,
+            'test_result_id',
+            testResultIds,
+            testResultConnection,
+          );
+          if (testTypeIds.length > 0) {
+            await deleteBasedOnWhereIn(
+              VEHICLE_LOAD_STATUS_TABLE.tableName,
+              'test_type_id',
+              testTypeIds,
+              testResultConnection,
+            );
+          }
+          await deleteBasedOnWhereIn(
+            TEST_RESULT_TABLE.tableName,
+            'id',
+            testResultIds,
+            testResultConnection,
+          );
+
+          await testResultConnection.commit();
+        }
+      }
+
       if (!testResult.testTypes || testResult.testTypes.length < 1) {
         await executeFullUpsert(
           TEST_RESULT_TABLE,
@@ -219,6 +275,7 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
           testType,
         );
         const testTypeId = await upsertTestType(testResultConnection, testType);
+        await upsertVehicleLoadStatus(testResultConnection, testType, testTypeId);
 
         debugLog('upsertTestResults: Upserting test result...');
 
@@ -610,4 +667,119 @@ const upsertCustomDefects = async (
       `upsertTestResults: Upserted custom defect (ID: ${response.rows.insertId})`,
     );
   }
+};
+
+const upsertLoadStatus = async (
+  connection: Connection,
+  load_status: string,
+): Promise<number> => {
+  debugLog(`upsertTestResults: Upserting load status (${load_status})...`);
+
+  const existingLoadStatusIds = await selectRecordIds(
+    LOAD_STATUE_TABLE.tableName,
+    { load_status },
+    connection,
+  );
+
+  if (existingLoadStatusIds.rows.length > 0) {
+    return existingLoadStatusIds.rows[0].id;
+  }
+
+  const response = await executePartialUpsert(LOAD_STATUE_TABLE, [load_status], connection);
+
+  debugLog(
+    `upsertTestResults: Upserted load status (ID: ${response.rows.insertId})`,
+  );
+
+  return response.rows.insertId;
+};
+
+const upsertUnladenBodyType = async (
+  connection: Connection,
+  unladen_body_type: string,
+): Promise<number> => {
+  debugLog(`upsertTestResults: Upserting unladen body type (${unladen_body_type})...`);
+
+  const existingUnladenBodyTypeIds = await selectRecordIds(
+    UNLADEN_BODY_TYPE_TABLE.tableName,
+    { unladen_body_type },
+    connection,
+  );
+
+  if (existingUnladenBodyTypeIds.rows.length > 0) {
+    return existingUnladenBodyTypeIds.rows[0].id;
+  }
+
+  const response = await executePartialUpsert(UNLADEN_BODY_TYPE_TABLE, [unladen_body_type], connection);
+
+  debugLog(
+    `upsertTestResults: Upserted unladen body type (ID: ${response.rows.insertId})`,
+  );
+
+  return response.rows.insertId;
+};
+
+const upsertReasonForNotLoading = async (
+  connection: Connection,
+  reason_for_not_loading: string,
+): Promise<number> => {
+  debugLog(`upsertTestResults: Upserting reason for not loading (${reason_for_not_loading})...`);
+
+  const existingReasonForNotLoadingIds = await selectRecordIds(
+    REASON_FOR_NOT_LOADING_TABLE.tableName,
+    { reason_for_not_loading },
+    connection,
+  );
+
+  if (existingReasonForNotLoadingIds.rows.length > 0) {
+    return existingReasonForNotLoadingIds.rows[0].id;
+  }
+
+  const response = await executePartialUpsert(REASON_FOR_NOT_LOADING_TABLE, [reason_for_not_loading], connection);
+
+  debugLog(
+    `upsertTestResults: Upserted reason for not loading (ID: ${response.rows.insertId})`,
+  );
+
+  return response.rows.insertId;
+};
+
+const upsertVehicleLoadStatus = async (
+  connection: Connection,
+  testType: TestType,
+  testTypeId: number,
+): Promise<number> => {
+  debugLog('upsertTestResults: Upserting test type vehicle load status...');
+
+  // REASON_FOR_NOT_LOADING_TABLE,
+
+  const loadStatusId = testType.load_status != null
+    ? await upsertLoadStatus(connection, testType.load_status)
+    : null;
+  const unladenBodyTypeId = testType.unladen_body_type != null
+    ? await upsertUnladenBodyType(connection, testType.unladen_body_type)
+    : null;
+  const reasonForNotLoadingId = testType.reason_for_not_loading != null
+    ? await upsertReasonForNotLoading(connection, testType.reason_for_not_loading)
+    : null;
+
+  const response = await executePartialUpsert(
+    VEHICLE_LOAD_STATUS_TABLE,
+    [
+      testTypeId,
+      loadStatusId,
+      unladenBodyTypeId,
+      testType.other_unladen_body_type,
+      reasonForNotLoadingId,
+      testType.other_reason_for_not_loading,
+      testType.partially_laden_reason,
+    ],
+    connection,
+  );
+
+  debugLog(
+    `upsertTestResults: Upserted test type vehicle load status (ID: ${response.rows.insertId})`,
+  );
+
+  return response.rows.insertId;
 };
