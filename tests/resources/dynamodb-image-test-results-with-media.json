@@ -6,7 +6,7 @@
     "S": "VRM-MEDIA"
   },
   "trailerId": {
-    "S": "TRL-MEDIA"
+    "S": "TRLMEDIA"
   },
   "vin": {
     "S": "VIN-MEDIA"
