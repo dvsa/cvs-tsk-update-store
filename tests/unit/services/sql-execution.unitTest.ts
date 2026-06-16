@@ -105,7 +105,7 @@ describe('executePartialUpsertIfNotExists()', () => {
 });
 
 describe('deleteBasedOnWhereIn()', () => {
-  it('should call generateDeleteBasedOnWhereIn', () => {
+  it('should call generateDeleteBasedOnWhereIn', async () => {
     (generateDeleteBasedOnWhereIn as jest.Mock) = jest
       .fn()
       .mockReturnValue('DELETE 1');
@@ -116,11 +116,23 @@ describe('deleteBasedOnWhereIn()', () => {
     });
 
     // @ts-expect-error
-    deleteBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, 'id', [], undefined);
+    await deleteBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, 'id', [1], undefined);
 
     expect(executeSql).toHaveBeenCalledTimes(1);
     expect(generateDeleteBasedOnWhereIn).toHaveBeenCalledTimes(1);
-    expect(executeSql).toHaveBeenCalledWith('DELETE 1', [], undefined);
+    expect(executeSql).toHaveBeenCalledWith('DELETE 1', [1], undefined);
+  });
+
+  it('should not execute SQL when there are no IDs to delete', async () => {
+    (generateDeleteBasedOnWhereIn as jest.Mock) = jest.fn();
+    (executeSql as jest.Mock) = jest.fn();
+
+    // @ts-expect-error
+    const result = await deleteBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, 'id', [], undefined);
+
+    expect(result).toEqual({ rows: [], fields: [] });
+    expect(executeSql).not.toHaveBeenCalled();
+    expect(generateDeleteBasedOnWhereIn).not.toHaveBeenCalled();
   });
 });
 
