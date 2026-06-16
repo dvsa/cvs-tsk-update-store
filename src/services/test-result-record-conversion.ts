@@ -60,6 +60,9 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
     return;
   }
 
+  debugLog("test result received for insert");
+  debugLog(JSON.stringify(testResults));
+
   const pool = await getConnectionPool();
 
   debugLog(`Upserting ${testResults.length} test results`);
@@ -719,6 +722,7 @@ const upsertMedias = async (
   medias: Medias,
 ): Promise<void> => {
   if (!medias || medias.length < 1) {
+    debugLog('no media found to insert');
     return;
   }
 
