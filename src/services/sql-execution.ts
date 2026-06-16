@@ -94,6 +94,10 @@ export async function deleteBasedOnWhereIn(
   ids: any[],
   connection: Connection,
 ): Promise<QueryResponse> {
+  if (ids.length === 0) {
+    return { rows: [], fields: [] };
+  }
+
   const values: any[] | undefined = Object.values(ids);
 
   return executeSql(
