@@ -38,6 +38,7 @@ import {
   executeFullUpsert,
   executePartialUpsert,
   executePartialUpsertIfNotExists,
+  selectColumnBasedOnWhereIn,
   selectRecordIds,
   selectRecordIdsBasedOnWhereIn,
 } from './sql-execution';
@@ -157,14 +158,16 @@ const upsertTestResults = async (testResults: TestResults): Promise<void> => {
           const testDefectIds = existingTestDefectIds.rows.map(
             (row: { id: any }) => row.id,
           );
-          const testResultIdPlaceholders = testResultIds.map(() => '?').join(', ');
-          const [existingTestTypeRows] = await testResultConnection.execute(
-            `SELECT test_type_id FROM ${TEST_RESULT_TABLE.tableName} WHERE id IN (${testResultIdPlaceholders})`,
+          const existingTestTypeRows = await selectColumnBasedOnWhereIn(
+            TEST_RESULT_TABLE.tableName,
+            'test_type_id',
+            'id',
             testResultIds,
+            testResultConnection,
           );
-          const testTypeIds = (existingTestTypeRows as { test_type_id: any }[])
-            .map((row) => row.test_type_id)
-            .filter((id) => id != null);
+          const testTypeIds = existingTestTypeRows.rows
+            .map((row: { test_type_id: any }) => row.test_type_id)
+            .filter((id: any) => id != null);
 
           if (testDefectIds.length > 0) {
             await deleteBasedOnWhereIn(
@@ -829,10 +832,20 @@ const upsertVehicleLoadStatus = async (
   connection: Connection,
   testType: TestType,
   testTypeId: number,
-): Promise<number> => {
+): Promise<void> => {
   debugLog('upsertTestResults: Upserting test type vehicle load status...');
 
-  // REASON_FOR_NOT_LOADING_TABLE,
+  if (
+    testType.load_status == null
+    && testType.unladen_body_type == null
+    && testType.other_unladen_body_type == null
+    && testType.reason_for_not_loading == null
+    && testType.other_reason_for_not_loading == null
+    && testType.partially_laden_reason == null
+  ) {
+    debugLog('upsertTestResults: No vehicle load status found to insert');
+    return;
+  }
 
   const loadStatusId = testType.load_status != null
     ? await upsertLoadStatus(connection, testType.load_status)
@@ -861,6 +874,4 @@ const upsertVehicleLoadStatus = async (
   debugLog(
     `upsertTestResults: Upserted test type vehicle load status (ID: ${response.rows.insertId})`,
   );
-
-  return response.rows.insertId;
 };

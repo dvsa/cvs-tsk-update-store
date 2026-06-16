@@ -1,69 +1,69 @@
 {
   "systemNumber": {
-    "S": "SYSTEM-NUMBER-LOAD-STATUS"
+    "S": "SYSTEM-NUMBER-4"
   },
   "vrm": {
-    "S": "VRM-LOAD-STATUS"
+    "S": "VRM-4"
   },
   "trailerId": {
-    "S": "TRL-LOAD-STATUS"
+    "S": "TRL-4"
   },
   "vin": {
-    "S": "VIN-LOAD-STATUS"
+    "S": "VIN-4"
   },
   "vehicleId": {
-    "S": "VEHICLE-ID-LOAD-STATUS"
+    "S": "VEHICLE-ID"
   },
   "testHistory": {
     "L": []
   },
   "testVersion": {
-    "S": "TEST-VERSION-LOAD-STATUS"
+    "S": "TEST-VERSION-4"
   },
   "reasonForCreation": {
-    "S": "REASON-FOR-CREATION-LOAD-STATUS"
+    "S": "REASON-FOR-CREATION-4"
   },
   "createdAt": {
     "S": "2020-01-01T00:00:00.000Z"
   },
   "createdByName": {
-    "S": "CREATED-BY-NAME-LOAD-STATUS"
+    "S": "CREATED-BY-NAME-4"
   },
   "createdById": {
-    "S": "CREATED-BY-ID-LOAD-STATUS"
+    "S": "CREATED-BY-ID-4"
   },
   "lastUpdatedAt": {
     "S": "2020-01-01T00:00:00.000Z"
   },
   "lastUpdatedByName": {
-    "S": "LAST-UPDATED-BY-NAME-LOAD-STATUS"
+    "S": "LAST-UPDATED-BY-NAME-4"
   },
   "lastUpdatedById": {
-    "S": "LAST-UPDATED-BY-ID-LOAD-STATUS"
+    "S": "LAST-UPDATED-BY-ID-4"
   },
   "shouldEmailCertificate": {
-    "S": "SHOULD-EMAIL-CERTIFICATE-LOAD-STATUS"
+    "S": "SHOULD-EMAIL-CERTIFICATE-4"
   },
   "testStationName": {
-    "S": "TEST-STATION-NAME-LOAD-STATUS"
+    "S": "TEST-STATION-NAME-4"
   },
   "testStationPNumber": {
-    "S": "P-NUMBER-LOAD-STATUS"
+    "S": "P-NUMBER-4"
   },
   "testStationType": {
     "S": "atf"
   },
   "testerName": {
-    "S": "TESTER-NAME-LOAD-STATUS"
+    "S": "TESTER-NAME-4"
   },
   "testerStaffId": {
-    "S": "999999997"
+    "S": "999999998"
   },
   "testResultId": {
-    "S": "TEST-RESULT-ID-LOAD-STATUS"
+    "S": "TEST-RESULT-ID-4"
   },
   "testerEmailAddress": {
-    "S": "TESTER-EMAIL-ADDRESS-LOAD-STATUS"
+    "S": "TESTER-EMAIL-ADDRESS-4"
   },
   "testStartTimestamp": {
     "S": "2020-01-01T00:00:00.000Z"
@@ -75,7 +75,7 @@
     "S": "submitted"
   },
   "reasonForCancellation": {
-    "S": "REASON-FOR-CANCELLATION-LOAD-STATUS"
+    "S": "REASON-FOR-CANCELLATION-4"
   },
   "vehicleClass": {
     "M": {
@@ -110,10 +110,10 @@
     "S": "KILOMETRES"
   },
   "preparerId": {
-    "S": "999999997"
+    "S": "999999998"
   },
   "preparerName": {
-    "S": "PREPARER-NAME-LOAD-STATUS"
+    "S": "PREPARER-NAME-4"
   },
   "numberOfWheelsDriven": {
     "N": "1"
@@ -122,7 +122,7 @@
     "S": "m1"
   },
   "countryOfRegistration": {
-    "S": "COUNTRY-OF-REGISTRATION-LOAD-STATUS"
+    "S": "COUNTRY-OF-REGISTRATION-4"
   },
   "vehicleSize": {
     "S": "large"
@@ -156,7 +156,7 @@
             "S": "Annual With Certificate"
           },
           "testTypeName": {
-            "S": "Annual test with load status"
+            "S": "TEST-TYPE-NAME"
           },
           "name": {
             "S": "Annual test"
@@ -254,7 +254,7 @@
             "S": "2020-01-01T00:00:00.000Z"
           },
           "testCode": {
-            "S": "334"
+            "S": "aav"
           },
           "testTypeClassification": {
             "S": "Annual With Certificate"

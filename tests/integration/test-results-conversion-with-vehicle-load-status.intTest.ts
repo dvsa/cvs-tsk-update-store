@@ -18,7 +18,7 @@ describe('convertTestResults() integration tests with vehicle load status', () =
   let container: StartedTestContainer;
   const testResultsJsonWithVehicleLoadStatus = JSON.parse(
     JSON.stringify(
-      require('../resources/dynamodb-image-test-result-with-vehicle-load-status.json'),
+      require('../resources/dynamodb-image-test-results-with-vehicle-load-status.json'),
     ),
   );
   const testResultId = testResultsJsonWithVehicleLoadStatus.testResultId.S;
@@ -66,15 +66,6 @@ describe('convertTestResults() integration tests with vehicle load status', () =
         reason_for_not_loading: 'Tanker',
         other_reason_for_not_loading: 'LOAD-OTHER-REASON',
         partially_laden_reason: 'LOAD-PARTIAL-REASON',
-      },
-      {
-        testNumber: 'LOAD-STATUS-2',
-        load_status: null,
-        unladen_body_type: null,
-        other_unladen_body_type: null,
-        reason_for_not_loading: null,
-        other_reason_for_not_loading: null,
-        partially_laden_reason: null,
       },
     ]);
 
