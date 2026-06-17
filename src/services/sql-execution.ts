@@ -10,6 +10,7 @@ import {
   generateSelectColumnBasedOnWhereIn,
   generateDeleteBasedOnWhereIn,
 } from './sql-generation';
+import { debugLog } from './logger';
 
 /**
  * Execute a "partial upsert" on a fingerprinted table:
@@ -95,16 +96,21 @@ export async function deleteBasedOnWhereIn(
   connection: Connection,
 ): Promise<QueryResponse> {
   if (ids.length === 0) {
+    debugLog(`There is no record to be deleted from ${targetTableName}.`);
     return { rows: [], fields: [] };
   }
 
   const values: any[] | undefined = Object.values(ids);
 
-  return executeSql(
+  const result = await executeSql(
     generateDeleteBasedOnWhereIn(targetTableName, targetColumnName, ids),
     values,
     connection,
   );
+
+  debugLog(`Records with value(s) [${ids.join(', ')}] for "${targetColumnName}" field are removed from ${targetTableName}`);
+
+  return result;
 }
 
 export async function selectRecordIds(

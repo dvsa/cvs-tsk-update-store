@@ -105,7 +105,14 @@ describe('executePartialUpsertIfNotExists()', () => {
 });
 
 describe('deleteBasedOnWhereIn()', () => {
+  afterEach(() => {
+    delete process.env.DEBUG;
+    jest.restoreAllMocks();
+  });
+
   it('should call generateDeleteBasedOnWhereIn', async () => {
+    process.env.DEBUG = 'true';
+    const consoleSpy = jest.spyOn(console, 'info').mockImplementation();
     (generateDeleteBasedOnWhereIn as jest.Mock) = jest
       .fn()
       .mockReturnValue('DELETE 1');
@@ -121,9 +128,15 @@ describe('deleteBasedOnWhereIn()', () => {
     expect(executeSql).toHaveBeenCalledTimes(1);
     expect(generateDeleteBasedOnWhereIn).toHaveBeenCalledTimes(1);
     expect(executeSql).toHaveBeenCalledWith('DELETE 1', [1], undefined);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      `Records with value(s) [1] for "id" field are removed from ${CUSTOM_DEFECT_TABLE.tableName}`,
+      [],
+    );
   });
 
   it('should not execute SQL when there are no IDs to delete', async () => {
+    process.env.DEBUG = 'true';
+    const consoleSpy = jest.spyOn(console, 'info').mockImplementation();
     (generateDeleteBasedOnWhereIn as jest.Mock) = jest.fn();
     (executeSql as jest.Mock) = jest.fn();
 
@@ -133,6 +146,10 @@ describe('deleteBasedOnWhereIn()', () => {
     expect(result).toEqual({ rows: [], fields: [] });
     expect(executeSql).not.toHaveBeenCalled();
     expect(generateDeleteBasedOnWhereIn).not.toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      `There is no record to be deleted from ${CUSTOM_DEFECT_TABLE.tableName}.`,
+      [],
+    );
   });
 });
 
