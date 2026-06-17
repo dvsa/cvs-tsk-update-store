@@ -66,6 +66,15 @@ export const generateSelectRecordIdsBasedOnWhereIn = (
   conditionAttributes,
 ).map(() => '?')})`;
 
+export const generateSelectColumnBasedOnWhereIn = (
+  targetTableName: string,
+  selectedColumnName: string,
+  targetColumnName: string,
+  conditionAttributes: any[],
+): string => `SELECT ${selectedColumnName} FROM ${targetTableName} WHERE ${targetColumnName} IN (${Object.entries(
+  conditionAttributes,
+).map(() => '?')})`;
+
 const generateUpsertSql = (
   tableDetails: TableDetails,
   updatePlaceholders: string[],

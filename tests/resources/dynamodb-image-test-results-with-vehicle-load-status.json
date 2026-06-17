@@ -1,0 +1,299 @@
+{
+  "systemNumber": {
+    "S": "SYSTEM-NUMBER-4"
+  },
+  "vrm": {
+    "S": "VRM-4"
+  },
+  "trailerId": {
+    "S": "TRL-4"
+  },
+  "vin": {
+    "S": "VIN-4"
+  },
+  "vehicleId": {
+    "S": "VEHICLE-ID"
+  },
+  "testHistory": {
+    "L": []
+  },
+  "testVersion": {
+    "S": "TEST-VERSION-4"
+  },
+  "reasonForCreation": {
+    "S": "REASON-FOR-CREATION-4"
+  },
+  "createdAt": {
+    "S": "2020-01-01T00:00:00.000Z"
+  },
+  "createdByName": {
+    "S": "CREATED-BY-NAME-4"
+  },
+  "createdById": {
+    "S": "CREATED-BY-ID-4"
+  },
+  "lastUpdatedAt": {
+    "S": "2020-01-01T00:00:00.000Z"
+  },
+  "lastUpdatedByName": {
+    "S": "LAST-UPDATED-BY-NAME-4"
+  },
+  "lastUpdatedById": {
+    "S": "LAST-UPDATED-BY-ID-4"
+  },
+  "shouldEmailCertificate": {
+    "S": "SHOULD-EMAIL-CERTIFICATE-4"
+  },
+  "testStationName": {
+    "S": "TEST-STATION-NAME-4"
+  },
+  "testStationPNumber": {
+    "S": "P-NUMBER-4"
+  },
+  "testStationType": {
+    "S": "atf"
+  },
+  "testerName": {
+    "S": "TESTER-NAME-4"
+  },
+  "testerStaffId": {
+    "S": "999999998"
+  },
+  "testResultId": {
+    "S": "TEST-RESULT-ID-4"
+  },
+  "testerEmailAddress": {
+    "S": "TESTER-EMAIL-ADDRESS-4"
+  },
+  "testStartTimestamp": {
+    "S": "2020-01-01T00:00:00.000Z"
+  },
+  "testEndTimestamp": {
+    "S": "2020-01-01T00:00:00.000Z"
+  },
+  "testStatus": {
+    "S": "submitted"
+  },
+  "reasonForCancellation": {
+    "S": "REASON-FOR-CANCELLATION-4"
+  },
+  "vehicleClass": {
+    "M": {
+      "code": {
+        "S": "v"
+      },
+      "description": {
+        "S": "heavy goods vehicle"
+      }
+    }
+  },
+  "vehicleSubclass": {
+    "L": [
+      {
+        "S": "2"
+      }
+    ]
+  },
+  "vehicleType": {
+    "S": "hgv"
+  },
+  "numberOfSeats": {
+    "N": "1"
+  },
+  "vehicleConfiguration": {
+    "S": "rigid"
+  },
+  "odometerReading": {
+    "N": "1"
+  },
+  "odometerReadingUnits": {
+    "S": "KILOMETRES"
+  },
+  "preparerId": {
+    "S": "999999998"
+  },
+  "preparerName": {
+    "S": "PREPARER-NAME-4"
+  },
+  "numberOfWheelsDriven": {
+    "N": "1"
+  },
+  "euVehicleCategory": {
+    "S": "m1"
+  },
+  "countryOfRegistration": {
+    "S": "COUNTRY-OF-REGISTRATION-4"
+  },
+  "vehicleSize": {
+    "S": "large"
+  },
+  "noOfAxles": {
+    "N": "4"
+  },
+  "regnDate": {
+    "S": "2020-01-01"
+  },
+  "firstUseDate": {
+    "S": "2020-01-01"
+  },
+  "testTypes": {
+    "L": [
+      {
+        "M": {
+          "createdAt": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "lastUpdatedAt": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "deletionFlag": {
+            "BOOL": true
+          },
+          "testCode": {
+            "S": "333"
+          },
+          "testTypeClassification": {
+            "S": "Annual With Certificate"
+          },
+          "testTypeName": {
+            "S": "TEST-TYPE-NAME"
+          },
+          "name": {
+            "S": "Annual test"
+          },
+          "testTypeId": {
+            "S": "94"
+          },
+          "testNumber": {
+            "S": "LOAD-STATUS-1"
+          },
+          "certificateNumber": {
+            "S": "LOAD-CERT-1"
+          },
+          "secondaryCertificateNumber": {
+            "S": "LOAD-CERT-2"
+          },
+          "certificateLink": {
+            "S": "CERTIFICATE-LINK"
+          },
+          "testExpiryDate": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "testAnniversaryDate": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "testTypeStartTimestamp": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "testTypeEndTimestamp": {
+            "S": "2020-01-01T16:54:44.123Z"
+          },
+          "statusUpdatedFlag": {
+            "BOOL": true
+          },
+          "numberOfSeatbeltsFitted": {
+            "N": "1"
+          },
+          "lastSeatbeltInstallationCheckDate": {
+            "S": "2020-01-01"
+          },
+          "seatbeltInstallationCheckDate": {
+            "BOOL": true
+          },
+          "testResult": {
+            "S": "pass"
+          },
+          "prohibitionIssued": {
+            "BOOL": false
+          },
+          "additionalNotesRecorded": {
+            "S": "ADDITIONAL-NOTES-RECORDED"
+          },
+          "modType": {
+            "M": {
+              "code": {
+                "S": "p"
+              },
+              "description": {
+                "S": "particulate trap"
+              }
+            }
+          },
+          "emissionStandard": {
+            "S": "0.10 g/kWh Euro 3 PM"
+          },
+          "fuelType": {
+            "S": "diesel"
+          },
+          "load_status": {
+            "S": "Unladen"
+          },
+          "unladen_body_type": {
+            "S": "Box"
+          },
+          "other_unladen_body_type": {
+            "S": "LOAD-OTHER-BODY"
+          },
+          "reason_for_not_loading": {
+            "S": "Tanker"
+          },
+          "other_reason_for_not_loading": {
+            "S": "LOAD-OTHER-REASON"
+          },
+          "partially_laden_reason": {
+            "S": "LOAD-PARTIAL-REASON"
+          }
+        }
+      },
+      {
+        "M": {
+          "createdAt": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "lastUpdatedAt": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "testCode": {
+            "S": "aav"
+          },
+          "testTypeClassification": {
+            "S": "Annual With Certificate"
+          },
+          "testTypeName": {
+            "S": "Annual test without load status"
+          },
+          "name": {
+            "S": "Annual test"
+          },
+          "testTypeId": {
+            "S": "95"
+          },
+          "testNumber": {
+            "S": "LOAD-STATUS-2"
+          },
+          "certificateNumber": {
+            "S": "LOAD-CERT-3"
+          },
+          "testExpiryDate": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "testAnniversaryDate": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "testTypeStartTimestamp": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "testTypeEndTimestamp": {
+            "S": "2020-01-01T17:54:44.123Z"
+          },
+          "testResult": {
+            "S": "pass"
+          },
+          "prohibitionIssued": {
+            "BOOL": false
+          }
+        }
+      }
+    ]
+  }
+}
