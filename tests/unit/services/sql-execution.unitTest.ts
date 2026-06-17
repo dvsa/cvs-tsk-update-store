@@ -4,6 +4,7 @@ import {
   executePartialUpsert,
   executePartialUpsertIfNotExists,
   selectRecordIds,
+  selectRecordIdsBasedOnWhereIn,
 } from '../../../src/services/sql-execution';
 import { executeSql } from '../../../src/services/connection-pool';
 import {
@@ -15,6 +16,7 @@ import {
   generateFullUpsertSql,
   generatePartialUpsertSql,
   generateSelectRecordIds,
+  generateSelectRecordIdsBasedOnWhereIn,
   generateSelectSql,
 } from '../../../src/services/sql-generation';
 
@@ -103,7 +105,14 @@ describe('executePartialUpsertIfNotExists()', () => {
 });
 
 describe('deleteBasedOnWhereIn()', () => {
-  it('should call generateDeleteBasedOnWhereIn', () => {
+  afterEach(() => {
+    delete process.env.DEBUG;
+    jest.restoreAllMocks();
+  });
+
+  it('should call generateDeleteBasedOnWhereIn', async () => {
+    process.env.DEBUG = 'true';
+    const consoleSpy = jest.spyOn(console, 'info').mockImplementation();
     (generateDeleteBasedOnWhereIn as jest.Mock) = jest
       .fn()
       .mockReturnValue('DELETE 1');
@@ -114,11 +123,33 @@ describe('deleteBasedOnWhereIn()', () => {
     });
 
     // @ts-expect-error
-    deleteBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, 'id', [], undefined);
+    await deleteBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, 'id', [1], undefined);
 
     expect(executeSql).toHaveBeenCalledTimes(1);
     expect(generateDeleteBasedOnWhereIn).toHaveBeenCalledTimes(1);
-    expect(executeSql).toHaveBeenCalledWith('DELETE 1', [], undefined);
+    expect(executeSql).toHaveBeenCalledWith('DELETE 1', [1], undefined);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      `Records with value(s) [1] for "id" field are removed from ${CUSTOM_DEFECT_TABLE.tableName}`,
+      [],
+    );
+  });
+
+  it('should not execute SQL when there are no IDs to delete', async () => {
+    process.env.DEBUG = 'true';
+    const consoleSpy = jest.spyOn(console, 'info').mockImplementation();
+    (generateDeleteBasedOnWhereIn as jest.Mock) = jest.fn();
+    (executeSql as jest.Mock) = jest.fn();
+
+    // @ts-expect-error
+    const result = await deleteBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, 'id', [], undefined);
+
+    expect(result).toEqual({ rows: [], fields: [] });
+    expect(executeSql).not.toHaveBeenCalled();
+    expect(generateDeleteBasedOnWhereIn).not.toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      `There is no record to be deleted from ${CUSTOM_DEFECT_TABLE.tableName}.`,
+      [],
+    );
   });
 });
 
@@ -138,6 +169,26 @@ describe('selectRecordIds()', () => {
 
     expect(executeSql).toHaveBeenCalledTimes(1);
     expect(generateSelectRecordIds).toHaveBeenCalledTimes(1);
+    expect(executeSql).toHaveBeenCalledWith('SELECT 1', [], undefined);
+  });
+});
+
+describe('selectRecordIdsBasedOnWhereIn()', () => {
+  it('should call generateSelectRecordIdsBasedOnWhereIn', () => {
+    (generateSelectRecordIdsBasedOnWhereIn as jest.Mock) = jest
+      .fn()
+      .mockReturnValue('SELECT 1');
+
+    (executeSql as jest.Mock) = jest.fn().mockResolvedValue({
+      rows: [],
+      fields: [],
+    });
+
+    // @ts-expect-error
+    selectRecordIdsBasedOnWhereIn(CUSTOM_DEFECT_TABLE.tableName, 'id', [], undefined);
+
+    expect(executeSql).toHaveBeenCalledTimes(1);
+    expect(generateSelectRecordIdsBasedOnWhereIn).toHaveBeenCalledTimes(1);
     expect(executeSql).toHaveBeenCalledWith('SELECT 1', [], undefined);
   });
 });

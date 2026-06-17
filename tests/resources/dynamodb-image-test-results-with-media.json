@@ -1,0 +1,478 @@
+{
+  "systemNumber": {
+    "S": "SYSTEM-NUMBER-MEDIA"
+  },
+  "vrm": {
+    "S": "VRM-MEDIA"
+  },
+  "trailerId": {
+    "S": "TRLMEDIA"
+  },
+  "vin": {
+    "S": "VIN-MEDIA"
+  },
+  "vehicleId": {
+    "S": "VEHICLE-ID"
+  },
+  "testHistory": {
+    "L": []
+  },
+  "testVersion": {
+    "S": "TEST-VERSION-3"
+  },
+  "reasonForCreation": {
+    "S": "REASON-FOR-CREATION-3"
+  },
+  "createdAt": {
+    "S": "2020-01-01T00:00:00.000Z"
+  },
+  "createdByName": {
+    "S": "CREATED-BY-NAME-3"
+  },
+  "createdById": {
+    "S": "CREATED-BY-ID-3"
+  },
+  "lastUpdatedAt": {
+    "S": "2020-01-01T00:00:00.000Z"
+  },
+  "lastUpdatedByName": {
+    "S": "LAST-UPDATED-BY-NAME-3"
+  },
+  "lastUpdatedById": {
+    "S": "LAST-UPDATED-BY-ID-3"
+  },
+  "shouldEmailCertificate": {
+    "S": "SHOULD-EMAIL-CERTIFICATE-3"
+  },
+  "testStationName": {
+    "S": "TEST-STATION-NAME-3"
+  },
+  "testStationPNumber": {
+    "S": "P-NUMBER-3"
+  },
+  "testStationType": {
+    "S": "atf"
+  },
+  "testerName": {
+    "S": "TESTER-NAME-3"
+  },
+  "testerStaffId": {
+    "S": "999999998"
+  },
+  "testResultId": {
+    "S": "TEST-RESULT-ID-MEDIA"
+  },
+  "testerEmailAddress": {
+    "S": "TESTER-EMAIL-ADDRESS-3"
+  },
+  "testStartTimestamp": {
+    "S": "2020-01-01T00:00:00.000Z"
+  },
+  "testEndTimestamp": {
+    "S": "2020-01-01T00:00:00.000Z"
+  },
+  "testStatus": {
+    "S": "submitted"
+  },
+  "reasonForCancellation": {
+    "S": "REASON-FOR-CANCELLATION-3"
+  },
+  "vehicleClass": {
+    "M": {
+      "code": {
+        "S": "v"
+      },
+      "description": {
+        "S": "heavy goods vehicle"
+      }
+    }
+  },
+  "vehicleSubclass": {
+    "L": [
+      {
+        "S": "2"
+      }
+    ]
+  },
+  "vehicleType": {
+    "S": "hgv"
+  },
+  "numberOfSeats": {
+    "N": "1"
+  },
+  "vehicleConfiguration": {
+    "S": "rigid"
+  },
+  "odometerReading": {
+    "N": "1"
+  },
+  "odometerReadingUnits": {
+    "S": "KILOMETRES"
+  },
+  "preparerId": {
+    "S": "999999998"
+  },
+  "preparerName": {
+    "S": "PREPARER-NAME-3"
+  },
+  "numberOfWheelsDriven": {
+    "N": "1"
+  },
+  "euVehicleCategory": {
+    "S": "m1"
+  },
+  "countryOfRegistration": {
+    "S": "COUNTRY-OF-REGISTRATION-3"
+  },
+  "vehicleSize": {
+    "S": "large"
+  },
+  "noOfAxles": {
+    "N": "4"
+  },
+  "regnDate": {
+    "S": "2020-01-01"
+  },
+  "firstUseDate": {
+    "S": "2020-01-01"
+  },
+  "media": {
+    "L": [
+      {
+        "M": {
+          "path": {
+            "S": "test-result-media-path-1.jpg"
+          },
+          "reason": {
+            "S": "TEST-RESULT-MEDIA-REASON"
+          },
+          "type": {
+            "S": "failReason"
+          }
+        }
+      }
+    ]
+  },
+  "testTypes": {
+    "L": [
+      {
+        "M": {
+          "createdAt": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "lastUpdatedAt": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "deletionFlag": {
+            "BOOL": true
+          },
+          "testCode": {
+            "S": "333"
+          },
+          "testTypeClassification": {
+            "S": "2323232323232323232323"
+          },
+          "testTypeName": {
+            "S": "TEST-TYPE-NAME"
+          },
+          "name": {
+            "S": "NAME"
+          },
+          "testTypeId": {
+            "S": "TEST-TYPE-ID"
+          },
+          "testNumber": {
+            "S": "TEST-NUMBER"
+          },
+          "certificateNumber": {
+            "S": "CERTIFICATE-NO"
+          },
+          "secondaryCertificateNumber": {
+            "S": "2ND-CERTIFICATE-NO"
+          },
+          "certificateLink": {
+            "S": "CERTIFICATE-LINK"
+          },
+          "testExpiryDate": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "testAnniversaryDate": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "testTypeStartTimestamp": {
+            "S": "2020-01-01T00:00:00.000Z"
+          },
+          "testTypeEndTimestamp": {
+            "S": "2020-01-01T16:54:44.123Z"
+          },
+          "statusUpdatedFlag": {
+            "BOOL": true
+          },
+          "numberOfSeatbeltsFitted": {
+            "N": "1"
+          },
+          "lastSeatbeltInstallationCheckDate": {
+            "S": "2020-01-01"
+          },
+          "seatbeltInstallationCheckDate": {
+            "BOOL": true
+          },
+          "testResult": {
+            "S": "fail"
+          },
+          "prohibitionIssued": {
+            "BOOL": true
+          },
+          "reasonForAbandoning": {
+            "S": "REASON-FOR-ABANDONING"
+          },
+          "additionalNotesRecorded": {
+            "S": "ADDITIONAL-NOTES-RECORDED"
+          },
+          "additionalCommentsForAbandon": {
+            "S": "ADDITIONAL-COMMENTS-FOR-ABANDON"
+          },
+          "modType": {
+            "M": {
+              "code": {
+                "S": "p"
+              },
+              "description": {
+                "S": "particulate trap"
+              }
+            }
+          },
+          "emissionStandard": {
+            "S": "0.10 g/kWh Euro 3 PM"
+          },
+          "fuelType": {
+            "S": "diesel"
+          },
+          "particulateTrapFitted": {
+            "S": "PARTICULATE-TRAP-FITTED"
+          },
+          "particulateTrapSerialNumber": {
+            "S": "PARTICULATE-TRAP-SERIAL-NUMBER"
+          },
+          "modificationTypeUsed": {
+            "S": "MODIFICATION-TYPE-USED"
+          },
+          "smokeTestKLimitApplied": {
+            "S": "SMOKE-TEST-K-LIMIT-APPLIED"
+          },
+          "defects": {
+            "L": [
+              {
+                "M": {
+                  "imNumber": {
+                    "N": "3"
+                  },
+                  "imDescription": {
+                    "S": "IM-DESCRIPTION-3"
+                  },
+                  "additionalInformation": {
+                    "M": {
+                      "location": {
+                        "M": {
+                          "vertical": {
+                            "S": "upper"
+                          },
+                          "horizontal": {
+                            "S": "inner"
+                          },
+                          "lateral": {
+                            "S": "nearside"
+                          },
+                          "longitudinal": {
+                            "S": "front"
+                          },
+                          "rowNumber": {
+                            "N": "1"
+                          },
+                          "seatNumber": {
+                            "N": "1"
+                          },
+                          "axleNumber": {
+                            "N": "1"
+                          }
+                        }
+                      },
+                      "notes": {
+                        "S": "NOTES"
+                      }
+                    }
+                  },
+                  "itemNumber": {
+                    "N": "1"
+                  },
+                  "itemDescription": {
+                    "S": "ITEM-DESCRIPTION-3"
+                  },
+                  "deficiencyRef": {
+                    "S": "DEFICIENCY-REF-3"
+                  },
+                  "deficiencyId": {
+                    "S": "a"
+                  },
+                  "deficiencySubId": {
+                    "S": "mdclxvi"
+                  },
+                  "deficiencyCategory": {
+                    "S": "advisory"
+                  },
+                  "deficiencyText": {
+                    "S": "DEFICIENCY-TEXT-3"
+                  },
+                  "stdForProhibition": {
+                    "BOOL": true
+                  },
+                  "prs": {
+                    "BOOL": true
+                  },
+                  "prohibitionIssued": {
+                    "BOOL": true
+                  },
+                  "media": {
+                    "L": [
+                      {
+                        "M": {
+                          "path": {
+                            "S": "defect-media-path-1.jpg"
+                          },
+                          "reason": {
+                            "S": "DEFECT-MEDIA-REASON"
+                          },
+                          "type": {
+                            "S": "failReason"
+                          }
+                        }
+                      },
+                      {
+                        "M": {
+                          "path": {
+                            "S": "defect-media-path-2.jpg"
+                          },
+                          "reason": {
+                            "S": "SECOND-DEFECT-MEDIA-REASON"
+                          },
+                          "type": {
+                            "S": "failReason"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "customDefects": {
+            "L": [
+              {
+                "M": {
+                  "referenceNumber": {
+                    "S": "def3"
+                  },
+                  "defectName": {
+                    "S": "DEFECT-NAME-3"
+                  },
+                  "defectNotes": {
+                    "S": "DEFECT-NOTES-3"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "M": {
+          "additionalCommentsForAbandon": {
+            "NULL": true
+          },
+          "additionalNotesRecorded": {
+            "S": "No emission plate default 0.70"
+          },
+          "certificateNumber": {
+            "S": "W123123"
+          },
+          "createdAt": {
+            "S": "2021-06-21T12:59:08.000Z"
+          },
+          "customDefects": {
+            "NULL": true
+          },
+          "defects": {
+            "L": []
+          },
+          "emissionStandard": {
+            "NULL": true
+          },
+          "fuelType": {
+            "NULL": true
+          },
+          "lastUpdatedAt": {
+            "S": "2021-06-21T12:59:08.000Z"
+          },
+          "modificationTypeUsed": {
+            "NULL": true
+          },
+          "modType": {
+            "NULL": true
+          },
+          "name": {
+            "S": "Annual test"
+          },
+          "particulateTrapFitted": {
+            "NULL": true
+          },
+          "particulateTrapSerialNumber": {
+            "NULL": true
+          },
+          "prohibitionIssued": {
+            "BOOL": false
+          },
+          "reasonForAbandoning": {
+            "NULL": true
+          },
+          "secondaryCertificateNumber": {
+            "NULL": true
+          },
+          "smokeTestKLimitApplied": {
+            "NULL": true
+          },
+          "testAnniversaryDate": {
+            "S": "2022-06-30T00:00:00.000Z"
+          },
+          "testCode": {
+            "S": "aav"
+          },
+          "testExpiryDate": {
+            "S": "2022-06-30T00:00:00.000Z"
+          },
+          "testNumber": {
+            "S": "W123123"
+          },
+          "testResult": {
+            "S": "pass"
+          },
+          "testTypeClassification": {
+            "S": "Annual With Certificate"
+          },
+          "testTypeEndTimestamp": {
+            "S": "2021-06-21T12:59:07.000Z"
+          },
+          "testTypeId": {
+            "S": "94"
+          },
+          "testTypeName": {
+            "S": "Annual test"
+          },
+          "testTypeStartTimestamp": {
+            "S": "2021-06-21T12:07:22.000Z"
+          }
+        }
+      }
+    ]
+  }
+}

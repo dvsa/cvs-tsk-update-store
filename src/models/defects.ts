@@ -1,5 +1,6 @@
 import { DynamoDbImage } from '../services/dynamodb-images';
 import { Maybe } from './optionals';
+import { Medias, parseMedias } from './medias';
 
 export type DeficiencyCategory = 'advisory' | 'dangerous' | 'major' | 'minor';
 
@@ -42,6 +43,7 @@ export interface Defect {
   stdForProhibition?: boolean;
   prs?: boolean;
   prohibitionIssued?: boolean;
+  medias: Medias;
 }
 
 export type CustomDefects = CustomDefect[];
@@ -98,6 +100,7 @@ export const parseDefect = (image: DynamoDbImage): Defect => ({
   stdForProhibition: image.getBoolean('stdForProhibition'),
   prs: image.getBoolean('prs'),
   prohibitionIssued: image.getBoolean('prohibitionIssued'),
+  medias: parseMedias(image.getList('media')),
 });
 
 export const parseDefectAdditionalInformation = (

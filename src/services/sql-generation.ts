@@ -58,6 +58,14 @@ export const generateSelectRecordIds = (
   .map(([key]) => `${key}=?`)
   .join(' AND ')}`;
 
+export const generateSelectRecordIdsBasedOnWhereIn = (
+  targetTableName: string,
+  targetColumnName: string,
+  conditionAttributes: any[],
+): string => `SELECT id FROM ${targetTableName} WHERE ${targetColumnName} IN (${Object.entries(
+  conditionAttributes,
+).map(() => '?')})`;
+
 const generateUpsertSql = (
   tableDetails: TableDetails,
   updatePlaceholders: string[],
